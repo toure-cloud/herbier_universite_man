@@ -1,0 +1,3 @@
+<template><div class="management-page"><h1>Gestion des statistiques</h1><p>Page en construction - Interface complète à venir</p><router-link to="/dashboard" class="btn-primary">Retour au tableau de bord</router-link></div></template>
+<script>import { useAuthStore } from '../stores/auth'; export default { name: 'StatsManagement', methods: { async logout() { await useAuthStore().logout(); this.$router.push('/login') } } }</script>
+<style scoped>.management-page { padding: 40px; text-align: center; } .btn-primary { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #32CD32; color: white; text-decoration: none; border-radius: 10px; }</style>

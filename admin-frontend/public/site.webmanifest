@@ -1,0 +1,14 @@
+{
+  "name": "Herbier Administration",
+  "short_name": "HerbierAdmin",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#2d5016",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
