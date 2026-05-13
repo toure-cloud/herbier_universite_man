@@ -4,7 +4,7 @@
         <section class="hero-section">
             <div class="slideshow-container">
                 <div class="slide fade" v-for="(slide, index) in slides" :key="index" v-show="currentSlide === index">
-                    <img :src="getImageUrl(slide.image)" :alt="slide.titre">
+                    <img :src="slide.image" :alt="slide.titre">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
                         <div class="slide-badge">{{ slide.titre }}</div>
@@ -30,7 +30,7 @@
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="/src/images/president.png" alt="Président de l'Université de Man">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Président de l'Université de Man">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -104,7 +104,7 @@
                     <div class="expertise-text" data-aos="fade-right">
                         <span class="section-badge">Notre Expertise</span>
                         <h2>Une équipe de<br>botanistes passionnés</h2>
-                        <p>Fort d'une expérience de plus de 07 ans dans le domaine de la botanique tropicale, notre équipe met son savoir-faire au service de la connaissance et de la préservation de la flore.</p>
+                        <p>Fort d'une expérience de plus de 10 ans dans le domaine de la botanique tropicale, notre équipe met son savoir-faire au service de la connaissance et de la préservation de la flore.</p>
                         <div class="expertise-features">
                             <div class="feature">
                                 <i class="fas fa-check-circle"></i>
@@ -134,7 +134,7 @@
                             <div class="stat-label">Années d'existence</div>
                         </div>
                         <div class="stat-big">
-                            <div class="stat-number-count">1000+</div>
+                            <div class="stat-number-count">5000+</div>
                             <div class="stat-label">Spécimens</div>
                         </div>
                         <div class="stat-big">
@@ -189,7 +189,7 @@
                 <div v-else class="team-grid">
                     <div class="team-card" v-for="(membre, index) in equipe" :key="membre.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="team-image">
-                            <img :src="getImageUrl(membre.photo)" :alt="membre.nom">
+                            <img :src="membre.photo || 'https://randomuser.me/api/portraits/men/1.jpg'" :alt="membre.nom">
                             <div class="team-overlay">
                                 <div class="team-social">
                                     <a :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
@@ -229,7 +229,7 @@
                 <div v-else class="partenaires-grid">
                     <div class="partenaire-card" v-for="(partenaire, index) in partenaires" :key="partenaire.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="partenaire-logo">
-                            <img :src="getImageUrl(partenaire.logo)" :alt="partenaire.nom">
+                            <img :src="partenaire.logo || 'https://via.placeholder.com/80x80?text=Logo'" :alt="partenaire.nom">
                         </div>
                         <div class="partenaire-info">
                             <h4>{{ partenaire.nom }}</h4>
@@ -295,6 +295,7 @@ export default {
             partenaires: [],
             loading: true,
             partenairesLoading: true,
+            apiUrl: 'https://herbier-universite-man.onrender.com',
             services: [
                 {
                     titre: "Identification",
@@ -342,56 +343,86 @@ export default {
     methods: {
         async fetchSlides() {
             try {
-                const response = await axios.get('http://localhost:8000/api/slides/')
-                if (response.data.length > 0) {
+                const response = await axios.get(`${this.apiUrl}/api/slides/`)
+                if (response.data && response.data.length > 0) {
                     this.slides = response.data
                 } else {
-                    // Slides par défaut
-                    this.slides = [
-                        { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
-                        { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 5000 spécimens." },
-                        { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
-                    ]
+                    this.setDefaultSlides()
                 }
             } catch (error) {
                 console.error('Erreur chargement slides:', error)
-                this.slides = [
-                    { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
-                    { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 1000 spécimens." },
-                    { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
-                ]
+                this.setDefaultSlides()
             }
+        },
+        
+        setDefaultSlides() {
+            this.slides = [
+                { 
+                    image: "https://images.pexels.com/photos/247431/pexels-photo-247431.jpeg?w=1920", 
+                    titre: "La Biodiversité des Montagnes", 
+                    texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée avec des espèces endémiques remarquables." 
+                },
+                { 
+                    image: "https://images.pexels.com/photos/450060/pexels-photo-450060.jpeg?w=1920", 
+                    titre: "Collection Botanique", 
+                    texte_botanique: "Notre herbier conserve plus de 5000 spécimens de plantes de la région du Tonkpi." 
+                },
+                { 
+                    image: "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?w=1920", 
+                    titre: "Recherche et Conservation", 
+                    texte_botanique: "Engagés dans la préservation de la flore pour les générations futures." 
+                }
+            ]
         },
         
         async fetchEquipe() {
             this.loading = true
             try {
-                const response = await axios.get('http://localhost:8000/api/equipe/')
-                this.equipe = response.data
+                const response = await axios.get(`${this.apiUrl}/api/equipe/`)
+                if (response.data && response.data.length > 0) {
+                    this.equipe = response.data
+                } else {
+                    this.setDefaultEquipe()
+                }
             } catch (error) {
                 console.error('Erreur chargement équipe:', error)
+                this.setDefaultEquipe()
             } finally {
                 this.loading = false
             }
         },
         
+        setDefaultEquipe() {
+            this.equipe = [
+                { id: 1, nom: "Dr. Kouassi Jean", poste: "Directeur de l'herbier", specialite: "Botanique tropicale", email: "jean.kouassi@herbier-man.ci", photo: "https://randomuser.me/api/portraits/men/1.jpg" },
+                { id: 2, nom: "Dr. Konan Marie", poste: "Responsable Recherche", specialite: "Écologie végétale", email: "marie.konan@herbier-man.ci", photo: "https://randomuser.me/api/portraits/women/2.jpg" },
+                { id: 3, nom: "M. Yao Paul", poste: "Coordinateur terrain", specialite: "Inventaire botanique", email: "paul.yao@herbier-man.ci", photo: "https://randomuser.me/api/portraits/men/3.jpg" }
+            ]
+        },
+        
         async fetchPartenaires() {
             this.partenairesLoading = true
             try {
-                const response = await axios.get('http://localhost:8000/api/partenaires/')
-                this.partenaires = response.data
+                const response = await axios.get(`${this.apiUrl}/api/partenaires/`)
+                if (response.data && response.data.length > 0) {
+                    this.partenaires = response.data
+                } else {
+                    this.setDefaultPartenaires()
+                }
             } catch (error) {
                 console.error('Erreur chargement partenaires:', error)
+                this.setDefaultPartenaires()
             } finally {
                 this.partenairesLoading = false
             }
         },
         
-        getImageUrl(imagePath) {
-            if (!imagePath) return '/src/images/placeholder.jpg'
-            if (imagePath.startsWith('http')) return imagePath
-            if (imagePath.startsWith('/media')) return `http://localhost:8000${imagePath}`
-            return imagePath
+        setDefaultPartenaires() {
+            this.partenaires = [
+                { id: 1, nom: "Université de Man", description: "Partenariat académique pour la recherche", site_web: "https://univ-man.ci", logo: "https://via.placeholder.com/80x80?text=Univ+Man" },
+                { id: 2, nom: "Ministère des Eaux et Forêts", description: "Partenariat institutionnel", site_web: "https://eauxetforets.ci", logo: "https://via.placeholder.com/80x80?text=MEF" },
+                { id: 3, nom: "ONG Nature Conservation", description: "Partenariat pour la conservation", site_web: "https://nature.ci", logo: "https://via.placeholder.com/80x80?text=ONG" }
+            ]
         },
         
         startSlideShow() {
@@ -434,7 +465,7 @@ export default {
         },
         
         subscribeNewsletter() {
-            alert("Merci pour votre abonnement !")
+            alert("Merci pour votre abonnement ! Vous recevrez bientôt nos actualités.")
         }
     }
 }
