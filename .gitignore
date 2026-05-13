@@ -42,3 +42,6 @@ dist-ssr/
 *.pem
 config.py
 secrets.py
+bun.lockb
+package.json
+index.tsx
