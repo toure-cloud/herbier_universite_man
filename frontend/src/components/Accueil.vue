@@ -30,7 +30,7 @@
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Président de l'Université de Man">
+                                <img src="/src/images/president.png" alt="Président de l'Université de Man">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -189,7 +189,7 @@
                 <div v-else class="team-grid">
                     <div class="team-card" v-for="(membre, index) in equipe" :key="membre.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="team-image">
-                            <img :src="membre.photo || 'https://randomuser.me/api/portraits/men/1.jpg'" :alt="membre.nom">
+                            <img :src="getImageUrl(membre.photo)" :alt="membre.nom">
                             <div class="team-overlay">
                                 <div class="team-social">
                                     <a :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
@@ -229,7 +229,7 @@
                 <div v-else class="partenaires-grid">
                     <div class="partenaire-card" v-for="(partenaire, index) in partenaires" :key="partenaire.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="partenaire-logo">
-                            <img :src="partenaire.logo || 'https://via.placeholder.com/80x80?text=Logo'" :alt="partenaire.nom">
+                            <img :src="getImageUrl(partenaire.logo)" :alt="partenaire.nom">
                         </div>
                         <div class="partenaire-info">
                             <h4>{{ partenaire.nom }}</h4>
@@ -295,7 +295,7 @@ export default {
             partenaires: [],
             loading: true,
             partenairesLoading: true,
-            apiUrl: 'https://herbier-universite-man.onrender.com',
+            apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
             services: [
                 {
                     titre: "Identification",
@@ -358,19 +358,24 @@ export default {
         setDefaultSlides() {
             this.slides = [
                 { 
-                    image: "https://images.pexels.com/photos/247431/pexels-photo-247431.jpeg?w=1920", 
+                    image: "/src/images/slide1.jpg", 
                     titre: "La Biodiversité des Montagnes", 
                     texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée avec des espèces endémiques remarquables." 
                 },
                 { 
-                    image: "https://images.pexels.com/photos/450060/pexels-photo-450060.jpeg?w=1920", 
+                    image: "/src/images/slide2.jpg", 
                     titre: "Collection Botanique", 
                     texte_botanique: "Notre herbier conserve plus de 5000 spécimens de plantes de la région du Tonkpi." 
                 },
                 { 
-                    image: "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?w=1920", 
+                    image: "/src/images/slide3.jpg", 
                     titre: "Recherche et Conservation", 
                     texte_botanique: "Engagés dans la préservation de la flore pour les générations futures." 
+                },
+                { 
+                    image: "/src/images/slide4.jpg", 
+                    titre: "Herbier Numérique", 
+                    texte_botanique: "Modernisation de la collecte et conservation des spécimens végétaux." 
                 }
             ]
         },
@@ -381,23 +386,12 @@ export default {
                 const response = await axios.get(`${this.apiUrl}/api/equipe/`)
                 if (response.data && response.data.length > 0) {
                     this.equipe = response.data
-                } else {
-                    this.setDefaultEquipe()
                 }
             } catch (error) {
                 console.error('Erreur chargement équipe:', error)
-                this.setDefaultEquipe()
             } finally {
                 this.loading = false
             }
-        },
-        
-        setDefaultEquipe() {
-            this.equipe = [
-                { id: 1, nom: "Dr. Kouassi Jean", poste: "Directeur de l'herbier", specialite: "Botanique tropicale", email: "jean.kouassi@herbier-man.ci", photo: "https://randomuser.me/api/portraits/men/1.jpg" },
-                { id: 2, nom: "Dr. Konan Marie", poste: "Responsable Recherche", specialite: "Écologie végétale", email: "marie.konan@herbier-man.ci", photo: "https://randomuser.me/api/portraits/women/2.jpg" },
-                { id: 3, nom: "M. Yao Paul", poste: "Coordinateur terrain", specialite: "Inventaire botanique", email: "paul.yao@herbier-man.ci", photo: "https://randomuser.me/api/portraits/men/3.jpg" }
-            ]
         },
         
         async fetchPartenaires() {
@@ -406,23 +400,20 @@ export default {
                 const response = await axios.get(`${this.apiUrl}/api/partenaires/`)
                 if (response.data && response.data.length > 0) {
                     this.partenaires = response.data
-                } else {
-                    this.setDefaultPartenaires()
                 }
             } catch (error) {
                 console.error('Erreur chargement partenaires:', error)
-                this.setDefaultPartenaires()
             } finally {
                 this.partenairesLoading = false
             }
         },
         
-        setDefaultPartenaires() {
-            this.partenaires = [
-                { id: 1, nom: "Université de Man", description: "Partenariat académique pour la recherche", site_web: "https://univ-man.ci", logo: "https://via.placeholder.com/80x80?text=Univ+Man" },
-                { id: 2, nom: "Ministère des Eaux et Forêts", description: "Partenariat institutionnel", site_web: "https://eauxetforets.ci", logo: "https://via.placeholder.com/80x80?text=MEF" },
-                { id: 3, nom: "ONG Nature Conservation", description: "Partenariat pour la conservation", site_web: "https://nature.ci", logo: "https://via.placeholder.com/80x80?text=ONG" }
-            ]
+        getImageUrl(imagePath) {
+            if (!imagePath) return ''
+            if (imagePath.startsWith('http')) return imagePath
+            if (imagePath.startsWith('/media')) return `${this.apiUrl}${imagePath}`
+            if (imagePath.startsWith('/src/images/')) return imagePath
+            return `/src/images/${imagePath}`
         },
         
         startSlideShow() {
