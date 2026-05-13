@@ -1,0 +1,9 @@
+Django
+djangorestframework
+django-cors-headers
+Pillow
+whitenoise
+gunicorn
+psycopg2-binary
+django-storages
+boto3
