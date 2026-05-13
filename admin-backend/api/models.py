@@ -1,130 +1,120 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
-import random
-import string
-import re
 
-def validate_phone_number(value):
-    phone_pattern = re.compile(r'^(\+225|0)?[0-9]{8,10}$')
-    if not phone_pattern.match(value):
-        raise ValueError('Numéro de téléphone invalide')
-    return value
-
-class SuperAdminManager(BaseUserManager):
-    def create_user(self, email, nom, telephone, password=None, **extra_fields):
-        if not email:
-            raise ValueError('L\'email est obligatoire')
-        if not telephone:
-            raise ValueError('Le numéro de téléphone est obligatoire')
-        
-        email = self.normalize_email(email)
-        user = self.model(email=email, nom=nom, telephone=telephone, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-    
-    def create_superuser(self, email, nom, telephone, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-        return self.create_user(email, nom, telephone, password, **extra_fields)
-
-class SuperAdmin(AbstractUser):
-    username = None
-    email = models.EmailField(unique=True, verbose_name="Email")
-    nom = models.CharField(max_length=200, verbose_name="Nom complet")
-    telephone = models.CharField(max_length=20, unique=True, verbose_name="Numéro de téléphone", validators=[validate_phone_number])
-    is_active = models.BooleanField(default=False, verbose_name="Compte actif")
-    is_verified = models.BooleanField(default=False, verbose_name="Email vérifié")
-    date_joined = models.DateTimeField(default=timezone.now)
-    last_login = models.DateTimeField(null=True, blank=True)
-    created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_users', verbose_name="Créé par")
-    
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nom', 'telephone']
-    
-    objects = SuperAdminManager()
+class Plante(models.Model):
+    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
+    famille = models.CharField(max_length=200, verbose_name="Famille botanique")
+    description = models.TextField(verbose_name="Description")
+    image = models.ImageField(upload_to='plantes/', blank=True, null=True)
+    nom_scientifique = models.CharField(max_length=200, blank=True)
+    habitat = models.CharField(max_length=300, blank=True)
+    statut_conservation = models.CharField(max_length=100, blank=True)
+    date_creation = models.DateTimeField(default=timezone.now)
     
     class Meta:
-        verbose_name = "Utilisateur"
-        verbose_name_plural = "Utilisateurs"
-        ordering = ['-date_joined']
+        verbose_name = "Plante"
+        verbose_name_plural = "Plantes"
+        ordering = ['nom']
     
     def __str__(self):
-        return f"{self.nom} - {self.email}"
-    
-    @property
-    def is_super_admin(self):
-        return self.is_superuser
+        return self.nom
 
-class OTPCode(models.Model):
-    user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='otp_codes')
-    code = models.CharField(max_length=6, verbose_name="Code OTP")
-    type = models.CharField(max_length=20, choices=[('email', 'Email'), ('sms', 'SMS')], default='email')
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
-    is_used = models.BooleanField(default=False)
+class Equipe(models.Model):
+    nom = models.CharField(max_length=200)
+    photo = models.ImageField(upload_to='equipe/', blank=True, null=True)
+    poste = models.CharField(max_length=200)
+    email = models.EmailField(blank=True)
+    specialite = models.CharField(max_length=200, blank=True)
+    ordre = models.IntegerField(default=0)
     
-    def is_valid(self):
-        return not self.is_used and self.expires_at > timezone.now()
+    class Meta:
+        verbose_name = "Membre de l'équipe"
+        verbose_name_plural = "Membres de l'équipe"
+        ordering = ['ordre', 'nom']
+    
+    def __str__(self):
+        return self.nom
 
-class AuditLog(models.Model):
-    ACTION_CHOICES = [
-        ('create', 'Création'),
-        ('update', 'Modification'),
-        ('delete', 'Suppression'),
-        ('login', 'Connexion'),
-        ('logout', 'Déconnexion'),
+class Partenaire(models.Model):
+    nom = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='partenaires/', blank=True, null=True)
+    site_web = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    ordre = models.IntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Partenaire"
+        verbose_name_plural = "Partenaires"
+        ordering = ['ordre', 'nom']
+    
+    def __str__(self):
+        return self.nom
+
+class Slide(models.Model):
+    titre = models.CharField(max_length=200)
+    texte_botanique = models.TextField()
+    image = models.ImageField(upload_to='slides/', blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+    ordre = models.IntegerField(default=0)
+    actif = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['ordre']
+    
+    def __str__(self):
+        return self.titre
+
+class Projet(models.Model):
+    STATUT_CHOICES = [
+        ('termine', 'Terminé'),
+        ('encours', 'En cours'),
+        ('planifie', 'Planifié'),
     ]
     
-    user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='audit_logs')
-    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
-    model_name = models.CharField(max_length=100)
-    object_id = models.IntegerField(null=True, blank=True)
-    object_name = models.CharField(max_length=200, blank=True)
-    changes = models.JSONField(default=dict, blank=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    CATEGORIE_CHOICES = [
+        ('recherche', 'Recherche'),
+        ('conservation', 'Conservation'),
+        ('formation', 'Formation'),
+        ('developpement', 'Développement'),
+    ]
+    
+    titre = models.CharField(max_length=200)
+    description = models.TextField()
+    description_longue = models.TextField(blank=True)
+    categorie = models.CharField(max_length=50, choices=CATEGORIE_CHOICES, default='recherche')
+    statut = models.CharField(max_length=50, choices=STATUT_CHOICES, default='encours')
+    featured = models.BooleanField(default=False)
+    annee = models.CharField(max_length=50)
+    lieu = models.CharField(max_length=200)
+    partenaires = models.IntegerField(default=0)
+    beneficiaires = models.CharField(max_length=100, blank=True)
+    budget = models.CharField(max_length=100, blank=True)
+    duree = models.CharField(max_length=100, blank=True)
+    impact = models.CharField(max_length=200, blank=True)
+    progression = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='projets/', blank=True, null=True)
+    tags = models.CharField(max_length=500, blank=True)
+    caption = models.CharField(max_length=200, blank=True)
     
     class Meta:
-        verbose_name = "Journal d'audit"
-        verbose_name_plural = "Journaux d'audit"
-        ordering = ['-created_at']
+        verbose_name = "Projet"
+        verbose_name_plural = "Projets"
+        ordering = ['-featured', '-annee']
     
     def __str__(self):
-        return f"{self.user.email} - {self.action} - {self.model_name}"
+        return self.titre
 
-class HerbierData(models.Model):
-    plantes = models.JSONField(default=list, verbose_name="Plantes")
-    equipe = models.JSONField(default=list, verbose_name="Équipe")
-    partenaires = models.JSONField(default=list, verbose_name="Partenaires")
-    slides = models.JSONField(default=list, verbose_name="Slides")
-    projets = models.JSONField(default=list, verbose_name="Projets")
-    activites = models.JSONField(default=list, verbose_name="Activités")
-    temoignages = models.JSONField(default=list, verbose_name="Témoignages")
-    publications = models.JSONField(default=list, verbose_name="Publications")
-    faqs = models.JSONField(default=list, verbose_name="FAQs")
-    statistiques = models.JSONField(default=list, verbose_name="Statistiques")
-    methodologie = models.JSONField(default=list, verbose_name="Méthodologie")
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(SuperAdmin, on_delete=models.SET_NULL, null=True, related_name='updates')
+class Contact(models.Model):
+    nom = models.CharField(max_length=200)
+    email = models.EmailField()
+    telephone = models.CharField(max_length=50, blank=True)
+    sujet = models.CharField(max_length=200)
+    message = models.TextField()
+    date_envoi = models.DateTimeField(default=timezone.now)
+    lu = models.BooleanField(default=False)
     
     class Meta:
-        verbose_name = "Donnée Herbier"
-        verbose_name_plural = "Données Herbier"
+        ordering = ['-date_envoi']
     
-    @classmethod
-    def get_current_data(cls):
-        obj, created = cls.objects.get_or_create(id=1)
-        return obj
-
-class LoginHistory(models.Model):
-    user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='login_history')
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.TextField(blank=True)
-    login_time = models.DateTimeField(auto_now_add=True)
-    success = models.BooleanField(default=True)
-    
-    class Meta:
-        ordering = ['-login_time']
+    def __str__(self):
+        return f"{self.nom} - {self.sujet}"
