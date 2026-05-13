@@ -472,7 +472,7 @@ export default {
 /* Hero Section - Hauteur réduite */
 .hero-section {
     position: relative;
-    height: 70vh;  /* Réduit de 100vh à 70vh */
+    height: 50vh;  /* Réduit de 100vh à 70vh */
     min-height: 500px;  /* Hauteur minimale pour éviter que ce soit trop petit sur écran */
     max-height: 600px;  /* Hauteur maximale */
     overflow: hidden;
@@ -486,7 +486,7 @@ export default {
 .slide {
     position: absolute;
     width: 100%;
-    height: 80%;
+    height: 100%;
     opacity: 0;
     transition: opacity 1s ease-in-out;
 }
