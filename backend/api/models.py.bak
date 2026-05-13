@@ -1,0 +1,124 @@
+from django.db import models
+from django.utils import timezone
+
+class Plante(models.Model):
+    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
+    famille = models.CharField(max_length=200, verbose_name="Famille botanique")
+    description = models.TextField(verbose_name="Description")
+    image = models.ImageField(upload_to='plantes/', blank=True, null=True)
+    nom_scientifique = models.CharField(max_length=200, blank=True)
+    habitat = models.CharField(max_length=300, blank=True)
+    statut_conservation = models.CharField(max_length=100, blank=True)
+    date_creation = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        verbose_name = "Plante"
+        verbose_name_plural = "Plantes"
+        ordering = ['nom']
+    
+    def __str__(self):
+        return self.nom
+
+class Equipe(models.Model):
+    nom = models.CharField(max_length=200, verbose_name="Nom complet")
+    photo = models.ImageField(upload_to='equipe/', blank=True, null=True)
+    poste = models.CharField(max_length=200, verbose_name="Poste")
+    email = models.EmailField(blank=True)
+    specialite = models.CharField(max_length=200, blank=True)
+    ordre = models.IntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Membre de l'équipe"
+        verbose_name_plural = "Membres de l'équipe"
+        ordering = ['ordre', 'nom']
+    
+    def __str__(self):
+        return self.nom
+
+class Partenaire(models.Model):
+    nom = models.CharField(max_length=200, verbose_name="Nom du partenaire")
+    logo = models.ImageField(upload_to='partenaires/', blank=True, null=True)
+    site_web = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    ordre = models.IntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Partenaire"
+        verbose_name_plural = "Partenaires"
+        ordering = ['ordre', 'nom']
+    
+    def __str__(self):
+        return self.nom
+
+class Slide(models.Model):
+    titre = models.CharField(max_length=200, verbose_name="Titre")
+    texte_botanique = models.TextField(verbose_name="Texte botanique")
+    image = models.ImageField(upload_to='slides/', blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+    ordre = models.IntegerField(default=0)
+    actif = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Slide"
+        verbose_name_plural = "Slides"
+        ordering = ['ordre']
+    
+    def __str__(self):
+        return self.titre
+
+class Projet(models.Model):
+    STATUT_CHOICES = [
+        ('termine', 'Terminé'),
+        ('encours', 'En cours'),
+        ('planifie', 'Planifié'),
+    ]
+    
+    CATEGORIE_CHOICES = [
+        ('recherche', 'Recherche'),
+        ('conservation', 'Conservation'),
+        ('formation', 'Formation'),
+        ('developpement', 'Développement'),
+    ]
+    
+    titre = models.CharField(max_length=200, verbose_name="Titre")
+    description = models.TextField(verbose_name="Description")
+    description_longue = models.TextField(blank=True)
+    categorie = models.CharField(max_length=50, choices=CATEGORIE_CHOICES, default='recherche')
+    statut = models.CharField(max_length=50, choices=STATUT_CHOICES, default='encours')
+    featured = models.BooleanField(default=False)
+    annee = models.CharField(max_length=50)
+    lieu = models.CharField(max_length=200)
+    partenaires = models.IntegerField(default=0)
+    beneficiaires = models.CharField(max_length=100, blank=True)
+    budget = models.CharField(max_length=100, blank=True)
+    duree = models.CharField(max_length=100, blank=True)
+    impact = models.CharField(max_length=200, blank=True)
+    progression = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='projets/', blank=True, null=True)
+    tags = models.CharField(max_length=500, blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    
+    class Meta:
+        verbose_name = "Projet"
+        verbose_name_plural = "Projets"
+        ordering = ['-featured', '-annee']
+    
+    def __str__(self):
+        return self.titre
+
+class Contact(models.Model):
+    nom = models.CharField(max_length=200, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email")
+    telephone = models.CharField(max_length=50, blank=True)
+    sujet = models.CharField(max_length=200, verbose_name="Sujet")
+    message = models.TextField(verbose_name="Message")
+    date_envoi = models.DateTimeField(default=timezone.now)
+    lu = models.BooleanField(default=False)
+    
+    class Meta:
+        verbose_name = "Contact"
+        verbose_name_plural = "Contacts"
+        ordering = ['-date_envoi']
+    
+    def __str__(self):
+        return f"{self.nom} - {self.sujet}"
