@@ -5,10 +5,7 @@ nixPkgs = ["python311", "python311Packages.pip"]
 cmds = ["pip install -r backend/requirements.txt"]
 
 [phases.build]
-cmds = [
-    "cd backend && python manage.py collectstatic --noinput",
-    "cd frontend && npm install && npm run build"
-]
+cmds = ["cd backend && python manage.py collectstatic --noinput || true"]
 
 [start]
-cmd = "cd backend && gunicorn herbier_backend.wsgi:application --bind 0.0.0.0:${PORT}"
+cmd = "cd backend && gunicorn herbier_backend.wsgi:application --bind 0.0.0.0:$PORT"

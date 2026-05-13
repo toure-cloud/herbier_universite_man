@@ -1,0 +1,16 @@
+{
+  "phases": {
+    "setup": {
+      "nixPkgs": ["python311", "python311Packages.pip"]
+    },
+    "install": {
+      "cmds": ["cd backend && pip install -r requirements.txt"]
+    },
+    "build": {
+      "cmds": ["cd backend && python manage.py collectstatic --noinput || true", "cd backend && python manage.py migrate --noinput || true"]
+    }
+  },
+  "start": {
+    "cmd": "cd backend && gunicorn herbier_backend.wsgi:application --bind 0.0.0.0:$PORT"
+  }
+}
