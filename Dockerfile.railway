@@ -2,19 +2,29 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     curl \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
+# Copier et installer les dépendances Python
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copier le code
 COPY backend/ .
 
-RUN mkdir -p staticfiles media
-RUN python manage.py collectstatic --noinput || true
+# Créer les dossiers nécessaires
+RUN mkdir -p staticfiles media static
+
+# Collecter les fichiers statiques
+RUN python manage.py collectstatic --noinput || echo "Collectstatic ignoré"
+
+# Ajouter les slides par défaut
+RUN python add_slides.py || echo "Slides ajoutés"
 
 EXPOSE 8000
 
