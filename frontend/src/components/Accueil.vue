@@ -30,7 +30,7 @@
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="/src/images/president.png" alt="Président de l'Université de Man">
+                                <img src="/images/president.png" alt="Président de l'Université de Man">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -295,7 +295,7 @@ export default {
             partenaires: [],
             loading: true,
             partenairesLoading: true,
-            apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+            apiUrl: import.meta.env.VITE_API_URL || 'https://herbier-universite-man.onrender.com',
             services: [
                 {
                     titre: "Identification",
@@ -358,22 +358,22 @@ export default {
         setDefaultSlides() {
             this.slides = [
                 { 
-                    image: "/src/images/slide1.jpg", 
+                    image: "/images/slide1.jpg", 
                     titre: "La Biodiversité des Montagnes", 
                     texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée avec des espèces endémiques remarquables." 
                 },
                 { 
-                    image: "/src/images/slide2.jpg", 
+                    image: "/images/slide2.jpg", 
                     titre: "Collection Botanique", 
                     texte_botanique: "Notre herbier conserve plus de 5000 spécimens de plantes de la région du Tonkpi." 
                 },
                 { 
-                    image: "/src/images/slide3.jpg", 
+                    image: "/images/slide3.jpg", 
                     titre: "Recherche et Conservation", 
                     texte_botanique: "Engagés dans la préservation de la flore pour les générations futures." 
                 },
                 { 
-                    image: "/src/images/slide4.jpg", 
+                    image: "/images/slide4.jpg", 
                     titre: "Herbier Numérique", 
                     texte_botanique: "Modernisation de la collecte et conservation des spécimens végétaux." 
                 }
@@ -412,8 +412,8 @@ export default {
             if (!imagePath) return ''
             if (imagePath.startsWith('http')) return imagePath
             if (imagePath.startsWith('/media')) return `${this.apiUrl}${imagePath}`
-            if (imagePath.startsWith('/src/images/')) return imagePath
-            return `/src/images/${imagePath}`
+            if (imagePath.startsWith('/images/')) return imagePath
+            return `/images/${imagePath}`
         },
         
         startSlideShow() {
@@ -469,10 +469,12 @@ export default {
     overflow-x: hidden;
 }
 
-/* Hero Section */
+/* Hero Section - Hauteur réduite */
 .hero-section {
     position: relative;
-    height: 100vh;
+    height: 70vh;  /* Réduit de 100vh à 70vh */
+    min-height: 500px;  /* Hauteur minimale pour éviter que ce soit trop petit sur écran */
+    max-height: 600px;  /* Hauteur maximale */
     overflow: hidden;
 }
 
@@ -497,6 +499,7 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 30%; /* Décale légèrement l'image vers le haut pour mieux cadrer */
 }
 
 .slide-overlay {
@@ -505,15 +508,15 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(26,42,58,0.7) 0%, rgba(44,62,80,0.5) 100%);
+    background: linear-gradient(135deg, rgba(26,42,58,0.6) 0%, rgba(44,62,80,0.4) 100%);
 }
 
 .slide-content {
     position: absolute;
-    bottom: 20%;
+    bottom: 15%;  /* Ajusté pour la hauteur réduite */
     left: 10%;
     right: 10%;
-    max-width: 800px;
+    max-width: 700px;
     animation: slideUp 0.8s ease-out;
 }
 
@@ -531,25 +534,25 @@ export default {
 
 .slide-title {
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
+    font-size: 2.5rem;  /* Réduit de 3.5rem à 2.5rem */
     font-weight: 700;
     color: white;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     line-height: 1.2;
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .slide-text {
     font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1rem;  /* Réduit de 1.1rem à 1rem */
     color: rgba(255,255,255,0.9);
-    line-height: 1.6;
-    max-width: 600px;
+    line-height: 1.5;
+    max-width: 550px;
 }
 
 @keyframes slideUp {
     from {
-        transform: translateY(50px);
+        transform: translateY(40px);
         opacity: 0;
     }
     to {
@@ -563,15 +566,15 @@ export default {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    padding: 16px;
+    padding: 12px;  /* Réduit de 16px à 12px */
     color: white;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 16px;  /* Réduit de 18px à 16px */
     background: rgba(0,0,0,0.4);
     border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 40px;  /* Réduit de 50px à 40px */
+    height: 40px;  /* Réduit de 50px à 40px */
     transition: all 0.3s ease;
     z-index: 10;
 }
@@ -591,7 +594,7 @@ export default {
 
 .hero-scroll {
     position: absolute;
-    bottom: 30px;
+    bottom: 15px;  /* Ajusté pour la hauteur réduite */
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -601,8 +604,8 @@ export default {
 }
 
 .scroll-mouse {
-    width: 26px;
-    height: 40px;
+    width: 24px;  /* Légèrement réduit */
+    height: 36px;  /* Légèrement réduit */
     border: 2px solid white;
     border-radius: 20px;
     margin: 0 auto 5px;
@@ -610,8 +613,8 @@ export default {
 }
 
 .scroll-wheel {
-    width: 4px;
-    height: 8px;
+    width: 3px;
+    height: 7px;
     background: white;
     border-radius: 2px;
     position: absolute;
@@ -623,16 +626,16 @@ export default {
 
 @keyframes scroll {
     0% { top: 6px; opacity: 1; }
-    100% { top: 25px; opacity: 0; }
+    100% { top: 22px; opacity: 0; }
 }
 
 @keyframes bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(10px); }
+    50% { transform: translateX(-50%) translateY(8px); }
 }
 
 .hero-scroll span {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: white;
     opacity: 0.8;
 }
@@ -646,7 +649,7 @@ export default {
 
 /* President Section */
 .president-section {
-    padding: 80px 0;
+    padding: 60px 0;  /* Réduit de 80px à 60px */
     background: white;
 }
 
@@ -833,7 +836,7 @@ export default {
 /* Section Header */
 .section-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 
 .section-badge {
@@ -850,7 +853,7 @@ export default {
 
 .section-title {
     font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: #1e293b;
     margin-bottom: 0.5rem;
 }
@@ -858,12 +861,12 @@ export default {
 .section-subtitle {
     font-family: 'Inter', sans-serif;
     color: #64748b;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 /* Expertise Section */
 .expertise-section {
-    padding: 80px 0;
+    padding: 60px 0;
     background: #f8fafc;
 }
 
@@ -876,9 +879,9 @@ export default {
 
 .expertise-text h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: #1e293b;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     line-height: 1.3;
 }
 
@@ -886,14 +889,14 @@ export default {
     font-family: 'Inter', sans-serif;
     color: #475569;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
 }
 
 .expertise-features {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.8rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .feature {
@@ -913,7 +916,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.8rem 1.8rem;
+    padding: 0.7rem 1.5rem;
     background: #3498db;
     color: white;
     text-decoration: none;
@@ -931,9 +934,9 @@ export default {
 .expertise-stats {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
     background: white;
-    padding: 2rem;
+    padding: 1.8rem;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
@@ -944,7 +947,7 @@ export default {
 
 .stat-number-count {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: bold;
     color: #3498db;
 }
@@ -956,13 +959,13 @@ export default {
 
 /* Services Section */
 .services-section {
-    padding: 80px 0;
+    padding: 60px 0;
     background: white;
 }
 
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
 }
 
@@ -982,8 +985,8 @@ export default {
 }
 
 .service-icon {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     background: #eef2ff;
     border-radius: 50%;
     display: flex;
@@ -993,13 +996,13 @@ export default {
 }
 
 .service-icon i {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #3498db;
 }
 
 .service-card h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #1e293b;
     margin-bottom: 0.5rem;
 }
@@ -1027,7 +1030,7 @@ export default {
 
 /* Team Section */
 .team-section {
-    padding: 80px 0;
+    padding: 60px 0;
     background: #f8fafc;
 }
 
@@ -1052,7 +1055,7 @@ export default {
 
 .team-image {
     position: relative;
-    height: 280px;
+    height: 260px;
     overflow: hidden;
 }
 
@@ -1091,8 +1094,8 @@ export default {
 }
 
 .team-social-link {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: white;
     border-radius: 50%;
     display: flex;
@@ -1115,7 +1118,7 @@ export default {
 
 .team-info h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #1e293b;
     margin-bottom: 0.2rem;
 }
@@ -1148,14 +1151,14 @@ export default {
 
 /* Partenaires Section */
 .partenaires-section {
-    padding: 80px 0;
+    padding: 60px 0;
     background: white;
 }
 
 .partenaires-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .partenaire-card {
@@ -1173,8 +1176,8 @@ export default {
 }
 
 .partenaire-logo {
-    width: 70px;
-    height: 70px;
+    width: 65px;
+    height: 65px;
     flex-shrink: 0;
     background: white;
     border-radius: 12px;
@@ -1215,12 +1218,12 @@ export default {
 /* Loading */
 .loading-container {
     text-align: center;
-    padding: 3rem;
+    padding: 2rem;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border: 3px solid #e2e8f0;
     border-top-color: #3498db;
     border-radius: 50%;
@@ -1234,44 +1237,44 @@ export default {
 
 /* Newsletter */
 .newsletter-section {
-    padding: 80px 0;
+    padding: 60px 0;
     background: linear-gradient(135deg, #1e293b 0%, #2c3e50 100%);
     color: white;
 }
 
 .newsletter-content {
     text-align: center;
-    max-width: 600px;
+    max-width: 550px;
     margin: 0 auto;
 }
 
 .newsletter-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
     color: #3498db;
 }
 
 .newsletter-content h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin-bottom: 0.5rem;
 }
 
 .newsletter-content p {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     opacity: 0.8;
 }
 
 .newsletter-form {
     display: flex;
     gap: 1rem;
-    max-width: 500px;
+    max-width: 450px;
     margin: 0 auto;
 }
 
 .newsletter-form input {
     flex: 1;
-    padding: 1rem;
+    padding: 0.8rem 1rem;
     border: none;
     border-radius: 50px;
     outline: none;
@@ -1279,7 +1282,7 @@ export default {
 }
 
 .newsletter-form button {
-    padding: 1rem 2rem;
+    padding: 0.8rem 1.5rem;
     background: #3498db;
     border: none;
     border-radius: 50px;
@@ -1299,24 +1302,24 @@ export default {
 
 /* CTA Section */
 .cta-section {
-    padding: 60px 0;
+    padding: 50px 0;
     background: white;
 }
 
 .cta-content {
     background: linear-gradient(135deg, #3498db, #2c3e50);
     border-radius: 24px;
-    padding: 3rem;
+    padding: 2.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .cta-text h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: white;
     margin-bottom: 0.3rem;
 }
@@ -1329,7 +1332,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.8rem 1.8rem;
+    padding: 0.7rem 1.5rem;
     background: white;
     color: #3498db;
     text-decoration: none;
@@ -1345,12 +1348,21 @@ export default {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .hero-section {
+        height: 50vh;
+        min-height: 400px;
+    }
+    
     .slide-title {
         font-size: 1.5rem;
     }
     
     .slide-text {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+    }
+    
+    .slide-content {
+        bottom: 10%;
     }
     
     .president-grid {
@@ -1396,9 +1408,10 @@ export default {
     }
     
     .prev, .next {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+        padding: 8px;
     }
 }
 
