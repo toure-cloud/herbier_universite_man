@@ -95,8 +95,8 @@ export default {
         return {
             searchQuery: '',
             searchResults: [],
-            logoImage: '/src/images/uman.png',
-            footerLogoImage: '/src/images/uman.png'
+            logoImage: '/images/uman.png',
+            footerLogoImage: '/images/uman.png'
         }
     },
     methods: {

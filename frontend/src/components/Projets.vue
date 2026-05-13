@@ -480,7 +480,7 @@ export default {
         },
         
         getImageUrl(imagePath) {
-            if (!imagePath) return '/src/images/placeholder-project.jpg'
+            if (!imagePath) return '/images/placeholder-project.jpg'
             if (imagePath.startsWith('http')) return imagePath
             if (imagePath.startsWith('/media')) return `http://localhost:8000${imagePath}`
             return imagePath
