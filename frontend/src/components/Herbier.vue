@@ -584,14 +584,14 @@ export default {
         },
         
         getImageUrl(imagePath) {
-            if (!imagePath) return '/src/images/placeholder-plant.jpg'
+            if (!imagePath) return '/images/placeholder-plant.jpg'
             if (imagePath.startsWith('http')) return imagePath
             if (imagePath.startsWith('/media')) return `http://localhost:8000${imagePath}`
             return imagePath
         },
         
         handleImageError(event) {
-            event.target.src = '/src/images/placeholder-plant.jpg'
+            event.target.src = '/images/placeholder-plant.jpg'
         },
         
         getConservationClass(statut) {

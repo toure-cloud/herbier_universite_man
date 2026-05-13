@@ -30,7 +30,7 @@
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="/src/images/president.png" alt="Président de l'Université de Man">
+                                <img src="/images/president.png" alt="Président de l'Université de Man">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -348,17 +348,17 @@ export default {
                 } else {
                     // Slides par défaut
                     this.slides = [
-                        { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
-                        { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 5000 spécimens." },
-                        { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
+                        { image: "/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
+                        { image: "/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 5000 spécimens." },
+                        { image: "/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
                     ]
                 }
             } catch (error) {
                 console.error('Erreur chargement slides:', error)
                 this.slides = [
-                    { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
-                    { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 1000 spécimens." },
-                    { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
+                    { image: "/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
+                    { image: "/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 1000 spécimens." },
+                    { image: "/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
                 ]
             }
         },
@@ -388,7 +388,7 @@ export default {
         },
         
         getImageUrl(imagePath) {
-            if (!imagePath) return '/src/images/placeholder.jpg'
+            if (!imagePath) return '/images/placeholder.jpg'
             if (imagePath.startsWith('http')) return imagePath
             if (imagePath.startsWith('/media')) return `http://localhost:8000${imagePath}`
             return imagePath

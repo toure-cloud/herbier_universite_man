@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from .models import (
     Plante, Equipe, Partenaire, Slide, Projet, ProjetTimeline,
     Activite, Temoignage, Publication, FAQ, ContactMessage,
@@ -411,7 +412,6 @@ def export_herbier(request):
     
     if format_export == 'csv':
         import csv
-        from django.http import HttpResponse
         
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="herbier_export.csv"'
@@ -455,3 +455,18 @@ def generate_alphabet_index(request):
         index.append({'letter': '#', 'count': autres_count})
     
     return Response(index)
+
+@api_view(['GET'])
+def get_slide_images(request):
+    """Endpoint pour récupérer les URLs des images des slides"""
+    from .models import Slide
+    slides = Slide.objects.filter(actif=True).order_by('ordre')
+    data = []
+    for slide in slides:
+        data.append({
+            'id': slide.id,
+            'titre': slide.titre,
+            'texte_botanique': slide.texte_botanique,
+            'image': slide.image.url if slide.image else None
+        })
+    return Response(data)

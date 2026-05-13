@@ -29,7 +29,7 @@
           <thead><tr><th>Photo</th><th>Nom</th><th>Poste</th><th>Email</th><th>Spécialité</th><th>Actions</th></tr></thead>
           <tbody>
             <tr v-for="membre in equipe" :key="membre.id">
-              <td><img :src="membre.photo || '/src/images/avatar.jpg'" class="table-image" @error="handleImageError"></td>
+              <td><img :src="membre.photo || '/images/avatar.jpg'" class="table-image" @error="handleImageError"></td>
               <td><strong>{{ membre.nom }}</strong></td>
               <td>{{ membre.poste }}</td>
               <td>{{ membre.email || '-' }}</td>
@@ -50,7 +50,7 @@
             <div class="form-group"><label>Email</label><input type="email" v-model="form.email"></div>
             <div class="form-group"><label>Spécialité</label><input type="text" v-model="form.specialite"></div>
             <div class="form-group"><label>Téléphone</label><input type="text" v-model="form.telephone"></div>
-            <div class="form-group"><label>Photo URL</label><input type="text" v-model="form.photo" placeholder="/src/images/..."></div>
+            <div class="form-group"><label>Photo URL</label><input type="text" v-model="form.photo" placeholder="/images/..."></div>
             <div class="modal-footer"><button type="button" class="btn-secondary" @click="closeModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div>
           </form>
         </div>
@@ -87,7 +87,7 @@ export default {
     async deleteItem(item) { if(confirm('Supprimer ce membre ?')) { const equipe = this.equipe.filter(e => e.id !== item.id); await axios.put('http://localhost:8001/api/herbier-data/', { ...(await axios.get('http://localhost:8001/api/herbier-data/')).data, equipe }); this.equipe = equipe; this.showToast('success', 'Membre supprimé') } },
     closeModal() { this.showModal = false },
     showToast(type, msg) { this.toastType = type; this.toastMessage = msg; setTimeout(() => { this.toastMessage = '' }, 3000) },
-    handleImageError(e) { e.target.src = '/src/images/avatar.jpg' },
+    handleImageError(e) { e.target.src = '/images/avatar.jpg' },
     async logout() { await useAuthStore().logout(); this.$router.push('/login') }
   }
 }

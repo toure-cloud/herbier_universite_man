@@ -337,14 +337,14 @@ export default {
                     name: "Dr. Bernard Amani",
                     position: "Directeur",
                     organization: "Parc National de Taï",
-                    avatar: "/src/images/avatar1.jpg"
+                    avatar: "/images/avatar1.jpg"
                 },
                 {
                     text: "Collaboration exceptionnelle pour nos projets de recherche. Leur professionnalisme et leur rigueur scientifique sont remarquables.",
                     name: "Prof. Sylvie Koffi",
                     position: "Chercheuse",
                     organization: "Université Félix Houphouët-Boigny",
-                    avatar: "/src/images/avatar2.jpg"
+                    avatar: "/images/avatar2.jpg"
                 }
             ]
         }

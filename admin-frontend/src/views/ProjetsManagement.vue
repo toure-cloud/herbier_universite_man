@@ -56,7 +56,7 @@
             <div class="form-group"><label>Objectifs</label><textarea v-model="form.objectifs" rows="3"></textarea></div>
             <div class="form-group"><label>Résultats obtenus</label><textarea v-model="form.resultats" rows="3"></textarea></div>
             <div class="form-group"><label>Tags (séparés par des virgules)</label><input type="text" v-model="form.tags" placeholder="biodiversité, conservation, recherche"></div>
-            <div class="form-group"><label>Image principale (URL)</label><input type="text" v-model="form.image" placeholder="/src/images/..."></div>
+            <div class="form-group"><label>Image principale (URL)</label><input type="text" v-model="form.image" placeholder="/images/..."></div>
             <div class="form-group"><label>Images galerie (URLs séparées par des virgules)</label><input type="text" v-model="imagesGalerieInput" placeholder="https://.../image1.jpg, https://.../image2.jpg"></div>
             <div class="form-group"><label><input type="checkbox" v-model="form.featured"> Projet à la une</label></div>
             <div class="modal-footer"><button type="button" class="btn-secondary" @click="closeModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div>
@@ -99,8 +99,8 @@ export default {
   mounted() { this.loadData() },
   methods: {
     async loadData() { try { const res = await axios.get('http://localhost:8001/api/herbier-data/'); this.projets = res.data.projets || [] } catch(e) { console.error(e) } },
-    getImageUrl(url) { if (!url) return '/src/images/projet-placeholder.jpg'; if (url.startsWith('http')) return url; return url },
-    handleImageError(e) { e.target.src = '/src/images/projet-placeholder.jpg' },
+    getImageUrl(url) { if (!url) return '/images/projet-placeholder.jpg'; if (url.startsWith('http')) return url; return url },
+    handleImageError(e) { e.target.src = '/images/projet-placeholder.jpg' },
     getCategorieLabel(cat) { const labels = { recherche: '🔬 Recherche', conservation: '🌿 Conservation', formation: '📚 Formation', developpement: '💼 Développement' }; return labels[cat] || cat },
     getStatutLabel(statut) { const labels = { termine: '✅ Terminé', encours: '🔄 En cours', planifie: '📅 Planifié' }; return labels[statut] || statut },
     openModal() { this.editingId = null; this.form = { titre: '', categorie: 'recherche', statut: 'encours', annee: '', lieu: '', partenaires: 0, beneficiaires: '', budget: '', duree: '', impact: '', progression: 0, description: '', description_longue: '', objectifs: '', resultats: '', tags: '', image: '', images_galerie: [], featured: false }; this.imagesGalerieInput = ''; this.showModal = true },

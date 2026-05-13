@@ -111,7 +111,7 @@
             <h4><i class="fas fa-leaf"></i> Plantes en attente de validation</h4>
             <div class="moderation-list">
               <div v-for="plant in pendingPlants" :key="plant.id" class="moderation-item">
-                <img :src="plant.image || '/src/images/placeholder.jpg'" class="moderation-image" @error="e=>e.target.src='/src/images/placeholder.jpg'">
+                <img :src="plant.image || '/images/placeholder.jpg'" class="moderation-image" @error="e=>e.target.src='/images/placeholder.jpg'">
                 <div class="moderation-info"><strong>{{ plant.nom }}</strong> - {{ plant.famille }}<br><small>Ajouté par: {{ plant.created_by || 'Inconnu' }}</small></div>
                 <div class="moderation-actions"><button @click="approvePlant(plant)" class="btn-approve"><i class="fas fa-check"></i> Approuver</button><button @click="rejectPlant(plant)" class="btn-reject"><i class="fas fa-times"></i> Rejeter</button></div>
               </div>

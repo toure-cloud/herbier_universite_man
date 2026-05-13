@@ -29,7 +29,7 @@ urlpatterns = [
     # Routes de recherche pour plantes
     path('rechercher/', views.PlanteViewSet.as_view({'get': 'search'}), name='rechercher_plantes'),
     path('suggestions/', views.search_suggestions, name='suggestions'),
-    
+    path('slides-images/', views.get_slide_images, name='slides_images'),
     # Routes d'indexation alphabétique
     path('alphabetique/', views.PlanteViewSet.as_view({'get': 'alphabetique'}), name='alphabetique'),
     path('alphabet-index/', views.PlanteViewSet.as_view({'get': 'alphabet_index'}), name='alphabet_index'),

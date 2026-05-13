@@ -19,7 +19,7 @@
 
       <div class="plants-grid">
         <div v-for="plante in filteredPlantes" :key="plante.id" class="plant-card">
-          <div class="plant-image"><img :src="plante.image || '/src/images/placeholder.jpg'" @error="handleImageError"><div class="plant-badge" v-if="plante.created_by !== currentUserId && isSuperAdmin">Créé par un autre</div></div>
+          <div class="plant-image"><img :src="plante.image || '/images/placeholder.jpg'" @error="handleImageError"><div class="plant-badge" v-if="plante.created_by !== currentUserId && isSuperAdmin">Créé par un autre</div></div>
           <div class="plant-info"><h3>{{ plante.nom }}</h3><p class="plant-famille">{{ plante.famille }}</p><p>{{ plante.description | truncate(80) }}</p><div class="plant-footer"><span class="plant-date"><i class="fas fa-calendar"></i> {{ formatDate(plante.date_creation) }}</span><div class="plant-actions"><button @click="editItem(plante)" class="btn-edit"><i class="fas fa-edit"></i></button><button @click="deleteItem(plante)" class="btn-delete" :disabled="plante.created_by !== currentUserId && !isSuperAdmin"><i class="fas fa-trash"></i></button></div></div></div>
         </div>
         <div v-if="filteredPlantes.length === 0" class="empty"><i class="fas fa-seedling"></i> Aucune plante</div>
@@ -67,7 +67,7 @@ export default {
     async deleteItem(i){ if(!this.isSuperAdmin && i.created_by!==this.currentUserId){ this.showToast('Vous ne pouvez pas supprimer cette plante','error'); return } if(confirm('Supprimer ?')){ const plantes=this.plantes.filter(p=>p.id!==i.id); const data=await axios.get('http://localhost:8001/api/herbier-data/'); await axios.put('http://localhost:8001/api/herbier-data/',{...data.data,plantes}); this.plantes=plantes; this.showToast('Plante supprimée','success') } },
     closeModal(){ this.showModal=false },
     showToast(t,m){ this.toastType=t; this.toastMessage=m; setTimeout(()=>{this.toastMessage=''},3000) },
-    handleImageError(e){ e.target.src='/src/images/placeholder.jpg' },
+    handleImageError(e){ e.target.src='/images/placeholder.jpg' },
     formatDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('fr-FR') }
   }
 }
