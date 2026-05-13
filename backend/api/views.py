@@ -382,3 +382,72 @@ class PlanteViewSet(viewsets.ModelViewSet):
             total=Count('plantes')
         ).values('id', 'nom', 'famille__nom', 'total')
         return Response(list(genres))
+
+# Fonctions supplémentaires
+@api_view(['GET'])
+def search_suggestions(request):
+    """Suggestions de recherche"""
+    query = request.query_params.get('q', '')
+    if not query:
+        return Response([])
+    
+    plantes = Plante.objects.filter(nom__icontains=query)[:10]
+    suggestions = [{'nom': p.nom, 'id': p.id} for p in plantes]
+    return Response(suggestions)
+
+@api_view(['GET'])
+def get_slide_images(request):
+    """Récupérer les images des slides"""
+    slides = Slide.objects.filter(actif=True).order_by('ordre')
+    data = [{'id': s.id, 'titre': s.titre, 'texte': s.texte_botanique, 'image': s.image.url if s.image else None} for s in slides]
+    return Response(data)
+
+@api_view(['GET'])
+def dashboard_stats(request):
+    """Statistiques du tableau de bord"""
+    return Response({
+        'plantes': Plante.objects.count(),
+        'equipe': Equipe.objects.count(),
+        'projets': Projet.objects.count(),
+        'slides': Slide.objects.filter(actif=True).count(),
+    })
+
+@api_view(['GET'])
+def get_activites_data(request):
+    """Données pour la page Activités"""
+    return Response({
+        'activites': ActiviteSerializer(Activite.objects.filter(actif=True), many=True).data,
+        'temoignages': TemoignageSerializer(Temoignage.objects.filter(actif=True), many=True).data,
+    })
+
+@api_view(['GET'])
+def get_projets_data(request):
+    """Données pour la page Projets"""
+    return Response({
+        'projets': ProjetSerializer(Projet.objects.all(), many=True).data,
+    })
+
+@api_view(['GET'])
+def get_contact_data(request):
+    """Données pour la page Contact"""
+    return Response({
+        'equipe': EquipeSerializer(Equipe.objects.filter(actif=True), many=True).data,
+        'faqs': FAQSerializer(FAQ.objects.filter(actif=True), many=True).data,
+    })
+
+@api_view(['POST'])
+def submit_contact(request):
+    """Soumettre un message de contact"""
+    serializer = ContactMessageSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'success': True, 'message': 'Message envoyé'})
+    return Response({'success': False, 'errors': serializer.errors}, status=400)
+
+@api_view(['GET'])
+def herbier_stats(request):
+    """Statistiques globales"""
+    return Response({
+        'total_plantes': Plante.objects.count(),
+        'total_familles': FamilleBotanique.objects.count(),
+    })
