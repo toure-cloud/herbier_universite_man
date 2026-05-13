@@ -486,7 +486,7 @@ export default {
 .slide {
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 80%;
     opacity: 0;
     transition: opacity 1s ease-in-out;
 }
