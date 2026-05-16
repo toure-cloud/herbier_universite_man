@@ -190,3 +190,16 @@ def get_current_user(request):
     """Récupérer l'utilisateur connecté"""
     serializer = SuperAdminSerializer(request.user)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def api_root(request):
+    return Response({
+        'message': 'API Admin Herbier Universite de Man',
+        'version': '1.0.0',
+        'endpoints': {
+            'create-superadmin': '/api/create-superadmin/',
+            'login': '/api/login/',
+            'verify-2fa': '/api/verify-2fa/',
+            'me': '/api/me/'
+        }
+    })
