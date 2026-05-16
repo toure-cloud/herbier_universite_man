@@ -111,6 +111,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://herbier-frontend-public.onrender.com",
     "https://herbier-admin-frontend.onrender.com",  # Pas de slash à la fin
 ]
+AUTH_USER_MODEL = 'api.SuperAdmin'
 
 
 # Permettre les requêtes de l'admin

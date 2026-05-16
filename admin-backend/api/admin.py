@@ -1,37 +1,39 @@
 from django.contrib import admin
-from .models import Plante, Equipe, Partenaire, Slide, Projet, Contact
+from .models import SuperAdmin, OTPCode, APICache, APISyncLog
 
-@admin.register(Plante)
-class PlanteAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'famille', 'date_creation')
-    search_fields = ('nom', 'famille')
-    list_filter = ('famille',)
+@admin.register(SuperAdmin)
+class SuperAdminAdmin(admin.ModelAdmin):
+    list_display = ('email', 'nom', 'telephone', 'pays_code', 'is_active', 'date_joined')
+    list_filter = ('is_active', 'is_staff', 'is_superuser')
+    search_fields = ('email', 'nom', 'telephone')
+    readonly_fields = ('date_joined', 'last_login')
+    fieldsets = (
+        ('Informations personnelles', {
+            'fields': ('email', 'nom', 'telephone', 'pays_code')
+        }),
+        ('Authentification', {
+            'fields': ('password', 'is_active', 'is_staff', 'is_superuser')
+        }),
+        ('Dates', {
+            'fields': ('date_joined', 'last_login')
+        }),
+    )
 
-@admin.register(Equipe)
-class EquipeAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'poste', 'email')
-    search_fields = ('nom', 'poste')
+@admin.register(OTPCode)
+class OTPCodeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'code', 'type', 'created_at', 'expires_at', 'is_used')
+    list_filter = ('type', 'is_used')
+    search_fields = ('user__email', 'code')
+    readonly_fields = ('created_at',)
 
-@admin.register(Partenaire)
-class PartenaireAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'site_web')
-    search_fields = ('nom',)
+@admin.register(APICache)
+class APICacheAdmin(admin.ModelAdmin):
+    list_display = ('endpoint', 'last_update')
+    search_fields = ('endpoint',)
 
-@admin.register(Slide)
-class SlideAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'ordre', 'actif')
-    list_editable = ('ordre', 'actif')
-    search_fields = ('titre',)
-
-@admin.register(Projet)
-class ProjetAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'categorie', 'statut', 'annee')
-    list_filter = ('categorie', 'statut')
-    search_fields = ('titre', 'description')
-
-@admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'email', 'sujet', 'date_envoi', 'lu')
-    list_editable = ('lu',)
-    list_filter = ('sujet', 'lu')
-    search_fields = ('nom', 'email')
+@admin.register(APISyncLog)
+class APISyncLogAdmin(admin.ModelAdmin):
+    list_display = ('action', 'status', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('action', 'message')
+    readonly_fields = ('created_at',)

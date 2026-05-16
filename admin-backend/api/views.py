@@ -90,7 +90,7 @@ def login_superadmin(request):
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
         
-        user = authenticate(username=email, password=password)
+        user = authenticate_manual(username=email, password=password)
         
         if user and user.is_superuser:
             # Générer un nouveau code OTP

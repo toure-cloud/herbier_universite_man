@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-import random
-import string
 
 class SuperAdminManager(BaseUserManager):
     def create_user(self, email, nom, telephone, password=None, **extra_fields):
@@ -36,6 +34,24 @@ class SuperAdmin(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(null=True, blank=True)
+    
+    # Ajouter related_name pour éviter les conflits
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='superadmin_set',
+        related_query_name='superadmin',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='superadmin_set',
+        related_query_name='superadmin',
+    )
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nom', 'telephone']
@@ -79,7 +95,7 @@ class APICache(models.Model):
 
 class APISyncLog(models.Model):
     action = models.CharField(max_length=100)
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=[('SUCCESS', 'Succès'), ('ERROR', 'Erreur')])
     message = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
