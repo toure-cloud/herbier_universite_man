@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8001/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -25,24 +25,13 @@ export const useAuthStore = defineStore('auth', {
     
     async register(userData) {
       try {
-        const response = await axios.post(`${API_URL}/create-superadmin/`, userData, {
-          headers: { 'Content-Type': 'application/json' }
-        })
+        const response = await axios.post(`${API_URL}/create-superadmin/`, userData)
         if (response.data.success) {
           this.setEmail(response.data.email)
           return { success: true, message: response.data.message }
         }
-        return { success: false, message: 'Erreur inconnue' }
       } catch (error) {
-        let errorMessage = 'Erreur lors de l\'inscription'
-        if (error.response?.data?.error) {
-          errorMessage = error.response.data.error
-        } else if (error.response?.data?.email) {
-          errorMessage = error.response.data.email[0]
-        } else if (error.response?.data?.telephone) {
-          errorMessage = error.response.data.telephone[0]
-        }
-        return { success: false, message: errorMessage }
+        return { success: false, message: error.response?.data?.error || 'Erreur lors de l\'inscription' }
       }
     },
     
@@ -53,7 +42,6 @@ export const useAuthStore = defineStore('auth', {
           this.setEmail(response.data.email)
           return { success: true, requires2FA: true, message: response.data.message }
         }
-        return { success: false, message: 'Email ou mot de passe incorrect' }
       } catch (error) {
         return { success: false, message: error.response?.data?.error || 'Erreur de connexion' }
       }
@@ -74,67 +62,35 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('access_token', this.accessToken)
           localStorage.setItem('refresh_token', this.refreshToken)
           
-          // Configurer axios pour inclure le token dans toutes les requêtes
           axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
           
           return { success: true }
         }
-        return { success: false, message: response.data.error || 'Code invalide' }
       } catch (error) {
         return { success: false, message: error.response?.data?.error || 'Code invalide' }
       }
     },
     
     async logout() {
-      try {
-        if (this.refreshToken) {
-          await axios.post(`${API_URL}/logout/`, { refresh: this.refreshToken })
-        }
-      } catch (error) {
-        console.error('Erreur lors de la déconnexion', error)
-      } finally {
-        this.accessToken = null
-        this.refreshToken = null
-        this.user = null
-        this.email = ''
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('auth_email')
-        delete axios.defaults.headers.common['Authorization']
-      }
+      this.accessToken = null
+      this.refreshToken = null
+      this.user = null
+      this.email = ''
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('auth_email')
+      delete axios.defaults.headers.common['Authorization']
     },
     
     async fetchUser() {
-      if (!this.accessToken) {
-        return null
-      }
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
-      
-      try {
-        const response = await axios.get(`${API_URL}/me/`)
-        this.user = response.data
-        return this.user
-      } catch (error) {
-        // Token invalide ou expiré
-        if (error.response?.status === 401) {
+      if (this.accessToken) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
+        try {
+          const response = await axios.get(`${API_URL}/me/`)
+          this.user = response.data
+        } catch (error) {
           await this.logout()
         }
-        throw error
-      }
-    },
-    
-    // Vérifier si le token est encore valide
-    async checkAuth() {
-      if (!this.accessToken) {
-        return false
-      }
-      
-      try {
-        await this.fetchUser()
-        return true
-      } catch (error) {
-        return false
       }
     }
   }
