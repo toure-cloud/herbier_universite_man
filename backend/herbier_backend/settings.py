@@ -107,8 +107,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://herbier-universite-man.onrender.com",  # Pas de slash à la fin
+    "https://herbier-universite-man.onrender.com",
+    "https://herbier-frontend-public.onrender.com",
+    "https://herbier-admin-frontend.onrender.com",  # Pas de slash à la fin
 ]
+
+
+# Permettre les requêtes de l'admin
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_CREDENTIALS = True
 

@@ -1,20 +1,17 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenRefreshView
+from django.urls import path
 from . import views
 
-router = DefaultRouter()
-router.register(r'users', views.UserViewSet, basename='user')
-
 urlpatterns = [
-    path('', include(router.urls)),
-    path('create-superadmin/', views.create_superadmin, name='create_superadmin'),
-    path('login/', views.login_superadmin, name='login'),
-    path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
-    path('logout/', views.logout_superadmin, name='logout'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('herbier-data/', views.manage_herbier_data, name='herbier_data'),
-    path('login-history/', views.get_login_history, name='login_history'),
-    path('audit-logs/', views.get_audit_logs, name='audit_logs'),
-    path('change-password/', views.change_password, name='change_password'),
+    # Synchronisation
+    path('sync-all/', views.sync_all_data, name='sync_all'),
+    path('sync/<str:endpoint>/', views.sync_endpoint, name='sync_endpoint'),
+    path('push/<str:endpoint>/', views.push_to_public_api, name='push_to_public'),
+    path('sync-logs/', views.get_sync_logs, name='sync_logs'),
+    
+    # Dashboard et stats
+    path('stats/', views.get_stats, name='stats'),
+    path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    
+    # SuperAdmin
+    path('superadmins/', views.SuperAdminViewSet.as_view({'get': 'list', 'post': 'create'}), name='superadmins'),
 ]

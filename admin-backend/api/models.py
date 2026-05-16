@@ -1,120 +1,34 @@
 from django.db import models
 from django.utils import timezone
+import requests
+from django.conf import settings
 
-class Plante(models.Model):
-    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
-    famille = models.CharField(max_length=200, verbose_name="Famille botanique")
-    description = models.TextField(verbose_name="Description")
-    image = models.ImageField(upload_to='plantes/', blank=True, null=True)
-    nom_scientifique = models.CharField(max_length=200, blank=True)
-    habitat = models.CharField(max_length=300, blank=True)
-    statut_conservation = models.CharField(max_length=100, blank=True)
-    date_creation = models.DateTimeField(default=timezone.now)
-    
-    class Meta:
-        verbose_name = "Plante"
-        verbose_name_plural = "Plantes"
-        ordering = ['nom']
-    
-    def __str__(self):
-        return self.nom
-
-class Equipe(models.Model):
+class SuperAdmin(models.Model):
+    email = models.EmailField(unique=True)
     nom = models.CharField(max_length=200)
-    photo = models.ImageField(upload_to='equipe/', blank=True, null=True)
-    poste = models.CharField(max_length=200)
-    email = models.EmailField(blank=True)
-    specialite = models.CharField(max_length=200, blank=True)
-    ordre = models.IntegerField(default=0)
-    
-    class Meta:
-        verbose_name = "Membre de l'équipe"
-        verbose_name_plural = "Membres de l'équipe"
-        ordering = ['ordre', 'nom']
+    telephone = models.CharField(max_length=20)
+    password = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return self.nom
+        return f"{self.nom} - {self.email}"
 
-class Partenaire(models.Model):
-    nom = models.CharField(max_length=200)
-    logo = models.ImageField(upload_to='partenaires/', blank=True, null=True)
-    site_web = models.URLField(blank=True)
-    description = models.TextField(blank=True)
-    ordre = models.IntegerField(default=0)
-    
-    class Meta:
-        verbose_name = "Partenaire"
-        verbose_name_plural = "Partenaires"
-        ordering = ['ordre', 'nom']
+class APICache(models.Model):
+    """Cache pour les données récupérées de l'API publique"""
+    endpoint = models.CharField(max_length=200, unique=True)
+    data = models.JSONField()
+    last_update = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.nom
+        return self.endpoint
 
-class Slide(models.Model):
-    titre = models.CharField(max_length=200)
-    texte_botanique = models.TextField()
-    image = models.ImageField(upload_to='slides/', blank=True, null=True)
-    image_url = models.URLField(blank=True, null=True)
-    ordre = models.IntegerField(default=0)
-    actif = models.BooleanField(default=True)
-    
-    class Meta:
-        ordering = ['ordre']
+class APISyncLog(models.Model):
+    """Log des synchronisations avec l'API publique"""
+    action = models.CharField(max_length=100)
+    status = models.CharField(max_length=20)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.titre
-
-class Projet(models.Model):
-    STATUT_CHOICES = [
-        ('termine', 'Terminé'),
-        ('encours', 'En cours'),
-        ('planifie', 'Planifié'),
-    ]
-    
-    CATEGORIE_CHOICES = [
-        ('recherche', 'Recherche'),
-        ('conservation', 'Conservation'),
-        ('formation', 'Formation'),
-        ('developpement', 'Développement'),
-    ]
-    
-    titre = models.CharField(max_length=200)
-    description = models.TextField()
-    description_longue = models.TextField(blank=True)
-    categorie = models.CharField(max_length=50, choices=CATEGORIE_CHOICES, default='recherche')
-    statut = models.CharField(max_length=50, choices=STATUT_CHOICES, default='encours')
-    featured = models.BooleanField(default=False)
-    annee = models.CharField(max_length=50)
-    lieu = models.CharField(max_length=200)
-    partenaires = models.IntegerField(default=0)
-    beneficiaires = models.CharField(max_length=100, blank=True)
-    budget = models.CharField(max_length=100, blank=True)
-    duree = models.CharField(max_length=100, blank=True)
-    impact = models.CharField(max_length=200, blank=True)
-    progression = models.IntegerField(default=0)
-    image = models.ImageField(upload_to='projets/', blank=True, null=True)
-    tags = models.CharField(max_length=500, blank=True)
-    caption = models.CharField(max_length=200, blank=True)
-    
-    class Meta:
-        verbose_name = "Projet"
-        verbose_name_plural = "Projets"
-        ordering = ['-featured', '-annee']
-    
-    def __str__(self):
-        return self.titre
-
-class Contact(models.Model):
-    nom = models.CharField(max_length=200)
-    email = models.EmailField()
-    telephone = models.CharField(max_length=50, blank=True)
-    sujet = models.CharField(max_length=200)
-    message = models.TextField()
-    date_envoi = models.DateTimeField(default=timezone.now)
-    lu = models.BooleanField(default=False)
-    
-    class Meta:
-        ordering = ['-date_envoi']
-    
-    def __str__(self):
-        return f"{self.nom} - {self.sujet}"
+        return f"{self.action} - {self.status} - {self.created_at}"
