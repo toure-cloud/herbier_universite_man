@@ -1,0 +1,43 @@
+services:
+  # Backend public
+  - type: web
+    name: herbier-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn herbier_backend.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: PYTHON_VERSION
+        value: 3.11.10
+
+  # Admin backend
+  - type: web
+    name: herbier-admin-backend
+    runtime: python
+    rootDir: admin-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn admin_auth.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: PYTHON_VERSION
+        value: 3.11.10
+
+  # Frontend public
+  - type: static
+    name: herbier-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+
+  # Admin frontend
+  - type: static
+    name: herbier-admin-frontend
+    rootDir: admin-frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://herbier-admin-backend.onrender.com
