@@ -1,60 +1,65 @@
 from rest_framework import serializers
-from django.contrib.auth.password_validation import validate_password
-from .models import SuperAdmin, OTPCode, HerbierData, LoginHistory, AuditLog
+from .models import SuperAdmin, OTPCode
 import re
 
-class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+class SuperAdminCreateSerializer(serializers.Serializer):
+    nom = serializers.CharField(max_length=200)
+    email = serializers.EmailField()
+    telephone = serializers.CharField(max_length=20)
+    pays_code = serializers.CharField(max_length=10, default='+225')
+    password = serializers.CharField(write_only=True, min_length=6)
+    password2 = serializers.CharField(write_only=True)
     
-    class Meta:
-        model = SuperAdmin
-        fields = ['id', 'email', 'nom', 'telephone', 'is_active', 'is_superuser', 'password', 'password2', 'created_by']
-        read_only_fields = ['id', 'created_by']
-    
-    def validate_telephone(self, value):
-        value = value.strip()
-        phone_pattern = re.compile(r'^(\+225|0)?[0-9]{8,10}$')
-        if not phone_pattern.match(value):
-            raise serializers.ValidationError("Format de téléphone invalide")
-        if SuperAdmin.objects.filter(telephone=value).exists():
-            raise serializers.ValidationError("Ce numéro est déjà utilisé")
-        return value
+    # Liste des pays supportés avec leurs longueurs
+    COUNTRY_PHONE_LENGTHS = {
+        '+225': 10, '+33': 9, '+221': 9, '+237': 9, '+223': 8, '+226': 8,
+        '+224': 9, '+228': 8, '+229': 8, '+227': 8, '+241': 9, '+243': 9,
+        '+212': 9, '+216': 8, '+213': 9, '+233': 9, '+234': 10, '+254': 9,
+        '+27': 9, '+20': 10, '+32': 9, '+41': 9, '+352': 9, '+377': 8,
+        '+49': 10, '+34': 9, '+39': 10, '+351': 9, '+44': 10, '+353': 9,
+        '+31': 9, '+46': 9, '+47': 8, '+45': 8, '+358': 9, '+48': 9,
+        '+420': 9, '+43': 9, '+30': 10, '+7': 10, '+1': 10, '+52': 10,
+        '+55': 11, '+54': 10, '+56': 9, '+57': 10, '+86': 11, '+91': 10,
+        '+81': 10, '+82': 10, '+61': 9
+    }
     
     def validate_email(self, value):
         if SuperAdmin.objects.filter(email=value).exists():
             raise serializers.ValidationError("Cet email est déjà utilisé")
         return value
     
+    def validate_telephone(self, value):
+        # Supprimer les espaces et tirets
+        value = re.sub(r'[\s\-]', '', value)
+        if not value.isdigit():
+            raise serializers.ValidationError("Le numéro de téléphone doit contenir uniquement des chiffres")
+        return value
+    
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas"})
+        
+        # Vérifier la longueur du téléphone selon le pays
+        pays_code = attrs.get('pays_code', '+225')
+        expected_length = self.COUNTRY_PHONE_LENGTHS.get(pays_code, 10)
+        telephone = attrs.get('telephone', '')
+        
+        if len(telephone) != expected_length:
+            raise serializers.ValidationError({
+                "telephone": f"Le numéro doit contenir {expected_length} chiffres pour ce pays"
+            })
+        
         return attrs
     
     def create(self, validated_data):
         validated_data.pop('password2')
-        user = SuperAdmin.objects.create_user(**validated_data)
+        telephone = validated_data.pop('telephone')
+        
+        user = SuperAdmin.objects.create_user(
+            **validated_data,
+            telephone=telephone
+        )
         return user
-
-class UserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SuperAdmin
-        fields = ['id', 'email', 'nom', 'telephone', 'is_active', 'is_superuser']
-        read_only_fields = ['id']
-
-class UserListSerializer(serializers.ModelSerializer):
-    created_by_name = serializers.CharField(source='created_by.nom', read_only=True)
-    
-    class Meta:
-        model = SuperAdmin
-        fields = ['id', 'email', 'nom', 'telephone', 'is_active', 'is_superuser', 'date_joined', 'last_login', 'created_by', 'created_by_name']
-
-class AuditLogSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.nom', read_only=True)
-    
-    class Meta:
-        model = AuditLog
-        fields = '__all__'
 
 class SuperAdminLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -64,13 +69,8 @@ class OTPVerifySerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
 
-class HerbierDataSerializer(serializers.ModelSerializer):
+class SuperAdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = HerbierData
-        fields = '__all__'
-        read_only_fields = ['updated_at', 'updated_by']
-
-class LoginHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoginHistory
-        fields = ['id', 'ip_address', 'user_agent', 'login_time', 'success']
+        model = SuperAdmin
+        fields = ['id', 'email', 'nom', 'telephone', 'pays_code', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'date_joined', 'last_login']
