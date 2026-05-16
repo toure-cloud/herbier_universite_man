@@ -78,10 +78,10 @@
             </select>
             <input 
               type="tel" 
-              v-model="form.telephone" 
+              v-model="displayPhone" 
               :placeholder="phonePlaceholder"
-              :maxlength="phoneMaxLength"
-              @input="validatePhoneInput"
+              @input="formatPhoneInput"
+              @blur="validatePhone"
               :class="{ 'error-input': errors.telephone }"
             >
           </div>
@@ -150,7 +150,6 @@
         {{ errorMessage }}
       </div>
 
-      <!-- Affichage des erreurs détaillées -->
       <div v-if="serverErrors.length" class="alert alert-error">
         <i class="fas fa-times-circle"></i>
         <div>
@@ -174,10 +173,11 @@ export default {
       form: {
         nom: '',
         email: '',
-        telephone: '',
+        telephone: '',  // Stocke le numéro sans espaces
         password: '',
         password2: ''
       },
+      displayPhone: '',  // Stocke l'affichage avec espaces
       selectedCountry: {
         code: 'CI',
         name: 'Côte d\'Ivoire',
@@ -269,60 +269,81 @@ export default {
     phonePlaceholder() {
       return `Ex: ${this.selectedCountry.phoneFormat}`
     },
-    phoneMaxLength() {
-      // Retourner la longueur maximale sans les séparateurs
-      return this.selectedCountry.phoneLength
-    },
     phoneHelperText() {
       return `Format attendu : ${this.selectedCountry.phoneLength} chiffres (sans le ${this.selectedCountry.dialCode})`
     }
   },
   methods: {
-    validatePhoneInput() {
-      // Supprimer les espaces et caractères non numériques
-      let value = this.form.telephone.replace(/\D/g, '')
+    formatPhoneInput() {
+      // Récupérer la valeur brute (uniquement les chiffres)
+      let rawValue = this.displayPhone.replace(/\D/g, '')
       
       // Limiter la longueur
-      if (value.length > this.phoneMaxLength) {
-        value = value.slice(0, this.phoneMaxLength)
+      if (rawValue.length > this.selectedCountry.phoneLength) {
+        rawValue = rawValue.slice(0, this.selectedCountry.phoneLength)
       }
       
-      // Formater l'affichage selon le pays
-      let formatted = value
+      // Stocker le numéro brut sans espaces
+      this.form.telephone = rawValue
       
-      // Formatage spécial pour certains pays
+      // Formater l'affichage selon le pays
+      let formatted = rawValue
+      
       if (this.selectedCountry.code === 'CA' || this.selectedCountry.code === 'US') {
         // Format US/Canada: XXX-XXX-XXXX
-        if (value.length >= 3) formatted = value.slice(0, 3) + (value.length > 3 ? '-' + value.slice(3, 6) : '')
-        if (value.length >= 6) formatted = formatted.slice(0, 7) + (value.length > 6 ? '-' + value.slice(6, 10) : '')
+        if (rawValue.length >= 3) {
+          formatted = rawValue.slice(0, 3)
+          if (rawValue.length >= 6) {
+            formatted += '-' + rawValue.slice(3, 6)
+            if (rawValue.length >= 10) {
+              formatted += '-' + rawValue.slice(6, 10)
+            } else if (rawValue.length > 6) {
+              formatted += '-' + rawValue.slice(6)
+            }
+          } else if (rawValue.length > 3) {
+            formatted += '-' + rawValue.slice(3)
+          }
+        }
       } else if (this.selectedCountry.code === 'BR') {
         // Format Brésil: XX XXXXX XXXX
-        if (value.length >= 2) formatted = value.slice(0, 2) + (value.length > 2 ? ' ' + value.slice(2, 7) : '')
-        if (value.length >= 7) formatted = formatted.slice(0, 8) + (value.length > 7 ? ' ' + value.slice(7, 11) : '')
+        if (rawValue.length >= 2) {
+          formatted = rawValue.slice(0, 2)
+          if (rawValue.length >= 7) {
+            formatted += ' ' + rawValue.slice(2, 7)
+            if (rawValue.length >= 11) {
+              formatted += ' ' + rawValue.slice(7, 11)
+            } else if (rawValue.length > 7) {
+              formatted += ' ' + rawValue.slice(7)
+            }
+          } else if (rawValue.length > 2) {
+            formatted += ' ' + rawValue.slice(2)
+          }
+        }
       } else {
         // Format standard: espaces tous les 2 chiffres
         let spaced = ''
-        for (let i = 0; i < value.length; i++) {
-          if (i > 0 && i % 2 === 0 && i < this.phoneMaxLength) {
+        for (let i = 0; i < rawValue.length; i++) {
+          if (i > 0 && i % 2 === 0 && i < this.selectedCountry.phoneLength) {
             spaced += ' '
           }
-          spaced += value[i]
+          spaced += rawValue[i]
         }
         formatted = spaced
       }
       
-      this.form.telephone = formatted
-      
-      // Validation en temps réel
-      const cleanNumber = value
-      if (cleanNumber && cleanNumber.length !== this.phoneMaxLength) {
-        this.errors.telephone = `Le numéro doit contenir ${this.phoneMaxLength} chiffres`
-      } else if (cleanNumber) {
+      this.displayPhone = formatted
+    },
+    
+    validatePhone() {
+      if (this.form.telephone && this.form.telephone.length !== this.selectedCountry.phoneLength) {
+        this.errors.telephone = `Le numéro doit contenir ${this.selectedCountry.phoneLength} chiffres`
+      } else if (this.form.telephone) {
         this.errors.telephone = ''
       }
     },
     
     updatePhoneFormat() {
+      this.displayPhone = ''
       this.form.telephone = ''
       this.errors.telephone = ''
     },
@@ -350,12 +371,11 @@ export default {
         isValid = false
       }
       
-      // Validation téléphone
-      const cleanPhone = this.form.telephone.replace(/\D/g, '')
-      if (!cleanPhone || cleanPhone.length !== this.phoneMaxLength) {
-        this.errors.telephone = `Le numéro doit contenir ${this.phoneMaxLength} chiffres`
+      // Validation téléphone - vérifier uniquement les chiffres
+      if (!this.form.telephone || this.form.telephone.length !== this.selectedCountry.phoneLength) {
+        this.errors.telephone = `Le numéro doit contenir ${this.selectedCountry.phoneLength} chiffres`
         isValid = false
-      } else if (!/^\d+$/.test(cleanPhone)) {
+      } else if (!/^\d+$/.test(this.form.telephone)) {
         this.errors.telephone = 'Le numéro ne doit contenir que des chiffres'
         isValid = false
       }
@@ -387,13 +407,10 @@ export default {
       this.errorMessage = ''
       this.serverErrors = []
       
-      // Préparer les données
-      const cleanPhone = this.form.telephone.replace(/\D/g, '')
-      
       const userData = {
         nom: this.form.nom.trim(),
         email: this.form.email.trim(),
-        telephone: cleanPhone,
+        telephone: this.form.telephone,  // Déjà sans espaces
         pays_code: this.selectedCountry.dialCode,
         password: this.form.password,
         password2: this.form.password2
@@ -405,9 +422,7 @@ export default {
         
         if (response.data.success) {
           this.successMessage = response.data.message
-          // Stocker l'email pour la vérification 2FA
           localStorage.setItem('auth_email', response.data.email)
-          // Rediriger vers la vérification 2FA après 3 secondes
           setTimeout(() => {
             this.$router.push('/verify-2fa')
           }, 3000)
