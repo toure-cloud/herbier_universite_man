@@ -13,14 +13,7 @@ def api_root(request):
     return Response({
         'status': 'ok',
         'message': 'Admin API Herbier Universite de Man',
-        'version': '1.0.0',
-        'endpoints': {
-            'health': '/api/health/',
-            'create_superadmin': '/api/create-superadmin/',
-            'login': '/api/login/',
-            'verify_2fa': '/api/verify-2fa/',
-            'dashboard': '/api/dashboard/'
-        }
+        'version': '1.0.0'
     })
 
 @api_view(['GET'])
@@ -31,25 +24,17 @@ def health_check(request):
 
 @csrf_exempt
 @api_view(['POST'])
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-
-@csrf_exempt
-@api_view(['POST'])
 def create_superadmin(request):
     """Créer un nouveau super administrateur"""
     from .serializers import SuperAdminCreateSerializer
+    from .models import OTPCode
     
     serializer = SuperAdminCreateSerializer(data=request.data)
     if serializer.is_valid():
         try:
             user = serializer.save()
             
-            import random
-            import string
-            from django.utils import timezone
-            from .models import OTPCode
-            
+            # Générer le code OTP
             code = ''.join(random.choices(string.digits, k=6))
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
@@ -64,30 +49,34 @@ def create_superadmin(request):
                 'success': True,
                 'message': 'Compte créé avec succès. Un code de vérification a été envoyé.',
                 'email': user.email
-            }, status=201)
+            }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             return Response({
                 'success': False,
                 'errors': {'general': str(e)}
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({
         'success': False,
         'errors': serializer.errors
-    }, status=400)
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
+@api_view(['POST'])
+def login_superadmin(request):
     """Connexion - première étape"""
+    from .models import SuperAdmin, OTPCode
+    
     email = request.data.get('email')
     password = request.data.get('password')
     
-    from .models import SuperAdmin
     try:
         user = SuperAdmin.objects.get(email=email)
         if user.check_password(password):
             code = ''.join(random.choices(string.digits, k=6))
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
-            from .models import OTPCode
             OTPCode.objects.filter(user=user, is_used=False).delete()
             OTPCode.objects.create(
                 user=user,
@@ -117,10 +106,10 @@ def create_superadmin(request):
 @api_view(['POST'])
 def verify_2fa(request):
     """Vérification du code OTP"""
+    from .models import SuperAdmin, OTPCode
+    
     email = request.data.get('email')
     code = request.data.get('code')
-    
-    from .models import SuperAdmin, OTPCode
     
     try:
         user = SuperAdmin.objects.get(email=email)
@@ -158,14 +147,18 @@ def verify_2fa(request):
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def logout_superadmin(request):
+    """Déconnexion"""
+    return Response({'success': True, 'message': 'Déconnecté'})
+
 @api_view(['GET'])
-def dashboard_stats(request):
-    return Response({
-        'total_plantes': 0,
-        'total_equipe': 0,
-        'total_projets': 0,
-        'total_slides': 0
-    })
+def get_current_user(request):
+    """Récupérer l'utilisateur connecté"""
+    if request.user.is_authenticated:
+        from .serializers import SuperAdminSerializer
+        return Response(SuperAdminSerializer(request.user).data)
+    return Response({'error': 'Non authentifié'}, status=401)
 
 # ==================== VIEWSETS ====================
 
@@ -194,12 +187,23 @@ class ProjetViewSet(viewsets.ViewSet):
         return Response({'message': 'Créé'}, status=201)
 
 @api_view(['GET'])
+def dashboard_stats(request):
+    from .models import SuperAdmin
+    return Response({
+        'total_plantes': 0,
+        'total_equipe': 0,
+        'total_projets': 0,
+        'total_slides': 0,
+        'total_admins': SuperAdmin.objects.count()
+    })
+
+@api_view(['GET'])
 def sync_all_data(request):
-    return Response({'status': 'success'})
+    return Response({'status': 'success', 'message': 'Synchronisation terminée'})
 
 @api_view(['GET'])
 def sync_endpoint(request, endpoint):
-    return Response({'status': 'success'})
+    return Response({'status': 'success', 'endpoint': endpoint})
 
 @api_view(['GET'])
 def get_sync_logs(request):
