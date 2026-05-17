@@ -1,20 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from django.contrib.auth import authenticate
-from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 import random
 import string
-import json
-
-# Import conditionnel pour simplejwt
-try:
-    from rest_framework_simplejwt.tokens import RefreshToken
-    SIMPLEJWT_AVAILABLE = True
-except ImportError:
-    SIMPLEJWT_AVAILABLE = False
-    print("Warning: djangorestframework-simplejwt not installed")
 
 # ==================== FONCTIONS DE BASE ====================
 
@@ -29,8 +19,6 @@ def api_root(request):
             'create_superadmin': '/api/create-superadmin/',
             'login': '/api/login/',
             'verify_2fa': '/api/verify-2fa/',
-            'logout': '/api/logout/',
-            'me': '/api/me/',
             'dashboard': '/api/dashboard/'
         }
     })
@@ -39,11 +27,9 @@ def api_root(request):
 def health_check(request):
     return Response({'status': 'healthy', 'timestamp': timezone.now().isoformat()})
 
-# ==================== FONCTIONS D'AUTHENTIFICATION ====================
+# ==================== AUTHENTIFICATION ====================
 
-def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
-
+@csrf_exempt
 @api_view(['POST'])
 def create_superadmin(request):
     """Créer un nouveau super administrateur"""
@@ -55,7 +41,7 @@ def create_superadmin(request):
             user = serializer.save()
             
             # Générer le code OTP
-            code = generate_otp()
+            code = ''.join(random.choices(string.digits, k=6))
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
             from .models import OTPCode
@@ -83,6 +69,7 @@ def create_superadmin(request):
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
 
+@csrf_exempt
 @api_view(['POST'])
 def login_superadmin(request):
     """Connexion - première étape"""
@@ -93,7 +80,7 @@ def login_superadmin(request):
     try:
         user = SuperAdmin.objects.get(email=email)
         if user.check_password(password):
-            code = generate_otp()
+            code = ''.join(random.choices(string.digits, k=6))
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
             from .models import OTPCode
@@ -122,6 +109,7 @@ def login_superadmin(request):
             'error': 'Email ou mot de passe incorrect'
         }, status=status.HTTP_401_UNAUTHORIZED)
 
+@csrf_exempt
 @api_view(['POST'])
 def verify_2fa(request):
     """Vérification du code OTP"""
@@ -137,27 +125,22 @@ def verify_2fa(request):
         if otp and otp.is_valid():
             otp.is_used = True
             otp.save()
-            
             user.is_active = True
             user.save()
             
-            # Générer un token simple si simplejwt n'est pas disponible
+            # Générer un token simple
             import hashlib
-            import time
-            token_data = f"{user.email}:{int(time.time())}"
-            simple_token = hashlib.md5(token_data.encode()).hexdigest()
+            token = hashlib.md5(f"{user.email}:{timezone.now()}".encode()).hexdigest()
             
             return Response({
                 'success': True,
-                'message': 'Authentification réussie',
-                'access': simple_token,
-                'refresh': simple_token,
+                'access': token,
+                'refresh': token,
                 'user': {
                     'id': user.id,
                     'email': user.email,
                     'nom': user.nom,
-                    'telephone': user.telephone,
-                    'pays_code': user.pays_code
+                    'telephone': user.telephone
                 }
             })
         else:
@@ -165,70 +148,55 @@ def verify_2fa(request):
                 'success': False,
                 'error': 'Code invalide ou expiré'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
-    except SuperAdmin.DoesNotExist:
+    except Exception as e:
         return Response({
             'success': False,
-            'error': 'Utilisateur non trouvé'
-        }, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])
-def logout_superadmin(request):
-    """Déconnexion"""
-    return Response({'success': True, 'message': 'Déconnecté'})
-
-@api_view(['GET'])
-def get_current_user(request):
-    """Récupérer l'utilisateur connecté"""
-    # Pour l'instant, retourner un message simple
-    return Response({'message': 'Utilisateur non authentifié'}, status=401)
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def dashboard_stats(request):
-    """Statistiques du tableau de bord"""
-    from .models import SuperAdmin
     return Response({
         'total_plantes': 0,
         'total_equipe': 0,
         'total_projets': 0,
-        'total_slides': 0,
-        'total_admins': SuperAdmin.objects.count()
+        'total_slides': 0
     })
-
-@api_view(['GET'])
-def sync_all_data(request):
-    return Response({'status': 'success', 'message': 'Synchronisation terminée'})
-
-@api_view(['GET'])
-def sync_endpoint(request, endpoint):
-    return Response({'status': 'success', 'endpoint': endpoint})
-
-@api_view(['GET'])
-def get_sync_logs(request):
-    return Response([])
 
 # ==================== VIEWSETS ====================
 
 class PlanteViewSet(viewsets.ViewSet):
     def list(self, request):
-        return Response({'message': 'Liste des plantes', 'data': []})
+        return Response({'data': []})
     def create(self, request):
-        return Response({'message': 'Plante créée'}, status=201)
+        return Response({'message': 'Créé'}, status=201)
 
 class EquipeViewSet(viewsets.ViewSet):
     def list(self, request):
-        return Response({'message': 'Liste équipe', 'data': []})
+        return Response({'data': []})
     def create(self, request):
-        return Response({'message': 'Membre créé'}, status=201)
+        return Response({'message': 'Créé'}, status=201)
 
 class SlideViewSet(viewsets.ViewSet):
     def list(self, request):
-        return Response({'message': 'Liste slides', 'data': []})
+        return Response({'data': []})
     def create(self, request):
-        return Response({'message': 'Slide créé'}, status=201)
+        return Response({'message': 'Créé'}, status=201)
 
 class ProjetViewSet(viewsets.ViewSet):
     def list(self, request):
-        return Response({'message': 'Liste projets', 'data': []})
+        return Response({'data': []})
     def create(self, request):
-        return Response({'message': 'Projet créé'}, status=201)
+        return Response({'message': 'Créé'}, status=201)
+
+@api_view(['GET'])
+def sync_all_data(request):
+    return Response({'status': 'success'})
+
+@api_view(['GET'])
+def sync_endpoint(request, endpoint):
+    return Response({'status': 'success'})
+
+@api_view(['GET'])
+def get_sync_logs(request):
+    return Response([])
