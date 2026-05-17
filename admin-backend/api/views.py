@@ -31,6 +31,11 @@ def health_check(request):
 
 @csrf_exempt
 @api_view(['POST'])
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+
+@csrf_exempt
+@api_view(['POST'])
 def create_superadmin(request):
     """Créer un nouveau super administrateur"""
     from .serializers import SuperAdminCreateSerializer
@@ -40,11 +45,14 @@ def create_superadmin(request):
         try:
             user = serializer.save()
             
-            # Générer le code OTP
+            import random
+            import string
+            from django.utils import timezone
+            from .models import OTPCode
+            
             code = ''.join(random.choices(string.digits, k=6))
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
-            from .models import OTPCode
             OTPCode.objects.create(
                 user=user,
                 code=code,
@@ -56,22 +64,18 @@ def create_superadmin(request):
                 'success': True,
                 'message': 'Compte créé avec succès. Un code de vérification a été envoyé.',
                 'email': user.email
-            }, status=status.HTTP_201_CREATED)
+            }, status=201)
             
         except Exception as e:
             return Response({
                 'success': False,
                 'errors': {'general': str(e)}
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=400)
     
     return Response({
         'success': False,
         'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
-
-@csrf_exempt
-@api_view(['POST'])
-def login_superadmin(request):
+    }, status=400)
     """Connexion - première étape"""
     email = request.data.get('email')
     password = request.data.get('password')
