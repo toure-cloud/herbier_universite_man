@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-// URL de base - DOIT pointer vers /api
+// URL de base - CORRECTE avec /api
 const API_URL = 'https://herbier-admin-backend.onrender.com/api'
 
 console.log('🔧 API URL:', API_URL)
 
 const api = axios.create({
-  baseURL: `${API_URL}`,
+  baseURL: API_URL,  // Important : pas de /api supplémentaire
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +29,6 @@ api.interceptors.response.use(
   }
 )
 
-// API d'authentification
 export const authAPI = {
   register: (userData) => api.post('/create-superadmin/', userData),
   login: (credentials) => api.post('/login/', credentials),
