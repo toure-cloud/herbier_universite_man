@@ -117,7 +117,6 @@ AUTH_USER_MODEL = 'api.SuperAdmin'
 # Permettre les requêtes de l'admin
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
     'DELETE',
