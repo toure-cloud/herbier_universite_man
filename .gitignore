@@ -45,3 +45,11 @@ secrets.py
 bun.lockb
 package.json
 index.tsx
+
+# Admin backend
+admin-backend/__pycache__/
+admin-backend/*.pyc
+admin-backend/admin_db.sqlite3
+admin-backend/venv/
+admin-backend/staticfiles/
+admin-backend/media/

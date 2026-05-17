@@ -76,3 +76,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 os.makedirs(STATIC_ROOT, exist_ok=True)
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
+
+# Configuration CORS pour le frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://herbier-frontend.onrender.com",
+    "https://herbier-admin-frontend.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
