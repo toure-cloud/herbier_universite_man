@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-// URL de base - CORRECTE avec /api
+// URL EN DUR avec /api
 const API_URL = 'https://herbier-admin-backend.onrender.com/api'
 
 console.log('🔧 API URL:', API_URL)
 
 const api = axios.create({
-  baseURL: API_URL,  // Important : pas de /api supplémentaire
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,6 +29,7 @@ api.interceptors.response.use(
   }
 )
 
+// API d'authentification
 export const authAPI = {
   register: (userData) => api.post('/create-superadmin/', userData),
   login: (credentials) => api.post('/login/', credentials),
@@ -37,6 +38,7 @@ export const authAPI = {
   getCurrentUser: () => api.get('/me/'),
 }
 
+// API publique (pour le dashboard)
 export const publicAPI = {
   getPlantes: () => api.get('/plantes/'),
   getEquipe: () => api.get('/equipe/'),
@@ -45,6 +47,7 @@ export const publicAPI = {
   getDashboard: () => api.get('/dashboard/'),
 }
 
+// API d'administration
 export const adminAPI = {
   syncAll: () => api.get('/sync-all/'),
   syncEndpoint: (endpoint) => api.get(`/sync/${endpoint}/`),
