@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 // URL de base
-const API_URL = 'https://herbier-admin-backend.onrender.com/api';
+const API_URL = 'https://herbier-admin-backend.onrender.com';
 
 console.log('🔧 API URL:', API_URL)
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,  // Important: /api est ajouté ici
+  baseURL: `${API_URL}/api`,  
   headers: {
     'Content-Type': 'application/json',
   },
