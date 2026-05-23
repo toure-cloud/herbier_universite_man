@@ -14,45 +14,6 @@ def api_root(request):
 def health_check(request):
     return Response({'status': 'healthy'})
 
-@csrf_exempt
-@api_view(['POST'])
-def create_superadmin(request):
-    """Créer un nouveau super administrateur"""
-    from .serializers import SuperAdminCreateSerializer
-    from .models import OTPCode
-    
-    serializer = SuperAdminCreateSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            user = serializer.save()
-            
-            # Générer le code OTP
-            code = ''.join(random.choices(string.digits, k=6))
-            expires_at = timezone.now() + timezone.timedelta(minutes=10)
-            
-            OTPCode.objects.create(
-                user=user,
-                code=code,
-                type='email',
-                expires_at=expires_at
-            )
-            
-            return Response({
-                'success': True,
-                'message': 'Compte créé avec succès. Un code de vérification a été envoyé.',
-                'email': user.email
-            }, status=status.HTTP_201_CREATED)
-            
-        except Exception as e:
-            return Response({
-                'success': False,
-                'errors': {'general': str(e)}
-            }, status=status.HTTP_400_BAD_REQUEST)
-    
-    return Response({
-        'success': False,
-        'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
 
 @csrf_exempt
 @api_view(['POST'])
@@ -92,6 +53,47 @@ def login_superadmin(request):
             'success': False,
             'error': 'Identifiants incorrects'
         }, status=401)
+    
+
+@csrf_exempt
+@api_view(['POST'])
+def create_superadmin(request):
+    """Créer un nouveau super administrateur"""
+    from .serializers import SuperAdminCreateSerializer
+    from .models import OTPCode
+    
+    serializer = SuperAdminCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            user = serializer.save()
+            
+            # Générer le code OTP
+            code = ''.join(random.choices(string.digits, k=6))
+            expires_at = timezone.now() + timezone.timedelta(minutes=10)
+            
+            OTPCode.objects.create(
+                user=user,
+                code=code,
+                type='email',
+                expires_at=expires_at
+            )
+            
+            return Response({
+                'success': True,
+                'message': 'Compte créé avec succès. Un code de vérification a été envoyé.',
+                'email': user.email
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'errors': {'general': str(e)}
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({
+        'success': False,
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)    
 
 @csrf_exempt
 @api_view(['POST'])
