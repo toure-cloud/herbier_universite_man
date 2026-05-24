@@ -101,9 +101,32 @@ def login_superadmin(request):
 @csrf_exempt
 @api_view(['POST'])
 def create_superadmin(request):
-    """Créer un nouveau super administrateur"""
+    """Créer un nouveau super administrateur avec vérification d'unicité"""
     from .serializers import SuperAdminCreateSerializer
-    from .models import OTPCode
+    
+    # Vérifier si l'email existe déjà
+    email = request.data.get('email')
+    telephone = request.data.get('telephone')
+    
+    # Nettoyer le téléphone
+    if telephone:
+        telephone = re.sub(r'\D', '', telephone)
+    
+    errors = {}
+    
+    # Vérification email
+    if email and SuperAdmin.objects.filter(email=email).exists():
+        errors['email'] = 'Cet email est déjà utilisé. Veuillez en utiliser un autre.'
+    
+    # Vérification téléphone
+    if telephone and SuperAdmin.objects.filter(telephone=telephone).exists():
+        errors['telephone'] = 'Ce numéro de téléphone est déjà utilisé. Veuillez en utiliser un autre.'
+    
+    if errors:
+        return Response({
+            'success': False,
+            'errors': errors
+        }, status=status.HTTP_400_BAD_REQUEST)
     
     serializer = SuperAdminCreateSerializer(data=request.data)
     if serializer.is_valid():
@@ -111,22 +134,32 @@ def create_superadmin(request):
             user = serializer.save()
             
             # Générer le code OTP
-            code = ''.join(random.choices(string.digits, k=6))
+            code = generate_otp()
             expires_at = timezone.now() + timezone.timedelta(minutes=10)
             
+            from .models import OTPCode
             OTPCode.objects.create(
                 user=user,
                 code=code,
-                type='sms',
+                type='email',
                 expires_at=expires_at
             )
             
-            # Envoyer le code par SMS
-            send_sms(user.telephone, code)
+            # Afficher le code dans la console pour les tests
+            print("\n" + "="*60)
+            print("📧 CODE OTP - INSCRIPTION")
+            print("="*60)
+            print(f"📨 Email: {user.email}")
+            print(f"📞 Téléphone: {user.telephone}")
+            print(f"🔑 CODE OTP: {code}")
+            print("="*60)
+            print("⚠️  Utilisez ce code pour la vérification 2FA")
+            print("="*60 + "\n")
             
             return Response({
                 'success': True,
-                'message': 'Compte créé avec succès. Un code de vérification a été envoyé par SMS.',
+                'message': 'Compte créé avec succès. Un code de vérification a été envoyé.',
+                'email': user.email,
                 'telephone': user.telephone
             }, status=status.HTTP_201_CREATED)
             
