@@ -1,7 +1,10 @@
 import axios from 'axios'
 
-// URL EN DUR avec /api
-const API_URL = 'https://herbier-admin-backend.onrender.com/api'
+// 🏠 LOCAL (développement)
+const API_URL = 'http://localhost:8001/api'
+
+// ☁️ PRODUCTION (Render) - décommentez pour déployer
+// const API_URL = 'https://herbier-admin-backend.onrender.com/api'
 
 console.log('🔧 API URL:', API_URL)
 
@@ -29,16 +32,25 @@ api.interceptors.response.use(
   }
 )
 
-// API d'authentification
 export const authAPI = {
   register: (userData) => api.post('/create-superadmin/', userData),
   login: (credentials) => api.post('/login/', credentials),
-  verify2FA: (code) => api.post('/verify-2fa/', { code, email: localStorage.getItem('auth_email') }),
+  
+  // ✅ CORRIGÉ : utilise le téléphone au lieu de l'email
+  verify2FA: (data) => api.post('/verify-2fa/', {
+    telephone: data.telephone,
+    code: data.code
+  }),
+  
   logout: () => api.post('/logout/'),
   getCurrentUser: () => api.get('/me/'),
+  
+  // Ajout de la méthode pour renvoyer le code
+  resendCode: (data) => api.post('/resend-code/', {
+    telephone: data.telephone
+  }),
 }
 
-// API publique (pour le dashboard)
 export const publicAPI = {
   getPlantes: () => api.get('/plantes/'),
   getEquipe: () => api.get('/equipe/'),
@@ -47,13 +59,4 @@ export const publicAPI = {
   getDashboard: () => api.get('/dashboard/'),
 }
 
-// API d'administration
-export const adminAPI = {
-  syncAll: () => api.get('/sync-all/'),
-  syncEndpoint: (endpoint) => api.get(`/sync/${endpoint}/`),
-  getSyncLogs: () => api.get('/sync-logs/'),
-  getStats: () => api.get('/stats/'),
-  getDashboard: () => api.get('/dashboard/'),
-}
-
-export default { authAPI, publicAPI, adminAPI }
+export default { authAPI, publicAPI }

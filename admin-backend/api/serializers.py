@@ -28,8 +28,3 @@ class SuperAdminCreateSerializer(serializers.Serializer):
         )
         return user
 
-class SuperAdminSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SuperAdmin
-        fields = ['id', 'email', 'nom', 'telephone', 'pays_code', 'date_joined', 'last_login']
-        read_only_fields = ['id', 'date_joined', 'last_login']

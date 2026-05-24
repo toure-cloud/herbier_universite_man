@@ -164,7 +164,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+
+import { authAPI } from '../services/api'
 
 export default {
   name: 'Register',
@@ -417,9 +418,7 @@ export default {
       }
       
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api'
-        const response = await axios.post(`${API_URL}/create-superadmin/`, userData)
-        
+        const response = await authAPI.register(userData)
         if (response.data.success) {
           this.successMessage = response.data.message
           localStorage.setItem('auth_email', response.data.email)

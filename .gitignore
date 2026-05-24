@@ -53,3 +53,4 @@ admin-backend/admin_db.sqlite3
 admin-backend/venv/
 admin-backend/staticfiles/
 admin-backend/media/
+*.bak

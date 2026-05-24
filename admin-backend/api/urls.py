@@ -12,7 +12,8 @@ urlpatterns = [
     path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
     path('logout/', views.logout_superadmin, name='logout'),
     path('me/', views.get_current_user, name='me'),
-    
+    path('resend-code/', views.resend_code, name='resend_code'),
+    path('verify-2fa/', views.verify_2fa, name='verify_2fa'),
     # Endpoints de données
     path('plantes/', views.PlanteViewSet.as_view({'get': 'list', 'post': 'create'}), name='plantes'),
     path('equipe/', views.EquipeViewSet.as_view({'get': 'list', 'post': 'create'}), name='equipe'),
