@@ -8,44 +8,53 @@ class SuperAdminCreateSerializer(serializers.Serializer):
     pays_code = serializers.CharField(max_length=10, default='+225')
     password = serializers.CharField(write_only=True, min_length=6)
     password2 = serializers.CharField(write_only=True)
+    role = serializers.CharField(max_length=20, default='admin')
     
     def validate_email(self, value):
-        # Vérifier si l'email existe déjà
         if SuperAdmin.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Cet email est déjà utilisé. Veuillez en utiliser un autre.")
+            raise serializers.ValidationError("Cet email est déjà utilisé")
         return value
     
     def validate_telephone(self, value):
-        # Nettoyer le téléphone
-        value = re.sub(r'\D', '', value)
-        
-        # Vérifier la longueur
+        import re
+        value = re.sub(r'[\s\-]', '', value)
+        if not value.isdigit():
+            raise serializers.ValidationError("Le numéro doit contenir uniquement des chiffres")
         if len(value) < 8 or len(value) > 12:
-            raise serializers.ValidationError("Le numéro de téléphone doit contenir entre 8 et 12 chiffres.")
-        
-        # Vérifier si le téléphone existe déjà
-        if SuperAdmin.objects.filter(telephone=value).exists():
-            raise serializers.ValidationError("Ce numéro de téléphone est déjà utilisé. Veuillez en utiliser un autre.")
-        
+            raise serializers.ValidationError("Le numéro doit contenir entre 8 et 12 chiffres")
         return value
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas."})
+            raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas"})
         return attrs
     
     def create(self, validated_data):
         validated_data.pop('password2')
         telephone = validated_data.pop('telephone')
+        role = validated_data.pop('role', 'admin')
         user = SuperAdmin.objects.create_user(
             **validated_data,
-            telephone=telephone
+            telephone=telephone,
+            role=role
         )
         return user
+
+class SuperAdminUpdateSerializer(serializers.Serializer):
+    nom = serializers.CharField(max_length=200, required=False)
+    telephone = serializers.CharField(max_length=20, required=False)
+    pays_code = serializers.CharField(max_length=10, required=False)
+    role = serializers.CharField(max_length=20, required=False)
+    is_active = serializers.BooleanField(required=False)
+    
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 class SuperAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = SuperAdmin
-        fields = ['id', 'email', 'nom', 'telephone', 'pays_code', 'date_joined', 'last_login']
-        read_only_fields = ['id', 'date_joined', 'last_login']
-
+        fields = ['id', 'email', 'nom', 'telephone', 'pays_code', 'role', 'is_active', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'date_joined', 'last_login', 'email']
