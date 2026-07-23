@@ -1,38 +1,226 @@
 <template>
   <div class="management-page">
-    <aside class="sidebar"><div class="sidebar-header"><div class="logo"><div class="logo-icon"><i class="fas fa-leaf"></i></div><div class="logo-text"><span class="logo-title">Herbier Admin</span><span class="logo-subtitle">Université de Man</span></div></div></div>
-      <nav class="sidebar-nav"><router-link to="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></router-link><router-link to="/plantes" class="nav-item"><i class="fas fa-leaf"></i><span>Plantes</span></router-link><router-link to="/projets" class="nav-item"><i class="fas fa-project-diagram"></i><span>Projets</span></router-link><router-link to="/activites" class="nav-item"><i class="fas fa-chart-line"></i><span>Activités</span></router-link><router-link to="/users" class="nav-item active"><i class="fas fa-users"></i><span>Utilisateurs</span><span class="nav-badge">Admin</span></router-link><router-link to="/settings" class="nav-item"><i class="fas fa-cog"></i><span>Paramètres</span></router-link></nav>
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="logo"><div class="logo-icon"><i class="fas fa-leaf"></i></div><div class="logo-text"><span class="logo-title">Herbier Admin</span><span class="logo-subtitle">Université de Man</span></div></div></div>
+      <nav class="sidebar-nav">
+        <router-link to="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></router-link>
+        <router-link to="/plantes" class="nav-item"><i class="fas fa-leaf"></i><span>Plantes</span></router-link>
+        <router-link to="/projets" class="nav-item"><i class="fas fa-project-diagram"></i><span>Projets</span></router-link>
+        <router-link to="/activites" class="nav-item"><i class="fas fa-chart-line"></i><span>Activités</span></router-link>
+        <router-link to="/users" class="nav-item active"><i class="fas fa-users"></i><span>Utilisateurs</span><span class="nav-badge">Admin</span></router-link>
+        <router-link to="/settings" class="nav-item"><i class="fas fa-cog"></i><span>Paramètres</span></router-link>
+      </nav>
       <div class="sidebar-footer"><div class="user-info-sidebar"><div class="user-avatar-sidebar">{{ userInitials }}</div><div class="user-details-sidebar"><span class="user-name-sidebar">{{ user?.nom || 'Admin' }}</span><span class="user-role">Super Admin</span></div></div><button @click="confirmLogout" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></button></div>
     </aside>
+
     <main class="main-content">
-      <header class="top-bar"><div class="page-title"><h1><i class="fas fa-users"></i> Gestion des utilisateurs</h1><p>Créez, modifiez ou supprimez des utilisateurs</p></div><button @click="openAddUserModal" class="btn-primary"><i class="fas fa-plus"></i> Nouvel utilisateur</button></header>
-      <div class="stats-grid"><div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3>{{ users.length }}</h3><p>Utilisateurs</p></div></div><div class="stat-card"><div class="stat-icon green"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3>{{ activeUsers }}</h3><p>Actifs</p></div></div><div class="stat-card"><div class="stat-icon orange"><i class="fas fa-user-shield"></i></div><div class="stat-info"><h3>{{ adminUsers }}</h3><p>Administrateurs</p></div></div></div>
-      <div class="users-table">\n        <div v-for="u in users" :key="u.id" class="user-card"><div class="user-avatar-large">{{ u.nom?.charAt(0) || 'U' }}</div><div class="user-details"><h3>{{ u.nom }}</h3><p>{{ u.email }}</p><p class="user-phone">{{ u.telephone }}</p><div class="user-meta"><span class="role-badge" :class="{ admin: u.is_superuser }">{{ u.is_superuser ? 'Super Admin' : 'Utilisateur' }}</span><span class="status-badge" :class="{ active: u.is_active }">{{ u.is_active ? 'Actif' : 'Inactif' }}</span><span class="date-badge"><i class="fas fa-calendar"></i> Créé le {{ formatDate(u.date_joined) }}</span></div></div><div class="user-actions"><button @click="editUser(u)" class="btn-edit"><i class="fas fa-edit"></i> Modifier</button><button @click="toggleUserStatus(u)" class="btn-status" :class="{ active: u.is_active }"><i :class="u.is_active ? 'fas fa-ban' : 'fas fa-check'"></i> {{ u.is_active ? 'Désactiver' : 'Activer' }}</button><button @click="deleteUser(u)" class="btn-delete" :disabled="u.id === currentUserId"><i class="fas fa-trash"></i> Supprimer</button></div></div><div v-if="users.length===0" class="empty">Aucun utilisateur</div></div>
-      <div class="modal" :class="{ active: showModal }" @click.self="closeModal"><div class="modal-content"><div class="modal-header"><h2>{{ editingUser ? 'Modifier' : 'Ajouter' }} un utilisateur</h2><button class="close" @click="closeModal"><i class="fas fa-times"></i></button></div><form @submit.prevent="saveUser" class="modal-form"><div class="form-row"><div class="form-group"><label>Nom complet *</label><input type="text" v-model="userForm.nom" required></div><div class="form-group"><label>Email *</label><input type="email" v-model="userForm.email" required></div></div><div class="form-row"><div class="form-group"><label>Téléphone *</label><input type="text" v-model="userForm.telephone" required></div><div class="form-group"><label>Rôle</label><select v-model="userForm.is_superuser"><option :value="false">Utilisateur standard</option><option :value="true">Super Administrateur</option></select></div></div><div class="form-row" v-if="!editingUser"><div class="form-group"><label>Mot de passe</label><input type="password" v-model="userForm.password"></div><div class="form-group"><label>Confirmer</label><input type="password" v-model="userForm.password2"></div></div><div class="modal-footer"><button type="button" class="btn-secondary" @click="closeModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div></form></div></div>
+      <header class="top-bar">
+        <div class="page-title"><h1><i class="fas fa-users"></i> Gestion des utilisateurs</h1><p>Créez, modifiez ou supprimez des utilisateurs</p></div>
+        <button @click="openAddUserModal" class="btn-primary" v-if="isSuperAdmin"><i class="fas fa-plus"></i> Nouvel utilisateur</button>
+        <span v-else class="permission-badge">🔒 Réservé aux administrateurs</span>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3>{{ users.length }}</h3><p>Utilisateurs</p></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3>{{ activeUsers }}</h3><p>Actifs</p></div></div>
+        <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-user-shield"></i></div><div class="stat-info"><h3>{{ adminUsers }}</h3><p>Administrateurs</p></div></div>
+      </div>
+
+      <div class="users-table">
+        <div v-for="u in users" :key="u.id" class="user-card">
+          <div class="user-avatar-large">{{ u.nom?.charAt(0) || 'U' }}</div>
+          <div class="user-details">
+            <h3>{{ u.nom }}</h3>
+            <p>{{ u.email }}</p>
+            <p class="user-phone">{{ u.telephone }}</p>
+            <div class="user-meta">
+              <span class="role-badge" :class="{ admin: u.is_superuser }">{{ u.is_superuser ? 'Super Admin' : 'Utilisateur' }}</span>
+              <span class="status-badge" :class="{ active: u.is_active }">{{ u.is_active ? 'Actif' : 'Inactif' }}</span>
+              <span class="date-badge"><i class="fas fa-calendar"></i> Créé le {{ formatDate(u.date_joined) }}</span>
+            </div>
+          </div>
+          <div class="user-actions">
+            <button @click="editUser(u)" class="btn-edit" :disabled="!isSuperAdmin"><i class="fas fa-edit"></i> Modifier</button>
+            <button @click="toggleUserStatus(u)" class="btn-status" :class="{ active: u.is_active }" :disabled="!isSuperAdmin || u.id === currentUserId">
+              <i :class="u.is_active ? 'fas fa-ban' : 'fas fa-check'"></i> {{ u.is_active ? 'Désactiver' : 'Activer' }}
+            </button>
+            <button @click="deleteUser(u)" class="btn-delete" :disabled="!isSuperAdmin || u.id === currentUserId">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        </div>
+        <div v-if="users.length===0" class="empty">Aucun utilisateur</div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal" :class="{ active: showModal }" @click.self="closeModal">
+        <div class="modal-content">
+          <div class="modal-header"><h2>{{ editingUser ? 'Modifier' : 'Ajouter' }} un utilisateur</h2><button class="close" @click="closeModal"><i class="fas fa-times"></i></button></div>
+          <form @submit.prevent="saveUser" class="modal-form">
+            <div class="form-row"><div class="form-group"><label>Nom complet *</label><input type="text" v-model="userForm.nom" required></div><div class="form-group"><label>Email *</label><input type="email" v-model="userForm.email" required></div></div>
+            <div class="form-row"><div class="form-group"><label>Téléphone *</label><input type="text" v-model="userForm.telephone" required></div><div class="form-group"><label>Rôle</label><select v-model="userForm.is_superuser"><option :value="false">Utilisateur standard</option><option :value="true">Super Administrateur</option></select></div></div>
+            <div class="form-row" v-if="!editingUser"><div class="form-group"><label>Mot de passe</label><input type="password" v-model="userForm.password"></div><div class="form-group"><label>Confirmer</label><input type="password" v-model="userForm.password2"></div></div>
+            <div class="modal-footer"><button type="button" class="btn-secondary" @click="closeModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div>
+          </form>
+        </div>
+      </div>
+
       <div v-if="toastMessage" class="toast" :class="toastType"><i :class="toastType==='success'?'fas fa-check-circle':'fas fa-exclamation-circle'"></i><span>{{ toastMessage }}</span></div>
     </main>
   </div>
 </template>
+
 <script>
 import { useAuthStore } from '../stores/auth'
 import axios from 'axios'
+
+const API_BASE_URL = 'http://localhost:8001'
+
 export default {
   name: 'UsersManagement',
-  data() { return { users: [], showModal: false, editingUser: null, userForm: { nom: '', email: '', telephone: '', is_superuser: false, password: '', password2: '' }, toastMessage: '', toastType: '', user: null, currentUserId: null } },
-  computed: { userInitials() { return this.user?.nom ? this.user.nom.split(' ').map(n=>n[0]).join('').toUpperCase() : 'AD' }, activeUsers() { return this.users.filter(u=>u.is_active).length }, adminUsers() { return this.users.filter(u=>u.is_superuser).length } },
-  mounted() { const auth=useAuthStore(); this.user=auth.user; this.currentUserId=auth.user?.id; this.loadUsers() },
+  data() {
+    return {
+      users: [],
+      showModal: false,
+      editingUser: null,
+      userForm: { nom: '', email: '', telephone: '', is_superuser: false, password: '', password2: '' },
+      toastMessage: '',
+      toastType: '',
+      user: null,
+      currentUserId: null,
+      isSuperAdmin: false
+    }
+  },
+  computed: {
+    userInitials() {
+      return this.user?.nom ? this.user.nom.split(' ').map(n=>n[0]).join('').toUpperCase() : 'AD'
+    },
+    activeUsers() {
+      return this.users.filter(u => u.is_active).length
+    },
+    adminUsers() {
+      return this.users.filter(u => u.is_superuser).length
+    }
+  },
+  mounted() {
+    const auth = useAuthStore()
+    this.user = auth.user
+    this.isSuperAdmin = this.user?.role === 'it_admin' || this.user?.is_superuser
+    this.currentUserId = auth.user?.id
+    if (this.isSuperAdmin) {
+      this.loadUsers()
+    }
+  },
   methods: {
-    async loadUsers() { try { const res = await axios.get('http://localhost:8001/api/users/'); this.users = res.data } catch(e){ console.error(e) } },
-    openAddUserModal() { this.editingUser=null; this.userForm={nom:'',email:'',telephone:'',is_superuser:false,password:'',password2:''}; this.showModal=true },
-    editUser(u) { this.editingUser=u; this.userForm={...u,password:'',password2:''}; this.showModal=true },
-    async saveUser() { try { if(this.editingUser){ await axios.put(`http://localhost:8001/api/users/${this.editingUser.id}/`, this.userForm); this.showToast('Utilisateur modifié','success') } else { await axios.post('http://localhost:8001/api/users/', this.userForm); this.showToast('Utilisateur créé','success') } this.loadUsers(); this.closeModal() } catch(e){ this.showToast('Erreur','error') } },
-    async toggleUserStatus(u) { if(u.id===this.currentUserId){ this.showToast('Vous ne pouvez pas modifier votre propre statut','error'); return } try { await axios.patch(`http://localhost:8001/api/users/${u.id}/`, { is_active: !u.is_active }); this.loadUsers(); this.showToast(u.is_active?'Utilisateur désactivé':'Utilisateur activé','success') } catch(e){ this.showToast('Erreur','error') } },
-    async deleteUser(u) { if(u.id===this.currentUserId){ this.showToast('Vous ne pouvez pas vous supprimer','error'); return } if(confirm('Supprimer cet utilisateur ?')){ await axios.delete(`http://localhost:8001/api/users/${u.id}/`); this.loadUsers(); this.showToast('Utilisateur supprimé','success') } },
-    closeModal(){ this.showModal=false }, formatDate(d){ return new Date(d).toLocaleDateString('fr-FR') }, showToast(t,m){ this.toastType=t; this.toastMessage=m; setTimeout(()=>{this.toastMessage=''},3000) },
-    confirmLogout(){ if(confirm('Déconnexion ?')){ useAuthStore().logout(); this.$router.push('/login') } }
+    async loadUsers() {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/users/`)
+        this.users = res.data
+      } catch(e) { console.error(e) }
+    },
+
+    openAddUserModal() {
+      if (!this.isSuperAdmin) {
+        this.showToast('error', 'Vous n\'avez pas les droits')
+        return
+      }
+      this.editingUser = null
+      this.userForm = { nom: '', email: '', telephone: '', is_superuser: false, password: '', password2: '' }
+      this.showModal = true
+      document.body.style.overflow = 'hidden'
+    },
+
+    editUser(user) {
+      if (!this.isSuperAdmin) {
+        this.showToast('error', 'Vous n\'avez pas les droits')
+        return
+      }
+      this.editingUser = user
+      this.userForm = { ...user, password: '', password2: '' }
+      this.showModal = true
+      document.body.style.overflow = 'hidden'
+    },
+
+    async saveUser() {
+      try {
+        if (this.editingUser) {
+          await axios.put(`${API_BASE_URL}/api/users/${this.editingUser.id}/`, this.userForm)
+          this.showToast('success', 'Utilisateur modifié')
+        } else {
+          await axios.post(`${API_BASE_URL}/api/users/`, this.userForm)
+          this.showToast('success', 'Utilisateur créé')
+        }
+        await this.loadUsers()
+        this.closeModal()
+      } catch(e) {
+        console.error(e)
+        this.showToast('error', e.response?.data?.message || 'Erreur')
+      }
+    },
+
+    async toggleUserStatus(user) {
+      if (!this.isSuperAdmin) {
+        this.showToast('error', 'Vous n\'avez pas les droits')
+        return
+      }
+      if (user.id === this.currentUserId) {
+        this.showToast('error', 'Vous ne pouvez pas modifier votre propre statut')
+        return
+      }
+      try {
+        await axios.patch(`${API_BASE_URL}/api/users/${user.id}/`, { is_active: !user.is_active })
+        await this.loadUsers()
+        this.showToast('success', user.is_active ? 'Utilisateur désactivé' : 'Utilisateur activé')
+      } catch(e) {
+        this.showToast('error', 'Erreur')
+      }
+    },
+
+    async deleteUser(user) {
+      if (!this.isSuperAdmin) {
+        this.showToast('error', 'Vous n\'avez pas les droits')
+        return
+      }
+      if (user.id === this.currentUserId) {
+        this.showToast('error', 'Vous ne pouvez pas vous supprimer')
+        return
+      }
+      if (confirm('Supprimer cet utilisateur ?')) {
+        try {
+          await axios.delete(`${API_BASE_URL}/api/users/${user.id}/`)
+          await this.loadUsers()
+          this.showToast('success', 'Utilisateur supprimé')
+        } catch(e) {
+          this.showToast('error', 'Erreur')
+        }
+      }
+    },
+
+    closeModal() {
+      this.showModal = false
+      document.body.style.overflow = 'auto'
+    },
+
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' })
+    },
+
+    showToast(type, message) {
+      this.toastType = type
+      this.toastMessage = message
+      setTimeout(() => { this.toastMessage = '' }, 3000)
+    },
+
+    confirmLogout() {
+      if (confirm('Déconnexion ?')) {
+        useAuthStore().logout()
+        this.$router.push('/login')
+      }
+    }
   }
 }
 </script>
+
 <style scoped>
 .management-page { display: flex; min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e8 100%); }
 .sidebar { width: 280px; background: linear-gradient(180deg, #0d3b0f 0%, #1a472a 50%, #0a2412 100%); color: white; position: fixed; height: 100vh; }
@@ -63,6 +251,8 @@ export default {
 .page-title h1 { font-size: 24px; color: #1a472a; }
 .page-title h1 i { color: #32CD32; margin-right: 10px; }
 .btn-primary { padding: 10px 20px; background: linear-gradient(135deg, #32CD32, #228B22); color: white; border: none; border-radius: 12px; cursor: pointer; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.permission-badge { background: #fff3cd; color: #856404; padding: 6px 14px; border-radius: 20px; font-size: 13px; }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
 .stat-card { background: white; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; }
 .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
@@ -70,7 +260,8 @@ export default {
 .stat-icon.green { background: #28a745; }
 .stat-icon.orange { background: #ff9800; }
 .stat-icon i { font-size: 24px; color: white; }
-.stat-info h3 { font-size: 28px; font-weight: bold; color: #1a472a; }
+.stat-info h3 { font-size: 28px; font-weight: bold; color: #1a472a; margin: 0; }
+.stat-info p { margin: 0; color: #666; }
 .users-table { display: flex; flex-direction: column; gap: 15px; }
 .user-card { background: white; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 20px; transition: transform 0.3s; }
 .user-card:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -88,27 +279,32 @@ export default {
 .user-actions { display: flex; gap: 10px; }
 .btn-edit, .btn-status, .btn-delete { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px; transition: all 0.3s; }
 .btn-edit { background: #ffc107; color: #1a472a; }
+.btn-edit:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-status { background: #dc3545; color: white; }
 .btn-status.active { background: #28a745; }
+.btn-status:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-delete { background: #dc3545; color: white; }
-.btn-delete:disabled { opacity: 0.5; cursor: not-allowed; }
-.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; }
+.btn-delete:disabled { opacity: 0.4; cursor: not-allowed; }
+.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(4px); }
 .modal.active { visibility: visible; opacity: 1; }
-.modal-content { background: white; border-radius: 24px; width: 90%; max-width: 600px; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; }
-.modal-header h2 { color: #1a472a; }
-.close { background: none; border: none; font-size: 24px; cursor: pointer; }
+.modal-content { background: white; border-radius: 24px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: modalSlideIn 0.3s ease; }
+@keyframes modalSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; background: white; border-radius: 24px 24px 0 0; }
+.modal-header h2 { color: #1a472a; margin: 0; }
+.close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; transition: color 0.3s; }
+.close:hover { color: #f44336; transform: rotate(90deg); }
 .modal-form { padding: 20px; }
 .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
 .form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
 .form-group label { font-weight: 500; font-size: 13px; }
-.form-group input, .form-group select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+.form-group input, .form-group select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.form-group input:focus, .form-group select:focus { border-color: #32CD32; outline: none; box-shadow: 0 0 0 3px rgba(50,205,50,0.1); }
 .modal-footer { display: flex; justify-content: flex-end; gap: 15px; padding: 20px; border-top: 1px solid #eee; }
-.btn-secondary { padding: 10px 20px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer; }
-.toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 22px; border-radius: 12px; display: flex; align-items: center; gap: 12px; z-index: 1100; animation: slideInRight 0.3s; }
+.btn-secondary { padding: 10px 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+.toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 22px; border-radius: 12px; display: flex; align-items: center; gap: 12px; z-index: 1100; animation: slideInRight 0.3s; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 .toast.success { background: #28a745; color: white; }
 .toast.error { background: #dc3545; color: white; }
-.empty { text-align: center; padding: 60px; color: #999; }
 @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@media (max-width: 768px) { .sidebar { width: 80px; } .sidebar-nav span, .sidebar-footer span, .logo-text, .user-info-sidebar { display: none; } .nav-item { justify-content: center; } .main-content { margin-left: 80px; padding: 15px; } .user-card { flex-direction: column; text-align: center; } .user-actions { justify-content: center; } .user-meta { justify-content: center; } .stats-grid { grid-template-columns: 1fr; } }
+.empty { text-align: center; padding: 60px; color: #999; }
+@media (max-width: 768px) { .sidebar { width: 80px; } .sidebar-nav span, .sidebar-footer span, .logo-text, .user-info-sidebar { display: none; } .nav-item { justify-content: center; } .main-content { margin-left: 80px; padding: 15px; } .user-card { flex-direction: column; text-align: center; } .user-actions { justify-content: center; } .user-meta { justify-content: center; } .stats-grid { grid-template-columns: 1fr; } .form-row { flex-direction: column; } .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; } }
 </style>

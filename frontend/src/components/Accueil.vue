@@ -4,7 +4,7 @@
         <section class="hero-section">
             <div class="slideshow-container">
                 <div class="slide fade" v-for="(slide, index) in slides" :key="index" v-show="currentSlide === index">
-                    <img :src="slide.image" :alt="slide.titre">
+                    <img :src="getImageUrl(slide.image)" :alt="slide.titre" @error="handleImageError">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
                         <div class="slide-badge">{{ slide.titre }}</div>
@@ -30,7 +30,7 @@
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="/images/president.png" alt="Président de l'Université de Man">
+                                <img src="/images/president.png" alt="Président de l'Université de Man" @error="handleImageError">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -186,13 +186,18 @@
                     <p>Chargement de l'équipe...</p>
                 </div>
                 
+                <div v-else-if="equipe.length === 0" class="empty-state">
+                    <i class="fas fa-users" style="font-size: 40px; color: #ccc;"></i>
+                    <p>Aucun membre de l'équipe disponible</p>
+                </div>
+                
                 <div v-else class="team-grid">
                     <div class="team-card" v-for="(membre, index) in equipe" :key="membre.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="team-image">
-                            <img :src="getImageUrl(membre.photo)" :alt="membre.nom">
+                            <img :src="getImageUrl(membre.photo || membre.image)" :alt="membre.nom" @error="handleImageError">
                             <div class="team-overlay">
                                 <div class="team-social">
-                                    <a :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                                    <a v-if="membre.email" :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
                                     <a href="#" class="team-social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="team-social-link"><i class="fab fa-twitter"></i></a>
                                 </div>
@@ -201,7 +206,7 @@
                         <div class="team-info">
                             <h3>{{ membre.nom }}</h3>
                             <p class="team-poste">{{ membre.poste }}</p>
-                            <p class="team-specialite">{{ membre.specialite }}</p>
+                            <p class="team-specialite">{{ membre.specialite || '-' }}</p>
                             <div class="team-contact" v-if="membre.email">
                                 <i class="fas fa-envelope"></i>
                                 <span>{{ membre.email }}</span>
@@ -212,7 +217,9 @@
             </div>
         </section>
 
-        <!-- Section Partenaires (Dynamique) -->
+        <!-- ============================================ -->
+        <!-- SECTION PARTENAIRES - CORRIGÉE ET AMÉLIORÉE -->
+        <!-- ============================================ -->
         <section class="partenaires-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -221,21 +228,53 @@
                     <p class="section-subtitle">Un réseau de collaborateurs engagés</p>
                 </div>
                 
+                <!-- État de chargement -->
                 <div v-if="partenairesLoading" class="loading-container">
                     <div class="spinner"></div>
                     <p>Chargement des partenaires...</p>
                 </div>
                 
+                <!-- Aucun partenaire -->
+                <div v-else-if="partenaires.length === 0" class="empty-state">
+                    <i class="fas fa-handshake" style="font-size: 48px; color: #ccc;"></i>
+                    <p style="margin-top: 1rem; color: #94a3b8;">Aucun partenaire disponible pour le moment</p>
+                </div>
+                
+                <!-- Affichage des partenaires -->
                 <div v-else class="partenaires-grid">
-                    <div class="partenaire-card" v-for="(partenaire, index) in partenaires" :key="partenaire.id" data-aos="fade-up" :data-aos-delay="index * 100">
+                    <div class="partenaire-card" 
+                         v-for="(partenaire, index) in partenaires" 
+                         :key="partenaire.id" 
+                         data-aos="fade-up" 
+                         :data-aos-delay="index * 100">
+                        
+                        <!-- Logo du partenaire -->
                         <div class="partenaire-logo">
-                            <img :src="getImageUrl(partenaire.logo)" :alt="partenaire.nom">
+                            <img 
+                                :src="getPartenaireLogo(partenaire)" 
+                                :alt="partenaire.nom" 
+                                @error="handleImageError"
+                            >
                         </div>
+                        
+                        <!-- Informations du partenaire -->
                         <div class="partenaire-info">
                             <h4>{{ partenaire.nom }}</h4>
-                            <p>{{ partenaire.description }}</p>
-                            <a v-if="partenaire.site_web" :href="partenaire.site_web" target="_blank" class="partenaire-link">
-                                Visiter le site <i class="fas fa-external-link-alt"></i>
+                            <p>{{ partenaire.description || 'Partenaire de l\'Université de Man' }}</p>
+                            
+                            <!-- Type de partenaire (si disponible) -->
+                            <span v-if="partenaire.type" class="partenaire-type">
+                                <i class="fas fa-tag"></i>
+                                {{ partenaire.type }}
+                            </span>
+                            
+                            <!-- Lien vers le site web -->
+                            <a v-if="partenaire.site_web" 
+                               :href="partenaire.site_web" 
+                               target="_blank" 
+                               class="partenaire-link">
+                                Visiter le site 
+                                <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
@@ -341,6 +380,10 @@ export default {
         this.stopSlideShow()
     },
     methods: {
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
+        
         async fetchSlides() {
             try {
                 const response = await axios.get(`${this.apiUrl}/api/slides/`)
@@ -394,27 +437,115 @@ export default {
             }
         },
         
+        // ============================================
+        // CHARGEMENT DES PARTENAIRES - AMÉLIORÉ
+        // ============================================
         async fetchPartenaires() {
             this.partenairesLoading = true
             try {
-                const response = await axios.get(`${this.apiUrl}/api/partenaires/`)
-                if (response.data && response.data.length > 0) {
-                    this.partenaires = response.data
+                console.log('🔍 Récupération des partenaires depuis:', `${this.apiUrl}/api/partenaires/`)
+                
+                const response = await axios.get(`${this.apiUrl}/api/partenaires/`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                
+                console.log('📊 Réponse brute:', response)
+                console.log('📦 Données reçues:', response.data)
+                
+                // Vérifier si les données sont valides
+                if (response.data) {
+                    // Si c'est un tableau
+                    if (Array.isArray(response.data)) {
+                        this.partenaires = response.data
+                        console.log(`✅ ${this.partenaires.length} partenaires chargés`)
+                    } 
+                    // Si c'est un objet avec une propriété 'results' (API paginée)
+                    else if (response.data.results && Array.isArray(response.data.results)) {
+                        this.partenaires = response.data.results
+                        console.log(`✅ ${this.partenaires.length} partenaires chargés (paginés)`)
+                    }
+                    // Si c'est un objet unique
+                    else if (typeof response.data === 'object') {
+                        this.partenaires = [response.data]
+                        console.log('✅ 1 partenaire chargé (objet unique)')
+                    }
+                } else {
+                    console.warn('⚠️ Aucune donnée reçue')
+                    this.partenaires = []
                 }
             } catch (error) {
-                console.error('Erreur chargement partenaires:', error)
+                console.error('❌ Erreur détaillée chargement partenaires:', error)
+                console.error('❌ Statut:', error.response?.status)
+                console.error('❌ Message:', error.response?.data)
+                this.partenaires = []
             } finally {
                 this.partenairesLoading = false
             }
         },
         
+        // ============================================
+        // GESTION DES IMAGES
+        // ============================================
+        
         getImageUrl(imagePath) {
             if (!imagePath) return ''
-            if (imagePath.startsWith('http')) return imagePath
-            if (imagePath.startsWith('/media')) return `${this.apiUrl}${imagePath}`
-            if (imagePath.startsWith('/images/')) return imagePath
-            return `/images/${imagePath}`
+            
+            // Si c'est déjà une URL complète
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath
+            }
+            
+            // Si c'est un chemin media
+            if (imagePath.startsWith('/media/')) {
+                return `${this.apiUrl}${imagePath}`
+            }
+            
+            // Si c'est un chemin /images/ (dossier public)
+            if (imagePath.startsWith('/images/')) {
+                return imagePath
+            }
+            
+            // Si c'est juste un nom de fichier
+            if (imagePath.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+                return `/images/${imagePath}`
+            }
+            
+            // Fallback: retourner le chemin tel quel
+            return imagePath
         },
+        
+        // ============================================
+        // GESTION DU LOGO DES PARTENAIRES - SPÉCIFIQUE
+        // ============================================
+        getPartenaireLogo(partenaire) {
+            if (!partenaire) return ''
+            
+            // Priorité: logo_url (si disponible), puis logo, puis image
+            const logoSource = partenaire.logo_url || partenaire.logo || partenaire.image || ''
+            
+            console.log(`🖼️ Logo pour ${partenaire.nom}:`, logoSource)
+            
+            if (!logoSource) {
+                // Logo par défaut si aucun n'est fourni
+                return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E'
+            }
+            
+            return this.getImageUrl(logoSource)
+        },
+        
+        handleImageError(event) {
+            // Remplacer l'image par un placeholder en cas d'erreur
+            event.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle" dy=".3em"%3EPas d\'image%3C/text%3E%3C/svg%3E'
+            event.target.style.objectFit = 'contain'
+            event.target.style.padding = '20px'
+        },
+        
+        // ============================================
+        // SLIDESHOW
+        // ============================================
         
         startSlideShow() {
             if (this.slides.length > 0) {
@@ -436,6 +567,10 @@ export default {
             this.stopSlideShow()
             this.startSlideShow()
         },
+        
+        // ============================================
+        // ANIMATIONS ET AUTRES
+        // ============================================
         
         initAnimations() {
             const observer = new IntersectionObserver((entries) => {
@@ -469,12 +604,12 @@ export default {
     overflow-x: hidden;
 }
 
-/* Hero Section - Hauteur réduite */
+/* Hero Section */
 .hero-section {
     position: relative;
-    height: 20vh;  /* Réduit de 100vh à 70vh */
-    min-height: 300px;  /* Hauteur minimale pour éviter que ce soit trop petit sur écran */
-    max-height: 600px;  /* Hauteur maximale */
+    height: 70vh;
+    min-height: 500px;
+    max-height: 700px;
     overflow: hidden;
 }
 
@@ -499,7 +634,7 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%; /* Décale légèrement l'image vers le haut pour mieux cadrer */
+    object-position: center 30%;
 }
 
 .slide-overlay {
@@ -513,7 +648,7 @@ export default {
 
 .slide-content {
     position: absolute;
-    bottom: 15%;  /* Ajusté pour la hauteur réduite */
+    bottom: 15%;
     left: 10%;
     right: 10%;
     max-width: 700px;
@@ -534,7 +669,7 @@ export default {
 
 .slide-title {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;  /* Réduit de 3.5rem à 2.5rem */
+    font-size: 2.5rem;
     font-weight: 700;
     color: white;
     margin-bottom: 0.8rem;
@@ -544,7 +679,7 @@ export default {
 
 .slide-text {
     font-family: 'Inter', sans-serif;
-    font-size: 1rem;  /* Réduit de 1.1rem à 1rem */
+    font-size: 1rem;
     color: rgba(255,255,255,0.9);
     line-height: 1.5;
     max-width: 550px;
@@ -566,15 +701,15 @@ export default {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    padding: 12px;  /* Réduit de 16px à 12px */
+    padding: 12px;
     color: white;
     font-weight: bold;
-    font-size: 16px;  /* Réduit de 18px à 16px */
+    font-size: 16px;
     background: rgba(0,0,0,0.4);
     border: none;
     border-radius: 50%;
-    width: 40px;  /* Réduit de 50px à 40px */
-    height: 40px;  /* Réduit de 50px à 40px */
+    width: 40px;
+    height: 40px;
     transition: all 0.3s ease;
     z-index: 10;
 }
@@ -594,7 +729,7 @@ export default {
 
 .hero-scroll {
     position: absolute;
-    bottom: 15px;  /* Ajusté pour la hauteur réduite */
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -604,8 +739,8 @@ export default {
 }
 
 .scroll-mouse {
-    width: 24px;  /* Légèrement réduit */
-    height: 36px;  /* Légèrement réduit */
+    width: 24px;
+    height: 36px;
     border: 2px solid white;
     border-radius: 20px;
     margin: 0 auto 5px;
@@ -649,7 +784,7 @@ export default {
 
 /* President Section */
 .president-section {
-    padding: 60px 0;  /* Réduit de 80px à 60px */
+    padding: 60px 0;
     background: white;
 }
 
@@ -1149,61 +1284,100 @@ export default {
     color: #3498db;
 }
 
-/* Partenaires Section */
+/* ============================================ */
+/* SECTION PARTENAIRES - STYLES AMÉLIORÉS */
+/* ============================================ */
 .partenaires-section {
     padding: 60px 0;
-    background: white;
+    background: #ffffff;
 }
 
 .partenaires-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
 }
 
 .partenaire-card {
     display: flex;
-    gap: 1rem;
+    align-items: center;
+    gap: 1.2rem;
     background: #f8fafc;
-    padding: 1.2rem;
+    padding: 1.2rem 1.5rem;
     border-radius: 16px;
     transition: all 0.3s ease;
+    border: 1px solid #eef2f6;
 }
 
 .partenaire-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-color: #3498db;
+    background: #ffffff;
 }
 
 .partenaire-logo {
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     flex-shrink: 0;
     background: white;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
+    padding: 0.6rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
 }
 
 .partenaire-logo img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.partenaire-card:hover .partenaire-logo img {
+    transform: scale(1.05);
+}
+
+.partenaire-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .partenaire-info h4 {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: #1e293b;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
 }
 
 .partenaire-info p {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #64748b;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.partenaire-type {
+    display: inline-block;
+    font-size: 0.65rem;
+    color: #3498db;
+    background: #eef2ff;
+    padding: 0.15rem 0.7rem;
+    border-radius: 12px;
+    margin-bottom: 0.3rem;
+}
+
+.partenaire-type i {
+    font-size: 0.5rem;
+    margin-right: 0.2rem;
 }
 
 .partenaire-link {
@@ -1213,12 +1387,37 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-/* Loading */
+.partenaire-link:hover {
+    color: #2980b9;
+    gap: 0.5rem;
+    text-decoration: underline;
+}
+
+/* Loading & Empty State */
 .loading-container {
     text-align: center;
-    padding: 2rem;
+    padding: 3rem 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8fafc;
+    border-radius: 16px;
+}
+
+.empty-state i {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 0.95rem;
 }
 
 .spinner {
@@ -1293,6 +1492,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
 }
 
 .newsletter-form button:hover {
@@ -1351,6 +1551,7 @@ export default {
     .hero-section {
         height: 50vh;
         min-height: 400px;
+        max-height: 500px;
     }
     
     .slide-title {
@@ -1398,6 +1599,16 @@ export default {
         grid-template-columns: 1fr;
     }
     
+    .partenaire-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .partenaire-logo {
+        width: 80px;
+        height: 80px;
+    }
+    
     .newsletter-form {
         flex-direction: column;
     }
@@ -1412,6 +1623,10 @@ export default {
         height: 30px;
         font-size: 12px;
         padding: 8px;
+    }
+    
+    .expertise-features {
+        grid-template-columns: 1fr;
     }
 }
 

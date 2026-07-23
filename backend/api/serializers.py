@@ -5,37 +5,25 @@ from .models import (
     Statistique, Methodologie, FamilleBotanique, GenreBotanique, HerbierStats
 )
 
-# ==================== SERIALIZERS POUR LE SITE PUBLIC ====================
+class FamilleBotaniqueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FamilleBotanique
+        fields = '__all__'
+
+class GenreBotaniqueSerializer(serializers.ModelSerializer):
+    famille_nom = serializers.CharField(source='famille.nom', read_only=True)
+    
+    class Meta:
+        model = GenreBotanique
+        fields = '__all__'
 
 class PlanteSerializer(serializers.ModelSerializer):
-    tags_list = serializers.SerializerMethodField()
-    images_list = serializers.SerializerMethodField()
-    full_name = serializers.SerializerMethodField()
-    statut_conservation_label = serializers.SerializerMethodField()
+    famille_nom = serializers.CharField(source='famille.nom', read_only=True, allow_null=True)
+    genre_nom = serializers.CharField(source='genre.nom', read_only=True, allow_null=True)
     
     class Meta:
         model = Plante
         fields = '__all__'
-    
-    def get_tags_list(self, obj):
-        return obj.get_tags_list()
-    
-    def get_images_list(self, obj):
-        return obj.get_images_list()
-    
-    def get_full_name(self, obj):
-        return obj.get_full_name()
-    
-    def get_statut_conservation_label(self, obj):
-        return dict(Plante.STATUT_CONSERVATION_CHOICES).get(obj.statut_conservation, '')
-
-class PlanteListSerializer(serializers.ModelSerializer):
-    """Serializer simplifié pour les listes"""
-    class Meta:
-        model = Plante
-        fields = ['id', 'nom', 'nom_scientifique', 'famille', 'genre', 
-                  'description_courte', 'habitat', 'statut_conservation', 
-                  'image', 'date_creation', 'publie', 'featured']
 
 class EquipeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,15 +46,9 @@ class ProjetTimelineSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProjetSerializer(serializers.ModelSerializer):
-    tags_list = serializers.SerializerMethodField()
-    timeline = ProjetTimelineSerializer(many=True, read_only=True)
-    
     class Meta:
         model = Projet
         fields = '__all__'
-    
-    def get_tags_list(self, obj):
-        return obj.get_tags_list()
 
 class ActiviteSerializer(serializers.ModelSerializer):
     points_forts_list = serializers.SerializerMethodField()
@@ -107,23 +89,4 @@ class StatistiqueSerializer(serializers.ModelSerializer):
 class MethodologieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Methodologie
-        fields = '__all__'
-
-# ==================== SERIALIZERS POUR L'HERBIER AVANCÉ ====================
-
-class FamilleBotaniqueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FamilleBotanique
-        fields = '__all__'
-
-class GenreBotaniqueSerializer(serializers.ModelSerializer):
-    famille_nom = serializers.CharField(source='famille.nom', read_only=True)
-    
-    class Meta:
-        model = GenreBotanique
-        fields = '__all__'
-
-class HerbierStatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HerbierStats
         fields = '__all__'

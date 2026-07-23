@@ -3,31 +3,6 @@ from django.utils import timezone
 
 # ========== MODÈLES PRINCIPAUX ==========
 
-class Plante(models.Model):
-    """Modèle principal pour les plantes"""
-    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
-    nom_scientifique = models.CharField(max_length=200, blank=True, verbose_name="Nom scientifique")
-    famille = models.ForeignKey('FamilleBotanique', on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Famille")
-    genre = models.ForeignKey('GenreBotanique', on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Genre")
-    description = models.TextField(verbose_name="Description")
-    habitat = models.TextField(blank=True, verbose_name="Habitat")
-    distribution = models.CharField(max_length=500, blank=True, verbose_name="Distribution")
-    statut_conservation = models.CharField(max_length=100, blank=True, verbose_name="Statut de conservation")
-    usages = models.TextField(blank=True, verbose_name="Usages traditionnels")
-    image = models.ImageField(upload_to='plantes/', blank=True, null=True, verbose_name="Image principale")
-    images_galerie = models.JSONField(default=list, blank=True, verbose_name="Galerie d'images")
-    featured = models.BooleanField(default=False, verbose_name="À la une")
-    actif = models.BooleanField(default=True, verbose_name="Actif")
-    date_creation = models.DateTimeField(default=timezone.now, verbose_name="Date d'ajout")
-    
-    class Meta:
-        verbose_name = "Plante"
-        verbose_name_plural = "Plantes"
-        ordering = ['nom']
-    
-    def __str__(self):
-        return self.nom
-
 class FamilleBotanique(models.Model):
     """Modèle pour les familles botaniques"""
     nom = models.CharField(max_length=200, unique=True, verbose_name="Nom de la famille")
@@ -57,6 +32,31 @@ class GenreBotanique(models.Model):
     class Meta:
         verbose_name = "Genre botanique"
         verbose_name_plural = "Genres botaniques"
+        ordering = ['nom']
+    
+    def __str__(self):
+        return self.nom
+
+class Plante(models.Model):
+    """Modèle principal pour les plantes"""
+    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
+    nom_scientifique = models.CharField(max_length=200, blank=True, verbose_name="Nom scientifique")
+    famille = models.ForeignKey(FamilleBotanique, on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Famille")
+    genre = models.ForeignKey(GenreBotanique, on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Genre")
+    description = models.TextField(verbose_name="Description")
+    habitat = models.TextField(blank=True, verbose_name="Habitat")
+    distribution = models.CharField(max_length=500, blank=True, verbose_name="Distribution")
+    statut_conservation = models.CharField(max_length=100, blank=True, verbose_name="Statut de conservation")
+    usages = models.TextField(blank=True, verbose_name="Usages traditionnels")
+    image = models.ImageField(upload_to='plantes/', blank=True, null=True, verbose_name="Image principale")
+    images_galerie = models.JSONField(default=list, blank=True, verbose_name="Galerie d'images")
+    featured = models.BooleanField(default=False, verbose_name="À la une")
+    actif = models.BooleanField(default=True, verbose_name="Actif")
+    date_creation = models.DateTimeField(default=timezone.now, verbose_name="Date d'ajout")
+    
+    class Meta:
+        verbose_name = "Plante"
+        verbose_name_plural = "Plantes"
         ordering = ['nom']
     
     def __str__(self):
@@ -328,10 +328,6 @@ class Methodologie(models.Model):
     def __str__(self):
         return self.titre
 
-
-
-# ========== MODÈLES POUR LES STATISTIQUES DE L'HERBIER ==========
-
 class HerbierStats(models.Model):
     """Statistiques globales de l'herbier"""
     total_plantes = models.IntegerField(default=0)
@@ -350,13 +346,12 @@ class HerbierStats(models.Model):
     
     @classmethod
     def update_stats(cls):
-        """Mettre à jour les statistiques"""
         from django.db.models import Count
         stats, created = cls.objects.get_or_create(id=1)
         
         stats.total_plantes = Plante.objects.filter(actif=True).count()
-        stats.total_familles = Plante.objects.filter(actif=True).values('famille').distinct().count()
-        stats.total_genres = Plante.objects.filter(actif=True, genre__isnull=False).exclude(genre='').values('genre').distinct().count()
+        stats.total_familles = FamilleBotanique.objects.count()
+        stats.total_genres = GenreBotanique.objects.count()
         stats.total_images = Plante.objects.filter(actif=True, image__isnull=False).count()
         
         dernier = Plante.objects.filter(actif=True).order_by('-date_creation').first()
@@ -365,3 +360,4 @@ class HerbierStats(models.Model):
         
         stats.date_mise_a_jour = timezone.now()
         stats.save()
+        return stats

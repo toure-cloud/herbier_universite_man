@@ -1,10 +1,19 @@
 import os
 from pathlib import Path
 
+# ============================================
+# CONFIGURATION DE BASE
+# ============================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-admin-key')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'  # ✅ Mettre True par défaut
 ALLOWED_HOSTS = ['*']
+
+# ============================================
+# APPLICATIONS
+# ============================================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,6 +27,10 @@ INSTALLED_APPS = [
     'api',
 ]
 
+# ============================================
+# MIDDLEWARES
+# ============================================
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -29,6 +42,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# ============================================
+# URLS ET TEMPLATES
+# ============================================
 
 ROOT_URLCONF = 'admin_auth.urls'
 
@@ -50,6 +67,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'admin_auth.wsgi.application'
 
+# ============================================
+# BASE DE DONNÉES
+# ============================================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -57,47 +78,45 @@ DATABASES = {
     }
 }
 
+# ============================================
+# AUTHENTIFICATION
+# ============================================
+
 AUTH_PASSWORD_VALIDATORS = []
+
+# ============================================
+# INTERNATIONALISATION
+# ============================================
+
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Africa/Abidjan'
 USE_I18N = True
 USE_TZ = True
 
+# ============================================
+# FICHIERS STATIQUES
+# ============================================
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# ============================================
+# FICHIERS MÉDIAS - ✅ CORRIGÉ
+# ============================================
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# ============================================
+# CORS
+# ============================================
+
 CORS_ALLOW_ALL_ORIGINS = True
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Créer les dossiers nécessaires
-os.makedirs(STATIC_ROOT, exist_ok=True)
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
-
-# Configuration CORS pour le frontend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://herbier-frontend.onrender.com",
-    "https://herbier-admin-frontend.onrender.com",
-]
-
 CORS_ALLOW_CREDENTIALS = True
 
-# Configuration CORS pour autoriser le frontend admin
-CORS_ALLOWED_ORIGINS = [
-    "https://herbier-admin-frontend.onrender.com",
-    "http://localhost:5173",
-    "http://localhost:5174",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False
-
-# Autoriser toutes les méthodes
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -107,7 +126,6 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Autoriser tous les headers
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -119,3 +137,25 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# ============================================
+# AUTRES
+# ============================================
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+PUBLIC_API_URL = os.environ.get('PUBLIC_API_URL', 'http://localhost:8000/api')
+
+# ✅ Créer les dossiers nécessaires
+os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'staticfiles'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/plantes'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/equipe'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/partenaires'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/slides'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/projets'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/activites'), exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'media/temoignages'), exist_ok=True)
+
+# ✅ Si vous utilisez WhiteNoise en production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

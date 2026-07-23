@@ -60,7 +60,7 @@
             <div class="form-group"><label>Description courte *</label><textarea v-model="form.description_courte" rows="3" required></textarea></div>
             <div class="form-group"><label>Description détaillée</label><textarea v-model="form.description_longue" rows="6"></textarea></div>
             <div class="form-group"><label>Points forts (un par ligne)</label><textarea v-model="form.points_forts" rows="4" placeholder="Expertise reconnue&#10;Équipe qualifiée&#10;Méthodologie innovante"></textarea></div>
-            <div class="form-row"><div class="form-group"><label>Ordre d'affichage</label><input type="number" v-model="form.ordre"></div><div class="form-group"><label>Image (URL)</label><input type="text" v-model="form.image" placeholder="/images/..."></div></div>
+            <div class="form-row"><div class="form-group"><label>Ordre d'affichage</label><input type="number" v-model="form.ordre"></div><div class="form-group"><label>Image (URL)</label><input type="text" v-model="form.image" placeholder="/src/images/..."></div></div>
             <div class="form-group"><label>Légende de l'image</label><input type="text" v-model="form.caption"></div>
             <div class="form-group"><label><input type="checkbox" v-model="form.actif"> Actif</label></div>
             <div class="modal-footer"><button type="button" class="btn-secondary" @click="closeModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div>

@@ -1,5 +1,10 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+import json
+
 @csrf_exempt
-@api_view(['POST'])
+@require_POST
 def create_superadmin(request):
     """Créer un nouveau super administrateur"""
     from .serializers import SuperAdminCreateSerializer
@@ -8,7 +13,12 @@ def create_superadmin(request):
     import string
     from django.utils import timezone
     
-    serializer = SuperAdminCreateSerializer(data=request.data)
+    if request.content_type == 'application/json':
+        data = json.loads(request.body.decode('utf-8') or '{}')
+    else:
+        data = request.POST
+    
+    serializer = SuperAdminCreateSerializer(data=data)
     if serializer.is_valid():
         try:
             user = serializer.save()
@@ -27,19 +37,19 @@ def create_superadmin(request):
             # Envoyer le code par SMS
             send_sms(user.telephone, code)
             
-            return Response({
+            return JsonResponse({
                 'success': True,
                 'message': 'Compte créé avec succès. Un code de vérification a été envoyé par SMS.',
                 'telephone': user.telephone
-            }, status=status.HTTP_201_CREATED)
+            }, status=201)
             
         except Exception as e:
-            return Response({
+            return JsonResponse({
                 'success': False,
                 'errors': {'general': str(e)}
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }, status=400)
     
-    return Response({
+    return JsonResponse({
         'success': False,
         'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
+    }, status=400)
