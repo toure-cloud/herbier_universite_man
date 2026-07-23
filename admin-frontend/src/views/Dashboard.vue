@@ -39,54 +39,7 @@
         <div class="nav-section">
           <div class="nav-section-title">⚙️ ADMINISTRATION</div>
           
-          <!-- ✅ BOUTON ADMINISTRATION IT - REDIRECTION CORRIGÉE -->
-          
-<template>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <nav class="sidebar">
-      <div class="logo">
-        <i class="fas fa-leaf"></i>
-        <span>Herbier Admin</span>
-      </div>
-      <div class="nav-menu">
-        <div class="nav-section">
-          <div class="nav-section-title">📊 TABLEAU DE BORD</div>
-          <router-link to="/dashboard" class="nav-item">
-            <i class="fas fa-tachometer-alt"></i> Accueil
-          </router-link>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">🌿 CONTENU PRINCIPAL</div>
-          <button @click="activeTab = 'plantes'" :class="['nav-item', { active: activeTab === 'plantes' }]">
-            <i class="fas fa-leaf"></i> Plantes
-          </button>
-          <button @click="activeTab = 'equipe'" :class="['nav-item', { active: activeTab === 'equipe' }]">
-            <i class="fas fa-users"></i> Équipe
-          </button>
-          <button @click="activeTab = 'slides'" :class="['nav-item', { active: activeTab === 'slides' }]">
-            <i class="fas fa-images"></i> Slides
-          </button>
-          <button @click="activeTab = 'projets'" :class="['nav-item', { active: activeTab === 'projets' }]">
-            <i class="fas fa-project-diagram"></i> Projets
-          </button>
-          <button @click="activeTab = 'activites'" :class="['nav-item', { active: activeTab === 'activites' }]">
-            <i class="fas fa-chart-line"></i> Activités
-          </button>
-          <button @click="activeTab = 'partenaires'" :class="['nav-item', { active: activeTab === 'partenaires' }]">
-            <i class="fas fa-handshake"></i> Partenaires
-          </button>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">⚙️ ADMINISTRATION</div>
-          
-          <!-- ✅ BOUTON ADMINISTRATION IT - CORRIGÉ -->
-          <button 
-            @click="goToITAdmin" 
-            class="nav-item it-admin-btn"
-            type="button">
+          <button @click="goToITAdmin" class="nav-item it-admin-btn">
             <i class="fas fa-shield-alt"></i> Administration IT
             <span class="nav-badge">🔒</span>
           </button>
@@ -628,7 +581,14 @@ export default {
       formData: {},
       currentItemId: null,
       toast: { show: false, message: '', type: 'success' },
-      newUser: { nom: '', email: '', telephone: '', role: 'admin', password: '', password2: '' },
+      newUser: { 
+        nom: '', 
+        email: '', 
+        telephone: '', 
+        role: 'admin', 
+        password: '', 
+        password2: '' 
+      },
       fieldsMap: {
         plante: [
           { name: 'nom', label: 'Nom *', type: 'text', required: true },
@@ -687,7 +647,6 @@ export default {
     currentFields() { return this.fieldsMap[this.modalType] || [] }
   },
   mounted() {
-    // ✅ Vérifier l'authentification IT
     const isItAuthenticated = localStorage.getItem('it_admin_authenticated')
     if (isItAuthenticated === 'true') {
       this.isITAdmin = true
@@ -1078,16 +1037,24 @@ export default {
     },
 
     // ============================================
-    // BOUTON ADMINISTRATION IT - REDIRECTION CORRIGÉE
+    // BOUTON ADMINISTRATION IT
     // ============================================
     goToITAdmin() {
-      // Vérifier si l'utilisateur est déjà Super Admin
+      console.log('🔐 [goToITAdmin] Clic détecté')
+      console.log('🔐 [goToITAdmin] isSuperAdmin:', this.isSuperAdmin)
+      
       if (this.isSuperAdmin) {
-        // Rediriger directement vers la page des administrateurs
-        this.$router.push('/administrateurs')
+        console.log('➡️ Redirection vers /administrateurs')
+        this.$router.push('/administrateurs').catch(err => {
+          console.error('❌ Erreur redirection:', err)
+          window.location.href = '/administrateurs'
+        })
       } else {
-        // Sinon, rediriger vers la page de connexion IT
-        this.$router.push('/it-login')
+        console.log('➡️ Redirection vers /it-login')
+        this.$router.push('/it-login').catch(err => {
+          console.error('❌ Erreur redirection:', err)
+          window.location.href = '/it-login'
+        })
       }
     },
 
@@ -1152,7 +1119,6 @@ export default {
 
     logout() {
       if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-        // ✅ Supprimer également l'authentification IT
         localStorage.removeItem('it_admin_authenticated')
         localStorage.removeItem('it_admin_username')
         localStorage.removeItem('it_admin_login_time')
@@ -1178,7 +1144,6 @@ export default {
 .nav-item:hover, .nav-item.active { background: #FFD700; color: #1a472a; }
 .logout { margin-top: auto; color: #ff6b6b; }
 
-/* ✅ STYLE BOUTON ADMINISTRATION IT */
 .it-admin-btn {
   background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,165,0,0.12));
   border: 1px solid rgba(255,215,0,0.25);
@@ -1239,13 +1204,11 @@ export default {
 .btn-status:hover { background: #fff3e0; }
 .empty-row { text-align: center; color: #999; padding: 30px; }
 
-/* Styles pour les images dans les tableaux */
 .table-image { width: 50px; height: 50px; cursor: pointer; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 .thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s; }
 .thumbnail:hover { transform: scale(1.05); }
 .no-image { width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 20px; }
 
-/* Stats */
 .stats-section { margin-top: 30px; }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
 .stat-card { background: white; border-radius: 15px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -1253,7 +1216,6 @@ export default {
 .stat-card h3 { font-size: 24px; margin: 0; color: #1a472a; }
 .stat-card p { margin: 0; color: #666; font-size: 12px; }
 
-/* Modal */
 .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
 .modal-container { background: white; border-radius: 20px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: modalSlideIn 0.3s ease; }
 @keyframes modalSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -1269,7 +1231,6 @@ export default {
 .form-checkbox { width: 20px; height: 20px; cursor: pointer; }
 .form-help { display: block; color: #888; font-size: 12px; margin-top: 5px; }
 
-/* Upload d'image */
 .image-upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; min-height: 150px; display: flex; align-items: center; justify-content: center; }
 .image-upload-area:hover { border-color: #32CD32; background: #f8fafc; }
 .image-upload-area.has-image { border-color: #32CD32; background: #f8fafc; }
@@ -1281,7 +1242,6 @@ export default {
 .upload-placeholder i { font-size: 48px; color: #32CD32; margin-bottom: 10px; }
 .upload-hint { display: block; font-size: 12px; color: #999; margin-top: 5px; }
 
-/* Preview d'image plein écran */
 .image-preview-modal .image-preview-container { position: relative; max-width: 90vw; max-height: 90vh; }
 .image-preview-modal .close-preview { position: absolute; top: -20px; right: -20px; width: 40px; height: 40px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
 .image-preview-modal .close-preview:hover { background: rgba(0,0,0,0.9); }
@@ -1300,12 +1260,10 @@ export default {
 .users-table table { width: 100%; border-collapse: collapse; }
 .users-table th, .users-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
 
-/* Toast */
 .toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 24px; border-radius: 12px; z-index: 2000; animation: slideIn 0.3s ease; background: #28a745; color: white; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: 500; }
 .toast.error { background: #dc3545; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* Responsive */
 @media (max-width: 768px) { 
   .sidebar { width: 70px; } 
   .logo span, .nav-item span, .nav-section-title { display: none; } 
