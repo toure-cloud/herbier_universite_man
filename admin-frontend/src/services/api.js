@@ -14,8 +14,14 @@ const PUBLIC_API_URL = isProduction
   ? 'https://herbier-backend.onrender.com/api'
   : 'http://localhost:8000'
 
+// ✅ URL de base pour les médias (images uploadées)
+const MEDIA_BASE_URL = isProduction
+  ? 'https://herbier-admin-backend.onrender.com'
+  : 'http://localhost:8001'
+
 console.log('🔗 ADMIN_API_URL:', ADMIN_API_URL)
 console.log('🔗 PUBLIC_API_URL:', PUBLIC_API_URL)
+console.log('🔗 MEDIA_BASE_URL:', MEDIA_BASE_URL)
 
 // ============================================
 // UTILITAIRES
@@ -60,6 +66,37 @@ const buildFormData = (data) => {
 }
 
 /**
+ * Construit l'URL complète d'une image
+ */
+export const getFullImageUrl = (imagePath) => {
+  if (!imagePath) return ''
+  
+  // Si c'est déjà une URL complète
+  if (imagePath.startsWith('http://') || 
+      imagePath.startsWith('https://') || 
+      imagePath.startsWith('data:')) {
+    return imagePath
+  }
+  
+  // Si c'est un chemin /media/
+  if (imagePath.startsWith('/media/')) {
+    return `${MEDIA_BASE_URL}${imagePath}`
+  }
+  
+  // Si c'est un chemin media/
+  if (imagePath.startsWith('media/')) {
+    return `${MEDIA_BASE_URL}/${imagePath}`
+  }
+  
+  // Si c'est un chemin uploads/
+  if (imagePath.startsWith('uploads/')) {
+    return `${MEDIA_BASE_URL}/media/${imagePath}`
+  }
+  
+  return imagePath
+}
+
+/**
  * Gère les erreurs et redirige vers login si nécessaire
  */
 const handleAuthError = (error) => {
@@ -77,11 +114,15 @@ const handleAuthError = (error) => {
     console.error('🚫 Accès interdit (403)')
   }
   
+  if (error.response?.status === 500) {
+    console.error('❌ Erreur serveur (500)')
+  }
+  
   return Promise.reject(error)
 }
 
 // ============================================
-// ADMIN API (port 8001)
+// ADMIN API (port 8001) - Communication avec admin-backend
 // ============================================
 const adminApi = axios.create({
   baseURL: ADMIN_API_URL,
@@ -126,7 +167,7 @@ adminApi.interceptors.response.use(
 )
 
 // ============================================
-// PUBLIC API (port 8000)
+// PUBLIC API (port 8000) - Communication avec backend public
 // ============================================
 const publicApi = axios.create({
   baseURL: PUBLIC_API_URL,
@@ -147,7 +188,7 @@ publicApi.interceptors.response.use(
 )
 
 // ============================================
-// EXPORTS - AUTHENTIFICATION
+// EXPORTS - AUTHENTIFICATION (admin-backend)
 // ============================================
 export const authAPI = {
   /**
@@ -220,7 +261,7 @@ export const authAPI = {
 }
 
 // ============================================
-// EXPORTS - PUBLIC (Lecture seule)
+// EXPORTS - PUBLIC (Lecture seule) - backend public
 // ============================================
 export const publicAPI = {
   getPartenaires: () => publicApi.get('/partenaires/'),
@@ -240,7 +281,7 @@ export const publicAPI = {
 }
 
 // ============================================
-// EXPORTS - ADMIN (Écriture)
+// EXPORTS - ADMIN (Écriture) - admin-backend
 // ============================================
 export const adminAPI = {
   // ==================== GESTION DES UTILISATEURS ====================
@@ -397,4 +438,4 @@ export const adminAPI = {
 // ============================================
 // EXPORT PAR DÉFAUT
 // ============================================
-export default { authAPI, publicAPI, adminAPI }
+export default { authAPI, publicAPI, adminAPI, getFullImageUrl }
