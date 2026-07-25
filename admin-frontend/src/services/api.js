@@ -2,12 +2,22 @@
 import axios from 'axios'
 
 // === CONFIGURATION ===
-const ADMIN_API_URL = 'http://localhost:8001'
-const PUBLIC_API_URL = 'http://localhost:8000'
+// ✅ Détection automatique de l'environnement
+const isProduction = import.meta.env.PROD || 
+                     window.location.hostname !== 'localhost'
 
-console.log('🚀 API Configuration')
-console.log('📡 Admin API:', ADMIN_API_URL)
-console.log('📡 Public API:', PUBLIC_API_URL)
+const ADMIN_API_URL = isProduction 
+  ? 'https://herbier-admin-backend.onrender.com/api'
+  : 'http://localhost:8001'
+
+const API_URL = isProduction 
+  ? 'https://herbier-backend.onrender.com/api'
+  : 'http://localhost:8000'
+
+console.log('🔗 ADMIN_API_URL:', ADMIN_API_URL)
+console.log('🔗 API_URL:', API_URL)
+
+
 
 // ============================================
 // UTILITAIRES

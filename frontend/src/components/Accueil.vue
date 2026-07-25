@@ -608,20 +608,20 @@ export default {
 .hero-section {
     position: relative;
     height: 70vh;
-    min-height: 500px;
+    min-height: 600px;
     max-height: 700px;
     overflow: hidden;
 }
 
 .slideshow-container {
     position: relative;
-    height: 100%;
+    height: 70%;
 }
 
 .slide {
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 70%;
     opacity: 0;
     transition: opacity 1s ease-in-out;
 }
@@ -651,7 +651,7 @@ export default {
     bottom: 15%;
     left: 10%;
     right: 10%;
-    max-width: 700px;
+    max-width: 800px;
     animation: slideUp 0.8s ease-out;
 }
 
@@ -1549,9 +1549,9 @@ export default {
 /* Responsive */
 @media (max-width: 768px) {
     .hero-section {
-        height: 50vh;
-        min-height: 400px;
-        max-height: 500px;
+        height: 40vh;
+        min-height: 200px;
+        max-height: 300px;
     }
     
     .slide-title {
