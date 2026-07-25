@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse, Http404
 import os
-from .import views
+from . import views
 
 def serve_media(request, path):
     """Sert les fichiers médias manuellement"""
