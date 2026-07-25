@@ -10,14 +10,12 @@ const ADMIN_API_URL = isProduction
   ? 'https://herbier-admin-backend.onrender.com/api'
   : 'http://localhost:8001'
 
-const API_URL = isProduction 
+const PUBLIC_API_URL = isProduction 
   ? 'https://herbier-backend.onrender.com/api'
   : 'http://localhost:8000'
 
 console.log('🔗 ADMIN_API_URL:', ADMIN_API_URL)
-console.log('🔗 API_URL:', API_URL)
-
-
+console.log('🔗 PUBLIC_API_URL:', PUBLIC_API_URL)
 
 // ============================================
 // UTILITAIRES
@@ -86,7 +84,7 @@ const handleAuthError = (error) => {
 // ADMIN API (port 8001)
 // ============================================
 const adminApi = axios.create({
-  baseURL: `${ADMIN_API_URL}/api`,
+  baseURL: ADMIN_API_URL,
   headers: { 
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -131,7 +129,7 @@ adminApi.interceptors.response.use(
 // PUBLIC API (port 8000)
 // ============================================
 const publicApi = axios.create({
-  baseURL: `${PUBLIC_API_URL}/api`,
+  baseURL: PUBLIC_API_URL,
   headers: { 
     'Content-Type': 'application/json',
     'Accept': 'application/json',
