@@ -8,7 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-admin-key')
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'  # ✅ Mettre True par défaut
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
 # ============================================
@@ -104,17 +104,26 @@ STATICFILES_DIRS = [
 ]
 
 # ============================================
-# FICHIERS MÉDIAS - ✅ CORRIGÉ
+# FICHIERS MÉDIAS
 # ============================================
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ============================================
-# CORS
+# CORS - ✅ CORRIGÉ POUR LA PRODUCTION
 # ============================================
 
-CORS_ALLOW_ALL_ORIGINS = True
+# ✅ En développement, autoriser tout
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'https://herbier-admin-frontend.onrender.com',
+        'https://herbier-frontend.onrender.com',
+        'https://herbier-admin-backend.onrender.com',
+    ]
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
@@ -157,5 +166,5 @@ os.makedirs(os.path.join(BASE_DIR, 'media/projets'), exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, 'media/activites'), exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, 'media/temoignages'), exist_ok=True)
 
-# ✅ Si vous utilisez WhiteNoise en production
+# ✅ WhiteNoise pour les fichiers statiques
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
