@@ -17,7 +17,6 @@ router.register(r'statistiques', views.StatistiqueViewSet)
 router.register(r'methodologie', views.MethodologieViewSet)
 router.register(r'partenaires', views.PartenaireViewSet)
 
-# ✅ PATTERNS PRINCIPAUX
 urlpatterns = [
     # ==================== ROUTES PRINCIPALES ====================
     path('', views.api_root, name='api-root'),
@@ -49,11 +48,9 @@ urlpatterns = [
     
     # ==================== MÉDIAS ET TESTS ====================
     path('test-media/', views.test_media, name='test-media'),
-    path('media/<path:path>', views.serve_media, name='serve-media'),
-    
-    # ==================== ROUTES ADMIN (compatibilité) ====================
+    path('media/<path:path>', views.serve_media, name='serve_media'),
     path('admin-users/', views.get_admin_users, name='get-admin-users'),
-    
-    # ==================== INCLURE LES ROUTES DU ROUTER ====================
-    path('', include(router.urls)),
 ]
+
+# ✅ AJOUTER LES ROUTES DU ROUTER (SÉPARÉMENT)
+urlpatterns += router.urls
