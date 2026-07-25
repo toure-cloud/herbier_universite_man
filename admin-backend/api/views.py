@@ -7,6 +7,9 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 import random
+from django.http import HttpResponse, Http404
+from django.conf import settings
+import os
 from django.views.decorators.csrf import csrf_exempt 
 import string
 import hashlib
@@ -284,9 +287,6 @@ def verify_2fa(request):
     except SuperAdmin.DoesNotExist:
         return Response({'success': False, 'error': 'Utilisateur non trouvé'}, status=404)
 
-from django.http import HttpResponse, Http404
-from django.conf import settings
-import os
 
 @api_view(['GET'])
 def serve_media(request, path):
