@@ -4,11 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponseRedirect
 
-# ✅ IMPORT CORRECT
 from api.views import api_root
 
 def root_redirect(request):
-    """Redirige la racine vers l'API"""
     return HttpResponseRedirect('/api/')
 
 urlpatterns = [
