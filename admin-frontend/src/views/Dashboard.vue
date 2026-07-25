@@ -541,8 +541,6 @@
 import { adminAPI, authAPI } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
-const API_BASE_URL = 'http://localhost:8001'
-
 const endpoints = {
   plante: 'plantes',
   equipe: 'equipe',
@@ -724,27 +722,34 @@ export default {
     },
 
     // ============================================
-    // GESTION DES IMAGES
+    // GESTION DES IMAGES - ✅ CORRIGÉE
     // ============================================
     getFullImageUrl(imagePath) {
       if (!imagePath) return ''
       
+      // ✅ Utiliser les variables d'environnement
+      const baseUrl = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
+      
+      // Si c'est déjà une URL complète
       if (imagePath.startsWith('http://') || 
           imagePath.startsWith('https://') || 
           imagePath.startsWith('data:')) {
         return imagePath
       }
       
+      // Si c'est un chemin /media/
       if (imagePath.startsWith('/media/')) {
-        return `${API_BASE_URL}${imagePath}`
+        return `${baseUrl.replace('/api', '')}${imagePath}`
       }
       
+      // Si c'est un chemin media/
       if (imagePath.startsWith('media/')) {
-        return `${API_BASE_URL}/${imagePath}`
+        return `${baseUrl.replace('/api', '')}/${imagePath}`
       }
       
+      // Si c'est un chemin uploads/
       if (imagePath.startsWith('uploads/')) {
-        return `${API_BASE_URL}/media/${imagePath}`
+        return `${baseUrl.replace('/api', '')}/media/${imagePath}`
       }
       
       return imagePath
@@ -1131,6 +1136,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .dashboard { display: flex; min-height: 100vh; background: #f5f7fa; }

@@ -310,7 +310,6 @@ export default {
     }
   },
   mounted() {
-    // Vérifier si l'email est sauvegardé
     const savedEmail = localStorage.getItem('saved_email')
     if (savedEmail) {
       this.form.email = savedEmail
@@ -347,16 +346,13 @@ export default {
       const country = this.selectedCountry
       if (!country) return false
       
-      // Nettoyer le numéro (garder uniquement les chiffres)
       let cleanNumber = this.form.telephone.replace(/\D/g, '')
       
-      // Vérifier la longueur
       if (cleanNumber.length !== country.minLength) {
         this.errors.telephone = `Le numéro doit contenir exactement ${country.minLength} chiffres (${country.format})`
         return false
       }
       
-      // Format spécifique pour la Côte d'Ivoire (commence par 01, 05, 07, 08)
       if (country.code === 'CI') {
         const prefix = cleanNumber.substring(0, 2)
         const validPrefixes = ['01', '05', '07', '08']
@@ -366,7 +362,6 @@ export default {
         }
       }
       
-      // Format spécifique pour la France
       if (country.code === 'FR') {
         const firstDigit = cleanNumber.charAt(0)
         if (!['0', '1', '2', '3', '4', '5', '6', '7'].includes(firstDigit)) {
@@ -391,13 +386,11 @@ export default {
       this.clearErrors()
       let isValid = true
       
-      // Validation nom
       if (!this.form.nom || this.form.nom.trim().length < 2) {
         this.errors.nom = 'Nom complet requis (minimum 2 caractères)'
         isValid = false
       }
       
-      // Validation email
       if (!this.form.email) {
         this.errors.email = 'L\'adresse email est requise'
         isValid = false
@@ -406,18 +399,15 @@ export default {
         isValid = false
       }
       
-      // Validation pays
       if (!this.form.pays) {
         this.errors.pays = 'Veuillez sélectionner un pays'
         isValid = false
       }
       
-      // Validation téléphone
       if (!this.validatePhoneNumber()) {
         isValid = false
       }
       
-      // Validation mot de passe
       if (!this.form.password) {
         this.errors.password = 'Le mot de passe est requis'
         isValid = false
@@ -426,13 +416,11 @@ export default {
         isValid = false
       }
       
-      // Validation confirmation
       if (this.form.password !== this.form.password2) {
         this.errors.password2 = 'Les mots de passe ne correspondent pas'
         isValid = false
       }
       
-      // Validation conditions
       if (!this.form.acceptTerms) {
         this.showErrorModalMessage('Vous devez accepter les conditions d\'utilisation')
         isValid = false
@@ -467,7 +455,6 @@ export default {
     
     async handleRegister() {
       if (!this.validateForm()) {
-        // Scroll to first error
         const firstError = document.querySelector('.form-group.error')
         if (firstError) {
           firstError.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -478,7 +465,6 @@ export default {
       this.isLoading = true
       const authStore = useAuthStore()
       
-      // Préparer les données avec le numéro formaté
       const registerData = {
         nom: this.form.nom,
         email: this.form.email,
@@ -493,11 +479,9 @@ export default {
         if (result.success) {
           this.showSuccessModalMessage(result.message || 'Votre compte a été créé avec succès. Un code de vérification a été envoyé à votre email et téléphone.')
         } else {
-          // Afficher l'erreur spécifique
           const errorMsg = result.message || 'Une erreur est survenue'
           this.showErrorModalMessage(errorMsg)
           
-          // Mettre en évidence les champs problématiques
           if (errorMsg.toLowerCase().includes('email')) {
             this.errors.email = errorMsg
           } else if (errorMsg.toLowerCase().includes('téléphone') || errorMsg.toLowerCase().includes('phone')) {
@@ -517,6 +501,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .login-container {
