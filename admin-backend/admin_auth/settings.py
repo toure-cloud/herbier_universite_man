@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 
 # ============================================
@@ -68,14 +69,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'admin_auth.wsgi.application'
 
 # ============================================
-# BASE DE DONNÉES
+# BASE DE DONNÉES - AVEC POSTGRESQL
 # ============================================
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # ============================================
@@ -109,12 +111,12 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8001')
 
 # ============================================
-# CORS - ✅ CORRIGÉ POUR LA PRODUCTION
+# CORS - CORRIGÉ POUR LA PRODUCTION
 # ============================================
 
-# ✅ En développement, autoriser tout
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
@@ -146,6 +148,30 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# ============================================
+# EMAIL - POUR LA 2FA
+# ============================================
+
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@herbier-man.ci')
+
+# ============================================
+# SÉCURITÉ - POUR LA PRODUCTION
+# ============================================
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ============================================
 # AUTRES
