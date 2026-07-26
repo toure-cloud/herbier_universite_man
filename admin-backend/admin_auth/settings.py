@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 from pathlib import Path
 
 # ============================================
@@ -11,6 +10,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-admin-key')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
+
+# ============================================
+# URLS - DÉTECTION ENVIRONNEMENT
+# ============================================
+
+if os.environ.get('RENDER'):
+    # 🚀 Production sur Render
+    PUBLIC_API_URL = os.environ.get('PUBLIC_API_URL', 'https://herbier-backend.onrender.com/api')
+    ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'https://herbier-admin-backend.onrender.com/api')
+    BASE_URL = os.environ.get('BASE_URL', 'https://herbier-admin-backend.onrender.com')
+else:
+    # 💻 Développement local
+    PUBLIC_API_URL = os.environ.get('PUBLIC_API_URL', 'http://localhost:8000/api')
+    ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'http://localhost:8001/api')
+    BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8001')
+
+print(f"🔗 PUBLIC_API_URL: {PUBLIC_API_URL}")
+print(f"🔗 ADMIN_API_URL: {ADMIN_API_URL}")
+print(f"🔗 BASE_URL: {BASE_URL}")
 
 # ============================================
 # APPLICATIONS
@@ -69,15 +87,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'admin_auth.wsgi.application'
 
 # ============================================
-# BASE DE DONNÉES - AVEC POSTGRESQL
+# BASE DE DONNÉES - SQLITE
 # ============================================
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
 # ============================================
@@ -111,7 +128,6 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8001')
 
 # ============================================
 # CORS - CORRIGÉ POUR LA PRODUCTION
@@ -178,7 +194,6 @@ if not DEBUG:
 # ============================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-PUBLIC_API_URL = os.environ.get('PUBLIC_API_URL', 'http://localhost:8000/api')
 
 # ✅ Créer les dossiers nécessaires
 os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
