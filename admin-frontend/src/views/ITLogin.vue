@@ -130,6 +130,8 @@
 </template>
 
 <script>
+import { useAuthStore } from '../stores/auth'
+
 export default {
   name: 'ITLogin',
   data() {
@@ -190,8 +192,37 @@ export default {
 
       this.isLoading = true
 
-      await new Promise(resolve => setTimeout(resolve, 800))
+      // ✅ Utiliser la variable d'environnement
+      const ADMIN_API_URL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
+      
+      try {
+        // Tenter de se connecter via l'API
+        const response = await fetch(`${ADMIN_API_URL}/login/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: this.form.username,
+            password: this.form.password
+          })
+        })
 
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success) {
+            localStorage.setItem('it_admin_authenticated', 'true')
+            localStorage.setItem('it_admin_username', this.form.username)
+            localStorage.setItem('it_admin_login_time', new Date().toISOString())
+            this.$router.push('/dashboard')
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Erreur de connexion IT:', error)
+      }
+
+      // Fallback: si l'API ne répond pas, utiliser les identifiants par défaut
       if (this.form.username === this.defaultCredentials.username &&
           this.form.password === this.defaultCredentials.password) {
         

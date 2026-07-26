@@ -474,6 +474,7 @@ export default {
       }
       
       try {
+        // ✅ Utiliser le store qui utilise les variables d'environnement
         const result = await authStore.register(registerData)
         
         if (result.success) {
@@ -501,7 +502,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped>
 .login-container {

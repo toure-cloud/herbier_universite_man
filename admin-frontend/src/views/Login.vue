@@ -167,7 +167,6 @@ export default {
     }
   },
   mounted() {
-    // Vérifier si l'email est sauvegardé
     const savedEmail = localStorage.getItem('saved_email')
     if (savedEmail) {
       this.form.email = savedEmail
@@ -183,7 +182,6 @@ export default {
       let isValid = true
       this.errors = { email: '', password: '' }
       
-      // Validation email
       if (!this.form.email) {
         this.errors.email = 'L\'adresse email est requise'
         isValid = false
@@ -192,7 +190,6 @@ export default {
         isValid = false
       }
       
-      // Validation mot de passe
       if (!this.form.password) {
         this.errors.password = 'Le mot de passe est requis'
         isValid = false
@@ -225,29 +222,42 @@ export default {
       this.isLoading = true
       this.clearAlert()
       
-      // Sauvegarder l'email si "Se souvenir de moi" est coché
       if (this.rememberMe) {
         localStorage.setItem('saved_email', this.form.email)
       } else {
         localStorage.removeItem('saved_email')
       }
       
-      const authStore = useAuthStore()
-      const result = await authStore.login({ 
-        email: this.form.email, 
-        password: this.form.password 
-      })
+      // ✅ Utiliser la variable d'environnement
+      const ADMIN_API_URL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
       
-      if (result.success && result.requires2FA) {
-        this.showAlert('Code de vérification envoyé à votre adresse email', 'success')
-        setTimeout(() => {
-          this.$router.push('/verify-2fa')
-        }, 1500)
-      } else if (!result.success) {
-        this.showAlert(result.message || 'Email ou mot de passe incorrect')
-        // Animation d'erreur sur les champs
-        this.errors.email = result.message || 'Identifiants incorrects'
-        this.errors.password = result.message || 'Identifiants incorrects'
+      try {
+        const response = await fetch(`${ADMIN_API_URL}/login/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: this.form.email,
+            password: this.form.password
+          })
+        })
+
+        const data = await response.json()
+
+        if (data.success && data.requires2FA) {
+          this.showAlert('Code de vérification envoyé à votre adresse email', 'success')
+          setTimeout(() => {
+            this.$router.push('/verify-2fa')
+          }, 1500)
+        } else if (!data.success) {
+          this.showAlert(data.message || 'Email ou mot de passe incorrect')
+          this.errors.email = data.message || 'Identifiants incorrects'
+          this.errors.password = data.message || 'Identifiants incorrects'
+        }
+      } catch (error) {
+        console.error('Erreur de connexion:', error)
+        this.showAlert('Erreur de connexion au serveur', 'error')
       }
       
       this.isLoading = false

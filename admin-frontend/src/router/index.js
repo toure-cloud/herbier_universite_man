@@ -20,7 +20,6 @@ const routes = [
   { path: '/statistiques', name: 'Statistiques', component: () => import('../views/StatsManagement.vue'), meta: { requiresAuth: true, adminOnly: true } },
   { path: '/herbier-data', name: 'HerbierData', component: () => import('../views/HerbierData.vue'), meta: { requiresAuth: true, adminOnly: true } },
   { path: '/settings', name: 'Settings', component: () => import('../views/Settings.vue'), meta: { requiresAuth: true, adminOnly: true } },
-  // ✅ Route Administrateurs
   { path: '/administrateurs', name: 'Administrateurs', component: () => import('../views/AdminUsersManagement.vue'), meta: { requiresAuth: true, adminOnly: true } },
   { path: '/users', name: 'Users', component: () => import('../views/UsersManagement.vue'), meta: { requiresAuth: true, adminOnly: true } }
 ]
@@ -37,7 +36,7 @@ const router = createRouter({
   }
 })
 
-// ✅ Navigation Guard - CORRIGÉE
+// ✅ Navigation Guard - CORRIGÉE ET AMÉLIORÉE
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('access_token')
   const hasToken = !!token
@@ -47,8 +46,11 @@ router.beforeEach(async (to, from, next) => {
   // ✅ Gestion de la page /it-login
   if (to.path === '/it-login') {
     const isItAuthenticated = localStorage.getItem('it_admin_authenticated')
-    // Si déjà authentifié IT, rediriger vers administrateurs
+    // Si déjà authentifié IT, vérifier le token
     if (isItAuthenticated === 'true') {
+      if (!hasToken) {
+        return next('/login')
+      }
       return next('/administrateurs')
     }
     // Si non authentifié, laisser accéder à la page de login IT
@@ -71,6 +73,10 @@ router.beforeEach(async (to, from, next) => {
 
   // ✅ Si la route nécessite une authentification et qu'il n'y a pas de token
   if (requiresAuth && !hasToken) {
+    // Sauvegarder la route demandée pour redirection après login
+    if (to.path !== '/login') {
+      localStorage.setItem('redirect_after_login', to.fullPath)
+    }
     return next('/login')
   }
 
@@ -83,10 +89,16 @@ router.beforeEach(async (to, from, next) => {
       }
       const isSuperAdmin = authStore.user?.is_superuser || authStore.user?.role === 'it_admin'
       if (!isSuperAdmin) {
+        console.warn('🚫 Accès refusé à', to.path, '- droits insuffisants')
         return next('/dashboard')
       }
     } catch (error) {
       console.error('❌ Erreur vérification droits:', error)
+      // Si erreur (token expiré ou invalide), déconnecter
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('it_admin_authenticated')
       return next('/login')
     }
   }
@@ -94,6 +106,15 @@ router.beforeEach(async (to, from, next) => {
   // ✅ Si l'utilisateur est connecté et essaie d'accéder aux pages d'auth
   const authPages = ['/login', '/register', '/forgot-password', '/verify-2fa']
   if (authPages.includes(to.path) && hasToken) {
+    // Vérifier si l'utilisateur est IT Admin
+    if (localStorage.getItem('it_admin_authenticated') === 'true') {
+      return next('/administrateurs')
+    }
+    return next('/dashboard')
+  }
+
+  // ✅ Redirection depuis la racine
+  if (to.path === '/' && hasToken) {
     return next('/dashboard')
   }
 
