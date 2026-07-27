@@ -147,10 +147,18 @@ def reset_password(request):
     except SuperAdmin.DoesNotExist:
         return Response({'error': 'Email non trouvé'}, status=404)
 
+
+import logging
+logger = logging.getLogger(__name__)
+
 @api_view(['GET'])
 def api_root(request):
     try:
-        # ✅ Vérifier que tout est ok
+        # ✅ Log pour debug
+        logger.info("📝 Headers reçus: %s", dict(request.headers))
+        logger.info("📝 Method: %s", request.method)
+        logger.info("📝 Path: %s", request.path)
+        
         return Response({
             'status': 'ok',
             'message': 'Admin API Herbier Universite de Man',
@@ -185,9 +193,10 @@ def api_root(request):
         })
     except Exception as e:
         import traceback
-        print(f"❌ Erreur dans api_root: {str(e)}")
-        print(traceback.format_exc())
+        logger.error("❌ Erreur dans api_root: %s", str(e))
+        logger.error(traceback.format_exc())
         return Response({'error': str(e), 'traceback': traceback.format_exc()}, status=500)
+    
     
 
 @api_view(['GET'])
