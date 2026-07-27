@@ -64,7 +64,6 @@
 import { useAuthStore } from '../stores/auth'
 import axios from 'axios'
 
-// ✅ Utiliser la variable d'environnement
 const ADMIN_API_URL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
 
 export default {
@@ -84,7 +83,6 @@ export default {
     fullCode() {
       return this.codeDigits.join('')
     },
-    // ✅ getEmail est un getter, pas une fonction
     userEmail() {
       const authStore = useAuthStore()
       return authStore.getEmail
@@ -92,7 +90,8 @@ export default {
   },
   mounted() {
     const authStore = useAuthStore()
-    // ✅ Vérifier l'email via le store
+    
+    // ✅ Vérifier l'email
     if (!authStore.getEmail) {
       this.setMessage('Aucune session trouvée, veuillez vous connecter', 'error')
       setTimeout(() => {
@@ -100,13 +99,13 @@ export default {
       }, 1500)
       return
     }
-    // Focus sur le premier champ
+    
+    // ✅ Focus sur le premier champ
     this.$nextTick(() => {
       this.$refs.codeInputs[0]?.focus()
     })
   },
   beforeUnmount() {
-    // ✅ Nettoyer le timer à la destruction
     if (this.timerInterval) {
       clearInterval(this.timerInterval)
       this.timerInterval = null
@@ -115,17 +114,13 @@ export default {
   methods: {
     handleCodeInput(index, event) {
       const value = event.target.value
-      
-      // ✅ Ne garder que les chiffres
       const cleanedValue = value.replace(/\D/g, '')
       
       if (cleanedValue && /^\d$/.test(cleanedValue)) {
         this.codeDigits[index] = cleanedValue
-        // ✅ Auto-vérification quand le code est complet
         if (index < 5) {
           this.$refs.codeInputs[index + 1]?.focus()
         } else {
-          // ✅ Attendre un peu pour que le dernier chiffre soit affiché
           setTimeout(() => {
             if (this.fullCode.length === 6 && !this.loading) {
               this.handleVerify()
@@ -135,12 +130,10 @@ export default {
       } else if (value === '' || cleanedValue === '') {
         this.codeDigits[index] = ''
       } else {
-        // ✅ Réinitialiser si ce n'est pas un chiffre
         this.codeDigits[index] = ''
       }
     },
     handleCodeKeydown(index, event) {
-      // ✅ Navigation avec les flèches
       if (event.key === 'ArrowLeft' && index > 0) {
         event.preventDefault()
         this.$refs.codeInputs[index - 1]?.focus()
@@ -151,12 +144,6 @@ export default {
         this.$refs.codeInputs[index - 1]?.focus()
       } else if (event.key === 'Delete' && !this.codeDigits[index] && index < 5) {
         this.$refs.codeInputs[index + 1]?.focus()
-      }
-      
-      // ✅ Permettre Ctrl+V pour coller
-      if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
-        // Le collage sera géré par l'événement input
-        return
       }
     },
     async handleVerify() {
@@ -173,23 +160,29 @@ export default {
       const authStore = useAuthStore()
       
       try {
+        console.log('🔐 Vérification du code:', this.fullCode)
+        
         const result = await authStore.verify2FA(this.fullCode)
+        
+        console.log('📥 Résultat vérification:', result)
         
         if (result.success) {
           this.setMessage('✅ Authentification réussie ! Redirection...', 'success')
+          
+          // ✅ Redirection vers le dashboard après 1.5s
           setTimeout(() => {
+            console.log('🚀 Redirection vers /dashboard')
             this.$router.push('/dashboard')
           }, 1500)
         } else {
           this.setMessage(result.message || '❌ Code invalide', 'error')
-          // ✅ Réinitialiser les champs et focus
           this.codeDigits = ['', '', '', '', '', '']
           this.$nextTick(() => {
             this.$refs.codeInputs[0]?.focus()
           })
         }
       } catch (error) {
-        console.error('Erreur de vérification:', error)
+        console.error('❌ Erreur de vérification:', error)
         this.setMessage('❌ Erreur de connexion au serveur', 'error')
         this.codeDigits = ['', '', '', '', '', '']
       } finally {
@@ -197,7 +190,6 @@ export default {
       }
     },
     async resendCode() {
-      // ✅ Empêcher les spams avec timer
       if (this.resendTimer > 0) {
         this.setMessage(`⏱️ Veuillez attendre ${this.resendTimer}s avant de renvoyer`, 'error')
         return
@@ -211,19 +203,20 @@ export default {
       const authStore = useAuthStore()
       
       try {
+        console.log('📧 Renvoi du code pour:', authStore.getEmail)
+        
         const response = await axios.post(`${ADMIN_API_URL}/resend-code/`, {
-          email: authStore.getEmail // ✅ getter, pas méthode
+          email: authStore.getEmail
         })
         
         if (response.data.success) {
           this.setMessage('✅ Un nouveau code a été envoyé à votre email', 'success')
-          // ✅ Démarrer le timer de 60 secondes
           this.startResendTimer(60)
         } else {
           this.setMessage(response.data.message || '❌ Erreur lors de l\'envoi', 'error')
         }
       } catch (error) {
-        console.error('Erreur resend:', error)
+        console.error('❌ Erreur resend:', error)
         let errorMessage = '❌ Erreur lors de l\'envoi du code'
         
         if (error.response?.data?.message) {
@@ -241,7 +234,6 @@ export default {
       this.message = text
       this.messageType = type
       
-      // ✅ Auto-effacer les messages d'erreur après 5 secondes
       if (type === 'error') {
         setTimeout(() => {
           if (this.message === text) {
@@ -253,7 +245,6 @@ export default {
     startResendTimer(seconds) {
       this.resendTimer = seconds
       
-      // ✅ Nettoyer l'ancien timer s'il existe
       if (this.timerInterval) {
         clearInterval(this.timerInterval)
         this.timerInterval = null
@@ -317,15 +308,9 @@ export default {
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .verify-header .icon i {
@@ -377,11 +362,6 @@ export default {
   background: #f0fff0;
 }
 
-.code-digit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .btn-verify, .btn-resend {
   width: 100%;
   padding: 12px;
@@ -397,29 +377,6 @@ export default {
   color: white;
   border: none;
   margin-bottom: 12px;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-verify::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  transform: rotate(45deg);
-  transition: all 0.5s;
-}
-
-.btn-verify:hover:not(:disabled)::after {
-  left: 100%;
 }
 
 .btn-verify:hover:not(:disabled) {
@@ -430,7 +387,6 @@ export default {
 .btn-verify:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  transform: none;
 }
 
 .btn-resend {
@@ -482,7 +438,6 @@ export default {
   font-size: 18px;
 }
 
-/* ✅ Responsive */
 @media (max-width: 520px) {
   .verify-card {
     padding: 30px 20px;
@@ -497,13 +452,8 @@ export default {
   .code-inputs {
     gap: 8px;
   }
-  
-  .verify-header h1 {
-    font-size: 20px;
-  }
 }
 
-/* ✅ Support pour mobile */
 @media (max-width: 400px) {
   .code-digit {
     width: 35px;
@@ -516,7 +466,6 @@ export default {
   }
 }
 
-/* ✅ Dark mode support */
 @media (prefers-color-scheme: dark) {
   .verify-card {
     background: #1a1a2e;
@@ -554,18 +503,6 @@ export default {
     border-color: #32CD32;
     color: #32CD32;
     background: #1a2a1a;
-  }
-  
-  .message.success {
-    background: #1a3a1a;
-    color: #32CD32;
-    border-color: #32CD32;
-  }
-  
-  .message.error {
-    background: #3a1a1a;
-    color: #ff6b6b;
-    border-color: #ff6b6b;
   }
 }
 </style>
