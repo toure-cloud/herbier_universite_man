@@ -59,6 +59,9 @@
 import { useAuthStore } from '../stores/auth'
 import axios from 'axios'
 
+// ✅ Utiliser la variable d'environnement
+const ADMIN_API_URL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
+
 export default {
   name: 'Verify2FA',
   data() {
@@ -76,7 +79,11 @@ export default {
     }
   },
   mounted() {
-    this.$refs.codeInputs[0].focus()
+    const email = localStorage.getItem('auth_email')
+    if (!email) {
+      this.$router.push('/login')
+    }
+    this.$refs.codeInputs[0]?.focus()
   },
   methods: {
     handleCodeInput(index, event) {
@@ -84,7 +91,7 @@ export default {
       if (value && /^\d$/.test(value)) {
         this.codeDigits[index] = value
         if (index < 5) {
-          this.$refs.codeInputs[index + 1].focus()
+          this.$refs.codeInputs[index + 1]?.focus()
         } else {
           this.handleVerify()
         }
@@ -94,7 +101,7 @@ export default {
     },
     handleCodeKeydown(index, event) {
       if (event.key === 'Backspace' && !this.codeDigits[index] && index > 0) {
-        this.$refs.codeInputs[index - 1].focus()
+        this.$refs.codeInputs[index - 1]?.focus()
       }
     },
     async handleVerify() {
@@ -120,7 +127,7 @@ export default {
         this.messageType = 'error'
         this.message = result.message || 'Code invalide'
         this.codeDigits = ['', '', '', '', '', '']
-        this.$refs.codeInputs[0].focus()
+        this.$refs.codeInputs[0]?.focus()
       }
       
       this.loading = false
@@ -131,7 +138,8 @@ export default {
       
       const authStore = useAuthStore()
       try {
-        const response = await axios.post('http://localhost:8001/api/resend-otp/', {
+        // ✅ Correction : Utiliser ADMIN_API_URL
+        const response = await axios.post(`${ADMIN_API_URL}/resend-code/`, {
           email: authStore.getEmail
         })
         if (response.data.success) {
@@ -139,6 +147,7 @@ export default {
           this.message = 'Un nouveau code a été envoyé'
         }
       } catch (error) {
+        console.error('Erreur resend:', error)
         this.messageType = 'error'
         this.message = 'Erreur lors de l\'envoi du code'
       }
@@ -241,6 +250,11 @@ export default {
   box-shadow: 0 10px 20px rgba(50,205,50,0.3);
 }
 
+.btn-verify:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .btn-resend {
   background: none;
   border: 1px solid #ddd;
@@ -250,6 +264,11 @@ export default {
 .btn-resend:hover:not(:disabled) {
   border-color: #32CD32;
   color: #32CD32;
+}
+
+.btn-resend:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .message {
