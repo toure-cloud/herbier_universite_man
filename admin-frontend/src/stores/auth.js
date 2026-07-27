@@ -3,7 +3,6 @@ import axios from 'axios'
 
 const ADMIN_API_URL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
 
-
 console.log('🔗 [Auth Store] ADMIN_API_URL:', ADMIN_API_URL)
 
 export const useAuthStore = defineStore('auth', {
@@ -28,7 +27,7 @@ export const useAuthStore = defineStore('auth', {
     
     async register(userData) {
       try {
-        const response = await axios.post(`${API_URL}/create-superadmin/`, userData, {
+        const response = await axios.post(`${ADMIN_API_URL}/create-superadmin/`, userData, {
           headers: { 'Content-Type': 'application/json' }
         })
         if (response.data.success) {
@@ -51,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
     
     async login(credentials) {
       try {
-        const response = await axios.post(`${API_URL}/login/`, credentials)
+        const response = await axios.post(`${ADMIN_API_URL}/login/`, credentials)
         if (response.data.success && response.data.requires_2fa) {
           this.setEmail(response.data.email)
           return { success: true, requires2FA: true, message: response.data.message }
@@ -64,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
     
     async verify2FA(code) {
       try {
-        const response = await axios.post(`${API_URL}/verify-2fa/`, {
+        const response = await axios.post(`${ADMIN_API_URL}/verify-2fa/`, {
           email: this.email,
           code: code
         })
@@ -77,7 +76,6 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('access_token', this.accessToken)
           localStorage.setItem('refresh_token', this.refreshToken)
           
-          // Configurer axios pour inclure le token dans toutes les requêtes
           axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
           
           return { success: true }
@@ -91,7 +89,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       try {
         if (this.refreshToken) {
-          await axios.post(`${API_URL}/logout/`, { refresh: this.refreshToken })
+          await axios.post(`${ADMIN_API_URL}/logout/`, { refresh: this.refreshToken })
         }
       } catch (error) {
         console.error('Erreur lors de la déconnexion', error)
@@ -115,11 +113,10 @@ export const useAuthStore = defineStore('auth', {
       axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
       
       try {
-        const response = await axios.get(`${API_URL}/me/`)
+        const response = await axios.get(`${ADMIN_API_URL}/me/`)
         this.user = response.data
         return this.user
       } catch (error) {
-        // Token invalide ou expiré
         if (error.response?.status === 401) {
           await this.logout()
         }
@@ -127,7 +124,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     
-    // Vérifier si le token est encore valide
     async checkAuth() {
       if (!this.accessToken) {
         return false
