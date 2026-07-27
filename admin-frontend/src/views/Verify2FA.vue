@@ -21,6 +21,10 @@
             @keydown="handleCodeKeydown(index, $event)"
             ref="codeInputs"
             class="code-digit"
+            :class="{ 'code-digit-filled': codeDigits[index] }"
+            autocomplete="one-time-code"
+            inputmode="numeric"
+            pattern="[0-9]"
           >
         </div>
 
@@ -35,10 +39,11 @@
           </span>
         </button>
 
-        <button type="button" class="btn-resend" @click="resendCode" :disabled="resendLoading">
+        <button type="button" class="btn-resend" @click="resendCode" :disabled="resendLoading || resendTimer > 0">
           <span v-if="!resendLoading">
             <i class="fas fa-redo-alt"></i>
             Renvoyer le code
+            <span v-if="resendTimer > 0" class="timer-badge">({{ resendTimer }}s)</span>
           </span>
           <span v-else>
             <i class="fas fa-spinner fa-pulse"></i>
@@ -70,89 +75,198 @@ export default {
       loading: false,
       resendLoading: false,
       message: '',
-      messageType: ''
+      messageType: '',
+      resendTimer: 0,
+      timerInterval: null
     }
   },
   computed: {
     fullCode() {
       return this.codeDigits.join('')
+    },
+    // ✅ getEmail est un getter, pas une fonction
+    userEmail() {
+      const authStore = useAuthStore()
+      return authStore.getEmail
     }
   },
   mounted() {
-    const email = localStorage.getItem('auth_email')
-    if (!email) {
-      this.$router.push('/login')
+    const authStore = useAuthStore()
+    // ✅ Vérifier l'email via le store
+    if (!authStore.getEmail) {
+      this.setMessage('Aucune session trouvée, veuillez vous connecter', 'error')
+      setTimeout(() => {
+        this.$router.push('/login')
+      }, 1500)
+      return
     }
-    this.$refs.codeInputs[0]?.focus()
+    // Focus sur le premier champ
+    this.$nextTick(() => {
+      this.$refs.codeInputs[0]?.focus()
+    })
+  },
+  beforeUnmount() {
+    // ✅ Nettoyer le timer à la destruction
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval)
+      this.timerInterval = null
+    }
   },
   methods: {
     handleCodeInput(index, event) {
       const value = event.target.value
-      if (value && /^\d$/.test(value)) {
-        this.codeDigits[index] = value
+      
+      // ✅ Ne garder que les chiffres
+      const cleanedValue = value.replace(/\D/g, '')
+      
+      if (cleanedValue && /^\d$/.test(cleanedValue)) {
+        this.codeDigits[index] = cleanedValue
+        // ✅ Auto-vérification quand le code est complet
         if (index < 5) {
           this.$refs.codeInputs[index + 1]?.focus()
         } else {
-          this.handleVerify()
+          // ✅ Attendre un peu pour que le dernier chiffre soit affiché
+          setTimeout(() => {
+            if (this.fullCode.length === 6 && !this.loading) {
+              this.handleVerify()
+            }
+          }, 300)
         }
-      } else if (value === '') {
+      } else if (value === '' || cleanedValue === '') {
+        this.codeDigits[index] = ''
+      } else {
+        // ✅ Réinitialiser si ce n'est pas un chiffre
         this.codeDigits[index] = ''
       }
     },
     handleCodeKeydown(index, event) {
-      if (event.key === 'Backspace' && !this.codeDigits[index] && index > 0) {
+      // ✅ Navigation avec les flèches
+      if (event.key === 'ArrowLeft' && index > 0) {
+        event.preventDefault()
         this.$refs.codeInputs[index - 1]?.focus()
+      } else if (event.key === 'ArrowRight' && index < 5) {
+        event.preventDefault()
+        this.$refs.codeInputs[index + 1]?.focus()
+      } else if (event.key === 'Backspace' && !this.codeDigits[index] && index > 0) {
+        this.$refs.codeInputs[index - 1]?.focus()
+      } else if (event.key === 'Delete' && !this.codeDigits[index] && index < 5) {
+        this.$refs.codeInputs[index + 1]?.focus()
+      }
+      
+      // ✅ Permettre Ctrl+V pour coller
+      if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+        // Le collage sera géré par l'événement input
+        return
       }
     },
     async handleVerify() {
       if (this.fullCode.length !== 6) {
-        this.message = 'Veuillez entrer un code à 6 chiffres'
-        this.messageType = 'error'
+        this.setMessage('Veuillez entrer un code à 6 chiffres', 'error')
         return
       }
+      
+      if (this.loading) return
       
       this.loading = true
       this.message = ''
       
       const authStore = useAuthStore()
-      const result = await authStore.verify2FA(this.fullCode)
       
-      if (result.success) {
-        this.messageType = 'success'
-        this.message = 'Authentification réussie !'
-        setTimeout(() => {
-          this.$router.push('/dashboard')
-        }, 1500)
-      } else {
-        this.messageType = 'error'
-        this.message = result.message || 'Code invalide'
+      try {
+        const result = await authStore.verify2FA(this.fullCode)
+        
+        if (result.success) {
+          this.setMessage('✅ Authentification réussie ! Redirection...', 'success')
+          setTimeout(() => {
+            this.$router.push('/dashboard')
+          }, 1500)
+        } else {
+          this.setMessage(result.message || '❌ Code invalide', 'error')
+          // ✅ Réinitialiser les champs et focus
+          this.codeDigits = ['', '', '', '', '', '']
+          this.$nextTick(() => {
+            this.$refs.codeInputs[0]?.focus()
+          })
+        }
+      } catch (error) {
+        console.error('Erreur de vérification:', error)
+        this.setMessage('❌ Erreur de connexion au serveur', 'error')
         this.codeDigits = ['', '', '', '', '', '']
-        this.$refs.codeInputs[0]?.focus()
+      } finally {
+        this.loading = false
       }
-      
-      this.loading = false
     },
     async resendCode() {
+      // ✅ Empêcher les spams avec timer
+      if (this.resendTimer > 0) {
+        this.setMessage(`⏱️ Veuillez attendre ${this.resendTimer}s avant de renvoyer`, 'error')
+        return
+      }
+      
+      if (this.resendLoading) return
+      
       this.resendLoading = true
       this.message = ''
       
       const authStore = useAuthStore()
+      
       try {
-        // ✅ Correction : Utiliser ADMIN_API_URL
         const response = await axios.post(`${ADMIN_API_URL}/resend-code/`, {
-          email: authStore.getEmail
+          email: authStore.getEmail // ✅ getter, pas méthode
         })
+        
         if (response.data.success) {
-          this.messageType = 'success'
-          this.message = 'Un nouveau code a été envoyé'
+          this.setMessage('✅ Un nouveau code a été envoyé à votre email', 'success')
+          // ✅ Démarrer le timer de 60 secondes
+          this.startResendTimer(60)
+        } else {
+          this.setMessage(response.data.message || '❌ Erreur lors de l\'envoi', 'error')
         }
       } catch (error) {
         console.error('Erreur resend:', error)
-        this.messageType = 'error'
-        this.message = 'Erreur lors de l\'envoi du code'
+        let errorMessage = '❌ Erreur lors de l\'envoi du code'
+        
+        if (error.response?.data?.message) {
+          errorMessage = `❌ ${error.response.data.message}`
+        } else if (error.response?.data?.error) {
+          errorMessage = `❌ ${error.response.data.error}`
+        }
+        
+        this.setMessage(errorMessage, 'error')
+      } finally {
+        this.resendLoading = false
+      }
+    },
+    setMessage(text, type) {
+      this.message = text
+      this.messageType = type
+      
+      // ✅ Auto-effacer les messages d'erreur après 5 secondes
+      if (type === 'error') {
+        setTimeout(() => {
+          if (this.message === text) {
+            this.message = ''
+          }
+        }, 5000)
+      }
+    },
+    startResendTimer(seconds) {
+      this.resendTimer = seconds
+      
+      // ✅ Nettoyer l'ancien timer s'il existe
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval)
+        this.timerInterval = null
       }
       
-      this.resendLoading = false
+      this.timerInterval = setInterval(() => {
+        this.resendTimer--
+        if (this.resendTimer <= 0) {
+          clearInterval(this.timerInterval)
+          this.timerInterval = null
+          this.resendTimer = 0
+        }
+      }, 1000)
     }
   }
 }
@@ -176,6 +290,18 @@ export default {
   width: 100%;
   box-shadow: 0 20px 60px rgba(0,0,0,0.1);
   text-align: center;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .verify-header .icon {
@@ -187,6 +313,19 @@ export default {
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .verify-header .icon i {
@@ -202,6 +341,7 @@ export default {
 
 .verify-header p {
   color: #666;
+  margin-bottom: 0;
 }
 
 .code-inputs {
@@ -220,12 +360,26 @@ export default {
   border: 2px solid #ddd;
   border-radius: 12px;
   transition: all 0.3s ease;
+  background: #fafafa;
+  color: #1a472a;
 }
 
 .code-digit:focus {
   outline: none;
   border-color: #32CD32;
   box-shadow: 0 0 0 3px rgba(50,205,50,0.1);
+  background: white;
+  transform: scale(1.05);
+}
+
+.code-digit-filled {
+  border-color: #32CD32;
+  background: #f0fff0;
+}
+
+.code-digit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-verify, .btn-resend {
@@ -243,6 +397,29 @@ export default {
   color: white;
   border: none;
   margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-verify::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s;
+}
+
+.btn-verify:hover:not(:disabled)::after {
+  left: 100%;
 }
 
 .btn-verify:hover:not(:disabled) {
@@ -253,6 +430,7 @@ export default {
 .btn-verify:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-resend {
@@ -264,6 +442,7 @@ export default {
 .btn-resend:hover:not(:disabled) {
   border-color: #32CD32;
   color: #32CD32;
+  background: #f0fff0;
 }
 
 .btn-resend:disabled {
@@ -271,33 +450,122 @@ export default {
   cursor: not-allowed;
 }
 
+.timer-badge {
+  font-size: 12px;
+  font-weight: normal;
+  color: #999;
+}
+
 .message {
   margin-top: 20px;
-  padding: 12px;
+  padding: 12px 16px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 10px;
+  animation: fadeInUp 0.3s ease-out;
 }
 
 .message.success {
   background: #d4edda;
   color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .message.error {
   background: #f8d7da;
   color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
+.message i {
+  font-size: 18px;
+}
+
+/* ✅ Responsive */
 @media (max-width: 520px) {
   .verify-card {
     padding: 30px 20px;
   }
+  
   .code-digit {
     width: 40px;
     height: 50px;
     font-size: 20px;
+  }
+  
+  .code-inputs {
+    gap: 8px;
+  }
+  
+  .verify-header h1 {
+    font-size: 20px;
+  }
+}
+
+/* ✅ Support pour mobile */
+@media (max-width: 400px) {
+  .code-digit {
+    width: 35px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .code-inputs {
+    gap: 6px;
+  }
+}
+
+/* ✅ Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .verify-card {
+    background: #1a1a2e;
+  }
+  
+  .verify-header h1 {
+    color: #32CD32;
+  }
+  
+  .verify-header p {
+    color: #aaa;
+  }
+  
+  .code-digit {
+    background: #2a2a3e;
+    border-color: #444;
+    color: white;
+  }
+  
+  .code-digit:focus {
+    background: #3a3a4e;
+  }
+  
+  .code-digit-filled {
+    border-color: #32CD32;
+    background: #1a3a1a;
+  }
+  
+  .btn-resend {
+    color: #aaa;
+    border-color: #444;
+  }
+  
+  .btn-resend:hover:not(:disabled) {
+    border-color: #32CD32;
+    color: #32CD32;
+    background: #1a2a1a;
+  }
+  
+  .message.success {
+    background: #1a3a1a;
+    color: #32CD32;
+    border-color: #32CD32;
+  }
+  
+  .message.error {
+    background: #3a1a1a;
+    color: #ff6b6b;
+    border-color: #ff6b6b;
   }
 }
 </style>
