@@ -147,41 +147,47 @@ def reset_password(request):
     except SuperAdmin.DoesNotExist:
         return Response({'error': 'Email non trouvé'}, status=404)
 
-
 @api_view(['GET'])
 def api_root(request):
-    return Response({
-        'status': 'ok',
-        'message': 'Admin API Herbier Universite de Man',
-        'version': '1.0.0',
-        'endpoints': {
-            'plantes': '/api/plantes/',
-            'equipe': '/api/equipe/',
-            'slides': '/api/slides/',
-            'projets': '/api/projets/',
-            'activites': '/api/activites/',
-            'partenaires': '/api/partenaires/',
-            'temoignages': '/api/temoignages/',
-            'publications': '/api/publications/',
-            'faqs': '/api/faqs/',
-            'statistiques': '/api/statistiques/',
-            'methodologie': '/api/methodologie/',
-            'auth': {
-                'create_superadmin': '/api/create-superadmin/',
-                'login': '/api/login/',
-                'verify_2fa': '/api/verify-2fa/',
-                'resend_code': '/api/resend-code/',
-                'forgot_password': '/api/forgot-password/',
-                'reset_password': '/api/reset-password/',
-                'logout': '/api/logout/',
-                'me': '/api/me/'
-            },
-            'admin': {
-                'users': '/api/users/',
-                'sync': '/api/sync-all/'
+    try:
+        # ✅ Vérifier que tout est ok
+        return Response({
+            'status': 'ok',
+            'message': 'Admin API Herbier Universite de Man',
+            'version': '1.0.0',
+            'endpoints': {
+                'plantes': '/api/plantes/',
+                'equipe': '/api/equipe/',
+                'slides': '/api/slides/',
+                'projets': '/api/projets/',
+                'activites': '/api/activites/',
+                'partenaires': '/api/partenaires/',
+                'temoignages': '/api/temoignages/',
+                'publications': '/api/publications/',
+                'faqs': '/api/faqs/',
+                'statistiques': '/api/statistiques/',
+                'methodologie': '/api/methodologie/',
+                'auth': {
+                    'create_superadmin': '/api/create-superadmin/',
+                    'login': '/api/login/',
+                    'verify_2fa': '/api/verify-2fa/',
+                    'resend_code': '/api/resend-code/',
+                    'forgot_password': '/api/forgot-password/',
+                    'reset_password': '/api/reset-password/',
+                    'logout': '/api/logout/',
+                    'me': '/api/me/'
+                },
+                'admin': {
+                    'users': '/api/users/',
+                    'sync': '/api/sync-all/'
+                }
             }
-        }
-    })
+        })
+    except Exception as e:
+        import traceback
+        print(f"❌ Erreur dans api_root: {str(e)}")
+        print(traceback.format_exc())
+        return Response({'error': str(e), 'traceback': traceback.format_exc()}, status=500)
     
 
 @api_view(['GET'])
