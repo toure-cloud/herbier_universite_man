@@ -1,6 +1,8 @@
 <template>
     <div class="accueil">
-        <!-- Hero Section avec slideshow -->
+        <!-- ============================================ -->
+        <!-- HERO SECTION AVEC SLIDESHOW                    -->
+        <!-- ============================================ -->
         <section class="hero-section">
             <div class="slideshow-container">
                 <div class="slide fade" v-for="(slide, index) in slides" :key="index" v-show="currentSlide === index">
@@ -23,7 +25,9 @@
             </div>
         </section>
 
-        <!-- Section Président et message de bienvenue -->
+        <!-- ============================================ -->
+        <!-- SECTION PRÉSIDENT ET MESSAGE DE BIENVENUE      -->
+        <!-- ============================================ -->
         <section class="president-section">
             <div class="container">
                 <div class="president-grid">
@@ -97,7 +101,9 @@
             </div>
         </section>
 
-        <!-- Section Expertise -->
+        <!-- ============================================ -->
+        <!-- SECTION EXPERTISE                            -->
+        <!-- ============================================ -->
         <section class="expertise-section">
             <div class="container">
                 <div class="expertise-content">
@@ -146,7 +152,9 @@
             </div>
         </section>
 
-        <!-- Section Services -->
+        <!-- ============================================ -->
+        <!-- SECTION SERVICES                             -->
+        <!-- ============================================ -->
         <section class="services-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -172,7 +180,9 @@
             </div>
         </section>
 
-        <!-- Section Équipe (Dynamique) -->
+        <!-- ============================================ -->
+        <!-- SECTION ÉQUIPE (DYNAMIQUE)                   -->
+        <!-- ============================================ -->
         <section class="team-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -218,7 +228,7 @@
         </section>
 
         <!-- ============================================ -->
-        <!-- SECTION PARTENAIRES - CORRIGÉE ET AMÉLIORÉE -->
+        <!-- SECTION PARTENAIRES                          -->
         <!-- ============================================ -->
         <section class="partenaires-section">
             <div class="container">
@@ -228,19 +238,16 @@
                     <p class="section-subtitle">Un réseau de collaborateurs engagés</p>
                 </div>
                 
-                <!-- État de chargement -->
                 <div v-if="partenairesLoading" class="loading-container">
                     <div class="spinner"></div>
                     <p>Chargement des partenaires...</p>
                 </div>
                 
-                <!-- Aucun partenaire -->
                 <div v-else-if="partenaires.length === 0" class="empty-state">
                     <i class="fas fa-handshake" style="font-size: 48px; color: #ccc;"></i>
                     <p style="margin-top: 1rem; color: #94a3b8;">Aucun partenaire disponible pour le moment</p>
                 </div>
                 
-                <!-- Affichage des partenaires -->
                 <div v-else class="partenaires-grid">
                     <div class="partenaire-card" 
                          v-for="(partenaire, index) in partenaires" 
@@ -248,7 +255,6 @@
                          data-aos="fade-up" 
                          :data-aos-delay="index * 100">
                         
-                        <!-- Logo du partenaire -->
                         <div class="partenaire-logo">
                             <img 
                                 :src="getPartenaireLogo(partenaire)" 
@@ -257,18 +263,13 @@
                             >
                         </div>
                         
-                        <!-- Informations du partenaire -->
                         <div class="partenaire-info">
                             <h4>{{ partenaire.nom }}</h4>
                             <p>{{ partenaire.description || 'Partenaire de l\'Université de Man' }}</p>
-                            
-                            <!-- Type de partenaire (si disponible) -->
                             <span v-if="partenaire.type" class="partenaire-type">
                                 <i class="fas fa-tag"></i>
                                 {{ partenaire.type }}
                             </span>
-                            
-                            <!-- Lien vers le site web -->
                             <a v-if="partenaire.site_web" 
                                :href="partenaire.site_web" 
                                target="_blank" 
@@ -282,7 +283,9 @@
             </div>
         </section>
 
-        <!-- Section Newsletter -->
+        <!-- ============================================ -->
+        <!-- SECTION NEWSLETTER                          -->
+        <!-- ============================================ -->
         <section class="newsletter-section">
             <div class="container">
                 <div class="newsletter-content" data-aos="zoom-in">
@@ -302,7 +305,9 @@
             </div>
         </section>
 
-        <!-- Section CTA -->
+        <!-- ============================================ -->
+        <!-- SECTION CTA                                 -->
+        <!-- ============================================ -->
         <section class="cta-section">
             <div class="container">
                 <div class="cta-content" data-aos="fade-up">
@@ -334,7 +339,7 @@ export default {
             partenaires: [],
             loading: true,
             partenairesLoading: true,
-            apiUrl: import.meta.env.VITE_API_URL || 'https://herbier-universite-man.onrender.com',
+            apiUrl: import.meta.env.VITE_API_URL || 'https://herbier-backend.onrender.com',
             services: [
                 {
                     titre: "Identification",
@@ -437,49 +442,21 @@ export default {
             }
         },
         
-        // ============================================
-        // CHARGEMENT DES PARTENAIRES - AMÉLIORÉ
-        // ============================================
         async fetchPartenaires() {
             this.partenairesLoading = true
             try {
-                console.log('🔍 Récupération des partenaires depuis:', `${this.apiUrl}/api/partenaires/`)
-                
-                const response = await axios.get(`${this.apiUrl}/api/partenaires/`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                
-                console.log('📊 Réponse brute:', response)
-                console.log('📦 Données reçues:', response.data)
-                
-                // Vérifier si les données sont valides
+                const response = await axios.get(`${this.apiUrl}/api/partenaires/`)
                 if (response.data) {
-                    // Si c'est un tableau
                     if (Array.isArray(response.data)) {
                         this.partenaires = response.data
-                        console.log(`✅ ${this.partenaires.length} partenaires chargés`)
-                    } 
-                    // Si c'est un objet avec une propriété 'results' (API paginée)
-                    else if (response.data.results && Array.isArray(response.data.results)) {
+                    } else if (response.data.results && Array.isArray(response.data.results)) {
                         this.partenaires = response.data.results
-                        console.log(`✅ ${this.partenaires.length} partenaires chargés (paginés)`)
-                    }
-                    // Si c'est un objet unique
-                    else if (typeof response.data === 'object') {
+                    } else if (typeof response.data === 'object') {
                         this.partenaires = [response.data]
-                        console.log('✅ 1 partenaire chargé (objet unique)')
                     }
-                } else {
-                    console.warn('⚠️ Aucune donnée reçue')
-                    this.partenaires = []
                 }
             } catch (error) {
-                console.error('❌ Erreur détaillée chargement partenaires:', error)
-                console.error('❌ Statut:', error.response?.status)
-                console.error('❌ Message:', error.response?.data)
+                console.error('Erreur chargement partenaires:', error)
                 this.partenaires = []
             } finally {
                 this.partenairesLoading = false
@@ -493,43 +470,31 @@ export default {
         getImageUrl(imagePath) {
             if (!imagePath) return ''
             
-            // Si c'est déjà une URL complète
             if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
                 return imagePath
             }
             
-            // Si c'est un chemin media
             if (imagePath.startsWith('/media/')) {
                 return `${this.apiUrl}${imagePath}`
             }
             
-            // Si c'est un chemin /images/ (dossier public)
             if (imagePath.startsWith('/images/')) {
                 return imagePath
             }
             
-            // Si c'est juste un nom de fichier
             if (imagePath.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
                 return `/images/${imagePath}`
             }
             
-            // Fallback: retourner le chemin tel quel
             return imagePath
         },
         
-        // ============================================
-        // GESTION DU LOGO DES PARTENAIRES - SPÉCIFIQUE
-        // ============================================
         getPartenaireLogo(partenaire) {
             if (!partenaire) return ''
             
-            // Priorité: logo_url (si disponible), puis logo, puis image
             const logoSource = partenaire.logo_url || partenaire.logo || partenaire.image || ''
             
-            console.log(`🖼️ Logo pour ${partenaire.nom}:`, logoSource)
-            
             if (!logoSource) {
-                // Logo par défaut si aucun n'est fourni
                 return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E'
             }
             
@@ -537,7 +502,6 @@ export default {
         },
         
         handleImageError(event) {
-            // Remplacer l'image par un placeholder en cas d'erreur
             event.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle" dy=".3em"%3EPas d\'image%3C/text%3E%3C/svg%3E'
             event.target.style.objectFit = 'contain'
             event.target.style.padding = '20px'
@@ -569,7 +533,7 @@ export default {
         },
         
         // ============================================
-        // ANIMATIONS ET AUTRES
+        // ANIMATIONS
         // ============================================
         
         initAnimations() {
@@ -600,11 +564,55 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* ============================================ */
+/* RESET & BASE                                 */
+/* ============================================ */
 .accueil {
     overflow-x: hidden;
 }
 
-/* Hero Section */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ============================================ */
+/* SECTION BADGE                                */
+/* ============================================ */
+.section-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3498db;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    font-family: 'Inter', sans-serif;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+/* ============================================ */
+/* HERO SECTION                                 */
+/* ============================================ */
 .hero-section {
     position: relative;
     height: 70vh;
@@ -686,14 +694,8 @@ export default {
 }
 
 @keyframes slideUp {
-    from {
-        transform: translateY(40px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .prev, .next {
@@ -719,13 +721,8 @@ export default {
     transform: translateY(-50%) scale(1.05);
 }
 
-.prev {
-    left: 20px;
-}
-
-.next {
-    right: 20px;
-}
+.prev { left: 20px; }
+.next { right: 20px; }
 
 .hero-scroll {
     position: absolute;
@@ -775,14 +772,9 @@ export default {
     opacity: 0.8;
 }
 
-/* Container */
-.container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
-/* President Section */
+/* ============================================ */
+/* PRESIDENT SECTION                            */
+/* ============================================ */
 .president-section {
     padding: 60px 0;
     background: white;
@@ -968,38 +960,9 @@ export default {
     font-size: 0.8rem;
 }
 
-/* Section Header */
-.section-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.section-badge {
-    display: inline-block;
-    background: #eef2ff;
-    color: #3498db;
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
-}
-
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-}
-
-.section-subtitle {
-    font-family: 'Inter', sans-serif;
-    color: #64748b;
-    font-size: 0.95rem;
-}
-
-/* Expertise Section */
+/* ============================================ */
+/* EXPERTISE SECTION                            */
+/* ============================================ */
 .expertise-section {
     padding: 60px 0;
     background: #f8fafc;
@@ -1092,7 +1055,9 @@ export default {
     color: #64748b;
 }
 
-/* Services Section */
+/* ============================================ */
+/* SERVICES SECTION                             */
+/* ============================================ */
 .services-section {
     padding: 60px 0;
     background: white;
@@ -1163,7 +1128,9 @@ export default {
     gap: 0.5rem;
 }
 
-/* Team Section */
+/* ============================================ */
+/* TEAM SECTION                                 */
+/* ============================================ */
 .team-section {
     padding: 60px 0;
     background: #f8fafc;
@@ -1285,7 +1252,7 @@ export default {
 }
 
 /* ============================================ */
-/* SECTION PARTENAIRES - STYLES AMÉLIORÉS */
+/* PARTENAIRES SECTION                          */
 /* ============================================ */
 .partenaires-section {
     padding: 60px 0;
@@ -1397,7 +1364,9 @@ export default {
     text-decoration: underline;
 }
 
-/* Loading & Empty State */
+/* ============================================ */
+/* LOADING & EMPTY STATE                       */
+/* ============================================ */
 .loading-container {
     text-align: center;
     padding: 3rem 1rem;
@@ -1434,7 +1403,9 @@ export default {
     to { transform: rotate(360deg); }
 }
 
-/* Newsletter */
+/* ============================================ */
+/* NEWSLETTER SECTION                           */
+/* ============================================ */
 .newsletter-section {
     padding: 60px 0;
     background: linear-gradient(135deg, #1e293b 0%, #2c3e50 100%);
@@ -1500,7 +1471,9 @@ export default {
     transform: translateY(-2px);
 }
 
-/* CTA Section */
+/* ============================================ */
+/* CTA SECTION                                  */
+/* ============================================ */
 .cta-section {
     padding: 50px 0;
     background: white;
@@ -1546,7 +1519,9 @@ export default {
     transform: translateY(-2px);
 }
 
-/* Responsive */
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
 @media (max-width: 768px) {
     .hero-section {
         height: 40vh;
