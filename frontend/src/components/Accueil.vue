@@ -615,9 +615,9 @@ export default {
 /* ============================================ */
 .hero-section {
     position: relative;
-    height: 30vh;
-    min-height: 500px;
-    max-height: 600px;
+    height: 10vh;
+    min-height: 300px;
+    max-height: 500px;
     overflow: hidden;
 }
 
@@ -1524,7 +1524,7 @@ export default {
 /* ============================================ */
 @media (max-width: 768px) {
     .hero-section {
-        height: 40vh;
+        height: 20vh;
         min-height: 200px;
         max-height: 300px;
     }
