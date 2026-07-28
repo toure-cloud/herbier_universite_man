@@ -1524,8 +1524,8 @@ export default {
 /* ============================================ */
 @media (max-width: 768px) {
     .hero-section {
-        height: 20vh;
-        min-height: 200px;
+        height: 40vh;
+        min-height: 33300px;
         max-height: 300px;
     }
     
