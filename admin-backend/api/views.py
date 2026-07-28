@@ -317,6 +317,8 @@ def serve_media(request, path):
     
     with open(file_path, 'rb') as f:
         return HttpResponse(f.read(), content_type='image/png')
+    
+    
 @api_view(['GET'])
 def get_admin_users(request):
     """Récupère la liste des administrateurs (accessible uniquement aux IT admins)"""
