@@ -1,12 +1,10 @@
 <template>
     <div class="accueil">
-        <!-- ============================================ -->
-        <!-- HERO SECTION AVEC SLIDESHOW                    -->
-        <!-- ============================================ -->
+        <!-- Hero Section avec slideshow -->
         <section class="hero-section">
             <div class="slideshow-container">
                 <div class="slide fade" v-for="(slide, index) in slides" :key="index" v-show="currentSlide === index">
-                    <img :src="getImageUrl(slide.image)" :alt="slide.titre" @error="handleImageError">
+                    <img :src="getImageUrl(slide.image)" :alt="slide.titre">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
                         <div class="slide-badge">{{ slide.titre }}</div>
@@ -25,16 +23,14 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION PRÉSIDENT ET MESSAGE DE BIENVENUE      -->
-        <!-- ============================================ -->
+        <!-- Section Président et message de bienvenue -->
         <section class="president-section">
             <div class="container">
                 <div class="president-grid">
                     <div class="president-card" data-aos="fade-right">
                         <div class="president-image-wrapper">
                             <div class="president-image">
-                                <img src="/images/president.png" alt="Président de l'Université de Man" @error="handleImageError">
+                                <img src="/src/images/president.png" alt="Président de l'Université de Man">
                                 <div class="president-social">
                                     <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -101,16 +97,14 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION EXPERTISE                            -->
-        <!-- ============================================ -->
+        <!-- Section Expertise -->
         <section class="expertise-section">
             <div class="container">
                 <div class="expertise-content">
                     <div class="expertise-text" data-aos="fade-right">
                         <span class="section-badge">Notre Expertise</span>
                         <h2>Une équipe de<br>botanistes passionnés</h2>
-                        <p>Fort d'une expérience de plus de 10 ans dans le domaine de la botanique tropicale, notre équipe met son savoir-faire au service de la connaissance et de la préservation de la flore.</p>
+                        <p>Fort d'une expérience de plus de 07 ans dans le domaine de la botanique tropicale, notre équipe met son savoir-faire au service de la connaissance et de la préservation de la flore.</p>
                         <div class="expertise-features">
                             <div class="feature">
                                 <i class="fas fa-check-circle"></i>
@@ -140,7 +134,7 @@
                             <div class="stat-label">Années d'existence</div>
                         </div>
                         <div class="stat-big">
-                            <div class="stat-number-count">5000+</div>
+                            <div class="stat-number-count">1000+</div>
                             <div class="stat-label">Spécimens</div>
                         </div>
                         <div class="stat-big">
@@ -152,9 +146,7 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION SERVICES                             -->
-        <!-- ============================================ -->
+        <!-- Section Services -->
         <section class="services-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -180,9 +172,7 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION ÉQUIPE (DYNAMIQUE)                   -->
-        <!-- ============================================ -->
+        <!-- Section Équipe (Dynamique) -->
         <section class="team-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -196,18 +186,13 @@
                     <p>Chargement de l'équipe...</p>
                 </div>
                 
-                <div v-else-if="equipe.length === 0" class="empty-state">
-                    <i class="fas fa-users" style="font-size: 40px; color: #ccc;"></i>
-                    <p>Aucun membre de l'équipe disponible</p>
-                </div>
-                
                 <div v-else class="team-grid">
                     <div class="team-card" v-for="(membre, index) in equipe" :key="membre.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="team-image">
-                            <img :src="getImageUrl(membre.photo || membre.image)" :alt="membre.nom" @error="handleImageError">
+                            <img :src="getImageUrl(membre.photo)" :alt="membre.nom">
                             <div class="team-overlay">
                                 <div class="team-social">
-                                    <a v-if="membre.email" :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
+                                    <a :href="'mailto:' + membre.email" class="team-social-link"><i class="fas fa-envelope"></i></a>
                                     <a href="#" class="team-social-link"><i class="fab fa-linkedin-in"></i></a>
                                     <a href="#" class="team-social-link"><i class="fab fa-twitter"></i></a>
                                 </div>
@@ -216,7 +201,7 @@
                         <div class="team-info">
                             <h3>{{ membre.nom }}</h3>
                             <p class="team-poste">{{ membre.poste }}</p>
-                            <p class="team-specialite">{{ membre.specialite || '-' }}</p>
+                            <p class="team-specialite">{{ membre.specialite }}</p>
                             <div class="team-contact" v-if="membre.email">
                                 <i class="fas fa-envelope"></i>
                                 <span>{{ membre.email }}</span>
@@ -227,9 +212,7 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION PARTENAIRES                          -->
-        <!-- ============================================ -->
+        <!-- Section Partenaires (Dynamique) -->
         <section class="partenaires-section">
             <div class="container">
                 <div class="section-header" data-aos="fade-up">
@@ -243,39 +226,16 @@
                     <p>Chargement des partenaires...</p>
                 </div>
                 
-                <div v-else-if="partenaires.length === 0" class="empty-state">
-                    <i class="fas fa-handshake" style="font-size: 48px; color: #ccc;"></i>
-                    <p style="margin-top: 1rem; color: #94a3b8;">Aucun partenaire disponible pour le moment</p>
-                </div>
-                
                 <div v-else class="partenaires-grid">
-                    <div class="partenaire-card" 
-                         v-for="(partenaire, index) in partenaires" 
-                         :key="partenaire.id" 
-                         data-aos="fade-up" 
-                         :data-aos-delay="index * 100">
-                        
+                    <div class="partenaire-card" v-for="(partenaire, index) in partenaires" :key="partenaire.id" data-aos="fade-up" :data-aos-delay="index * 100">
                         <div class="partenaire-logo">
-                            <img 
-                                :src="getPartenaireLogo(partenaire)" 
-                                :alt="partenaire.nom" 
-                                @error="handleImageError"
-                            >
+                            <img :src="getImageUrl(partenaire.logo)" :alt="partenaire.nom">
                         </div>
-                        
                         <div class="partenaire-info">
                             <h4>{{ partenaire.nom }}</h4>
-                            <p>{{ partenaire.description || 'Partenaire de l\'Université de Man' }}</p>
-                            <span v-if="partenaire.type" class="partenaire-type">
-                                <i class="fas fa-tag"></i>
-                                {{ partenaire.type }}
-                            </span>
-                            <a v-if="partenaire.site_web" 
-                               :href="partenaire.site_web" 
-                               target="_blank" 
-                               class="partenaire-link">
-                                Visiter le site 
-                                <i class="fas fa-external-link-alt"></i>
+                            <p>{{ partenaire.description }}</p>
+                            <a v-if="partenaire.site_web" :href="partenaire.site_web" target="_blank" class="partenaire-link">
+                                Visiter le site <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
@@ -283,9 +243,7 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION NEWSLETTER                          -->
-        <!-- ============================================ -->
+        <!-- Section Newsletter -->
         <section class="newsletter-section">
             <div class="container">
                 <div class="newsletter-content" data-aos="zoom-in">
@@ -305,9 +263,7 @@
             </div>
         </section>
 
-        <!-- ============================================ -->
-        <!-- SECTION CTA                                 -->
-        <!-- ============================================ -->
+        <!-- Section CTA -->
         <section class="cta-section">
             <div class="container">
                 <div class="cta-content" data-aos="fade-up">
@@ -339,7 +295,6 @@ export default {
             partenaires: [],
             loading: true,
             partenairesLoading: true,
-            apiUrl: import.meta.env.VITE_API_URL || 'https://herbier-backend.onrender.com',
             services: [
                 {
                     titre: "Identification",
@@ -385,56 +340,34 @@ export default {
         this.stopSlideShow()
     },
     methods: {
-        // ============================================
-        // CHARGEMENT DES DONNÉES
-        // ============================================
-        
         async fetchSlides() {
             try {
-                const response = await axios.get(`${this.apiUrl}/api/slides/`)
-                if (response.data && response.data.length > 0) {
+                const response = await axios.get('http://localhost:8000/api/slides/')
+                if (response.data.length > 0) {
                     this.slides = response.data
                 } else {
-                    this.setDefaultSlides()
+                    // Slides par défaut
+                    this.slides = [
+                        { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
+                        { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 5000 spécimens." },
+                        { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
+                    ]
                 }
             } catch (error) {
                 console.error('Erreur chargement slides:', error)
-                this.setDefaultSlides()
+                this.slides = [
+                    { image: "/src/images/1.png", titre: "La Biodiversité des Montagnes", texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée." },
+                    { image: "/src/images/slide2.jpg", titre: "Collection Botanique", texte_botanique: "Notre herbier conserve plus de 1000 spécimens." },
+                    { image: "/src/images/slide3.jpg", titre: "Recherche et Conservation", texte_botanique: "Engagés dans la préservation de la flore." }
+                ]
             }
-        },
-        
-        setDefaultSlides() {
-            this.slides = [
-                { 
-                    image: "/images/slide1.jpg", 
-                    titre: "La Biodiversité des Montagnes", 
-                    texte_botanique: "Les montagnes de Man abritent une flore unique et diversifiée avec des espèces endémiques remarquables." 
-                },
-                { 
-                    image: "/images/slide2.jpg", 
-                    titre: "Collection Botanique", 
-                    texte_botanique: "Notre herbier conserve plus de 5000 spécimens de plantes de la région du Tonkpi." 
-                },
-                { 
-                    image: "/images/slide3.jpg", 
-                    titre: "Recherche et Conservation", 
-                    texte_botanique: "Engagés dans la préservation de la flore pour les générations futures." 
-                },
-                { 
-                    image: "/images/slide4.jpg", 
-                    titre: "Herbier Numérique", 
-                    texte_botanique: "Modernisation de la collecte et conservation des spécimens végétaux." 
-                }
-            ]
         },
         
         async fetchEquipe() {
             this.loading = true
             try {
-                const response = await axios.get(`${this.apiUrl}/api/equipe/`)
-                if (response.data && response.data.length > 0) {
-                    this.equipe = response.data
-                }
+                const response = await axios.get('http://localhost:8000/api/equipe/')
+                this.equipe = response.data
             } catch (error) {
                 console.error('Erreur chargement équipe:', error)
             } finally {
@@ -445,71 +378,21 @@ export default {
         async fetchPartenaires() {
             this.partenairesLoading = true
             try {
-                const response = await axios.get(`${this.apiUrl}/api/partenaires/`)
-                if (response.data) {
-                    if (Array.isArray(response.data)) {
-                        this.partenaires = response.data
-                    } else if (response.data.results && Array.isArray(response.data.results)) {
-                        this.partenaires = response.data.results
-                    } else if (typeof response.data === 'object') {
-                        this.partenaires = [response.data]
-                    }
-                }
+                const response = await axios.get('http://localhost:8000/api/partenaires/')
+                this.partenaires = response.data
             } catch (error) {
                 console.error('Erreur chargement partenaires:', error)
-                this.partenaires = []
             } finally {
                 this.partenairesLoading = false
             }
         },
         
-        // ============================================
-        // GESTION DES IMAGES
-        // ============================================
-        
         getImageUrl(imagePath) {
-            if (!imagePath) return ''
-            
-            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-                return imagePath
-            }
-            
-            if (imagePath.startsWith('/media/')) {
-                return `${this.apiUrl}${imagePath}`
-            }
-            
-            if (imagePath.startsWith('/images/')) {
-                return imagePath
-            }
-            
-            if (imagePath.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-                return `/images/${imagePath}`
-            }
-            
+            if (!imagePath) return '/src/images/placeholder.jpg'
+            if (imagePath.startsWith('http')) return imagePath
+            if (imagePath.startsWith('/media')) return `http://localhost:8000${imagePath}`
             return imagePath
         },
-        
-        getPartenaireLogo(partenaire) {
-            if (!partenaire) return ''
-            
-            const logoSource = partenaire.logo_url || partenaire.logo || partenaire.image || ''
-            
-            if (!logoSource) {
-                return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E'
-            }
-            
-            return this.getImageUrl(logoSource)
-        },
-        
-        handleImageError(event) {
-            event.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect fill="%23f0f0f0" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="14" fill="%23999" text-anchor="middle" dy=".3em"%3EPas d\'image%3C/text%3E%3C/svg%3E'
-            event.target.style.objectFit = 'contain'
-            event.target.style.padding = '20px'
-        },
-        
-        // ============================================
-        // SLIDESHOW
-        // ============================================
         
         startSlideShow() {
             if (this.slides.length > 0) {
@@ -532,10 +415,6 @@ export default {
             this.startSlideShow()
         },
         
-        // ============================================
-        // ANIMATIONS
-        // ============================================
-        
         initAnimations() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -555,7 +434,7 @@ export default {
         },
         
         subscribeNewsletter() {
-            alert("Merci pour votre abonnement ! Vous recevrez bientôt nos actualités.")
+            alert("Merci pour votre abonnement !")
         }
     }
 }
@@ -564,72 +443,26 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ============================================ */
-/* RESET & BASE                                 */
-/* ============================================ */
 .accueil {
     overflow-x: hidden;
 }
 
-.container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
-/* ============================================ */
-/* SECTION BADGE                                */
-/* ============================================ */
-.section-badge {
-    display: inline-block;
-    background: #eef2ff;
-    color: #3498db;
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
-}
-
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-}
-
-.section-subtitle {
-    font-family: 'Inter', sans-serif;
-    color: #64748b;
-    font-size: 0.95rem;
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-/* ============================================ */
-/* HERO SECTION                                 */
-/* ============================================ */
+/* Hero Section */
 .hero-section {
     position: relative;
-    height: 10vh;
-    min-height: 300px;
-    max-height: 500px;
+    height: 100vh;
     overflow: hidden;
 }
 
 .slideshow-container {
     position: relative;
-    height: 70%;
+    height: 100%;
 }
 
 .slide {
     position: absolute;
     width: 100%;
-    height: 70%;
+    height: 100%;
     opacity: 0;
     transition: opacity 1s ease-in-out;
 }
@@ -642,7 +475,6 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
 }
 
 .slide-overlay {
@@ -651,12 +483,12 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(26,42,58,0.6) 0%, rgba(44,62,80,0.4) 100%);
+    background: linear-gradient(135deg, rgba(26,42,58,0.7) 0%, rgba(44,62,80,0.5) 100%);
 }
 
 .slide-content {
     position: absolute;
-    bottom: 15%;
+    bottom: 20%;
     left: 10%;
     right: 10%;
     max-width: 800px;
@@ -677,25 +509,31 @@ export default {
 
 .slide-title {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     font-weight: 700;
     color: white;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
     line-height: 1.2;
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .slide-text {
     font-family: 'Inter', sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: rgba(255,255,255,0.9);
-    line-height: 1.5;
-    max-width: 550px;
+    line-height: 1.6;
+    max-width: 600px;
 }
 
 @keyframes slideUp {
-    from { transform: translateY(40px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .prev, .next {
@@ -703,15 +541,15 @@ export default {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    padding: 12px;
+    padding: 16px;
     color: white;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
     background: rgba(0,0,0,0.4);
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     transition: all 0.3s ease;
     z-index: 10;
 }
@@ -721,8 +559,13 @@ export default {
     transform: translateY(-50%) scale(1.05);
 }
 
-.prev { left: 20px; }
-.next { right: 20px; }
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}
 
 .hero-scroll {
     position: absolute;
@@ -736,8 +579,8 @@ export default {
 }
 
 .scroll-mouse {
-    width: 24px;
-    height: 36px;
+    width: 26px;
+    height: 40px;
     border: 2px solid white;
     border-radius: 20px;
     margin: 0 auto 5px;
@@ -745,8 +588,8 @@ export default {
 }
 
 .scroll-wheel {
-    width: 3px;
-    height: 7px;
+    width: 4px;
+    height: 8px;
     background: white;
     border-radius: 2px;
     position: absolute;
@@ -758,25 +601,30 @@ export default {
 
 @keyframes scroll {
     0% { top: 6px; opacity: 1; }
-    100% { top: 22px; opacity: 0; }
+    100% { top: 25px; opacity: 0; }
 }
 
 @keyframes bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
+    50% { transform: translateX(-50%) translateY(10px); }
 }
 
 .hero-scroll span {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     color: white;
     opacity: 0.8;
 }
 
-/* ============================================ */
-/* PRESIDENT SECTION                            */
-/* ============================================ */
+/* Container */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* President Section */
 .president-section {
-    padding: 60px 0;
+    padding: 80px 0;
     background: white;
 }
 
@@ -960,11 +808,40 @@ export default {
     font-size: 0.8rem;
 }
 
-/* ============================================ */
-/* EXPERTISE SECTION                            */
-/* ============================================ */
+/* Section Header */
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3498db;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    font-family: 'Inter', sans-serif;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* Expertise Section */
 .expertise-section {
-    padding: 60px 0;
+    padding: 80px 0;
     background: #f8fafc;
 }
 
@@ -977,9 +854,9 @@ export default {
 
 .expertise-text h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: #1e293b;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
     line-height: 1.3;
 }
 
@@ -987,14 +864,14 @@ export default {
     font-family: 'Inter', sans-serif;
     color: #475569;
     line-height: 1.6;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
 }
 
 .expertise-features {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .feature {
@@ -1014,7 +891,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.7rem 1.5rem;
+    padding: 0.8rem 1.8rem;
     background: #3498db;
     color: white;
     text-decoration: none;
@@ -1032,9 +909,9 @@ export default {
 .expertise-stats {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
     background: white;
-    padding: 1.8rem;
+    padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
@@ -1045,7 +922,7 @@ export default {
 
 .stat-number-count {
     font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: bold;
     color: #3498db;
 }
@@ -1055,17 +932,15 @@ export default {
     color: #64748b;
 }
 
-/* ============================================ */
-/* SERVICES SECTION                             */
-/* ============================================ */
+/* Services Section */
 .services-section {
-    padding: 60px 0;
+    padding: 80px 0;
     background: white;
 }
 
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
 }
 
@@ -1085,8 +960,8 @@ export default {
 }
 
 .service-icon {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     background: #eef2ff;
     border-radius: 50%;
     display: flex;
@@ -1096,13 +971,13 @@ export default {
 }
 
 .service-icon i {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     color: #3498db;
 }
 
 .service-card h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #1e293b;
     margin-bottom: 0.5rem;
 }
@@ -1128,11 +1003,9 @@ export default {
     gap: 0.5rem;
 }
 
-/* ============================================ */
-/* TEAM SECTION                                 */
-/* ============================================ */
+/* Team Section */
 .team-section {
-    padding: 60px 0;
+    padding: 80px 0;
     background: #f8fafc;
 }
 
@@ -1157,7 +1030,7 @@ export default {
 
 .team-image {
     position: relative;
-    height: 260px;
+    height: 280px;
     overflow: hidden;
 }
 
@@ -1196,8 +1069,8 @@ export default {
 }
 
 .team-social-link {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     background: white;
     border-radius: 50%;
     display: flex;
@@ -1220,7 +1093,7 @@ export default {
 
 .team-info h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #1e293b;
     margin-bottom: 0.2rem;
 }
@@ -1251,36 +1124,30 @@ export default {
     color: #3498db;
 }
 
-/* ============================================ */
-/* PARTENAIRES SECTION                          */
-/* ============================================ */
+/* Partenaires Section */
 .partenaires-section {
-    padding: 60px 0;
-    background: #ffffff;
+    padding: 80px 0;
+    background: white;
 }
 
 .partenaires-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
 }
 
 .partenaire-card {
     display: flex;
-    align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     background: #f8fafc;
-    padding: 1.2rem 1.5rem;
+    padding: 1.2rem;
     border-radius: 16px;
     transition: all 0.3s ease;
-    border: 1px solid #eef2f6;
 }
 
 .partenaire-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-    border-color: #3498db;
-    background: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
 
 .partenaire-logo {
@@ -1292,59 +1159,26 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.6rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    overflow: hidden;
+    padding: 0.5rem;
 }
 
 .partenaire-logo img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    transition: transform 0.3s ease;
-}
-
-.partenaire-card:hover .partenaire-logo img {
-    transform: scale(1.05);
-}
-
-.partenaire-info {
-    flex: 1;
-    min-width: 0;
 }
 
 .partenaire-info h4 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: #1e293b;
-    margin-bottom: 0.2rem;
-    font-weight: 700;
+    margin-bottom: 0.3rem;
 }
 
 .partenaire-info p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #64748b;
-    margin-bottom: 0.3rem;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.partenaire-type {
-    display: inline-block;
-    font-size: 0.65rem;
-    color: #3498db;
-    background: #eef2ff;
-    padding: 0.15rem 0.7rem;
-    border-radius: 12px;
-    margin-bottom: 0.3rem;
-}
-
-.partenaire-type i {
-    font-size: 0.5rem;
-    margin-right: 0.2rem;
+    margin-bottom: 0.5rem;
 }
 
 .partenaire-link {
@@ -1354,44 +1188,17 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
 }
 
-.partenaire-link:hover {
-    color: #2980b9;
-    gap: 0.5rem;
-    text-decoration: underline;
-}
-
-/* ============================================ */
-/* LOADING & EMPTY STATE                       */
-/* ============================================ */
+/* Loading */
 .loading-container {
     text-align: center;
-    padding: 3rem 1rem;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    background: #f8fafc;
-    border-radius: 16px;
-}
-
-.empty-state i {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-    color: #94a3b8;
-    font-size: 0.95rem;
+    padding: 3rem;
 }
 
 .spinner {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     border: 3px solid #e2e8f0;
     border-top-color: #3498db;
     border-radius: 50%;
@@ -1403,48 +1210,46 @@ export default {
     to { transform: rotate(360deg); }
 }
 
-/* ============================================ */
-/* NEWSLETTER SECTION                           */
-/* ============================================ */
+/* Newsletter */
 .newsletter-section {
-    padding: 60px 0;
+    padding: 80px 0;
     background: linear-gradient(135deg, #1e293b 0%, #2c3e50 100%);
     color: white;
 }
 
 .newsletter-content {
     text-align: center;
-    max-width: 550px;
+    max-width: 600px;
     margin: 0 auto;
 }
 
 .newsletter-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
     color: #3498db;
 }
 
 .newsletter-content h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
 .newsletter-content p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     opacity: 0.8;
 }
 
 .newsletter-form {
     display: flex;
     gap: 1rem;
-    max-width: 450px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
 .newsletter-form input {
     flex: 1;
-    padding: 0.8rem 1rem;
+    padding: 1rem;
     border: none;
     border-radius: 50px;
     outline: none;
@@ -1452,7 +1257,7 @@ export default {
 }
 
 .newsletter-form button {
-    padding: 0.8rem 1.5rem;
+    padding: 1rem 2rem;
     background: #3498db;
     border: none;
     border-radius: 50px;
@@ -1463,7 +1268,6 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    white-space: nowrap;
 }
 
 .newsletter-form button:hover {
@@ -1471,28 +1275,26 @@ export default {
     transform: translateY(-2px);
 }
 
-/* ============================================ */
-/* CTA SECTION                                  */
-/* ============================================ */
+/* CTA Section */
 .cta-section {
-    padding: 50px 0;
+    padding: 60px 0;
     background: white;
 }
 
 .cta-content {
     background: linear-gradient(135deg, #3498db, #2c3e50);
     border-radius: 24px;
-    padding: 2.5rem;
+    padding: 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .cta-text h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: white;
     margin-bottom: 0.3rem;
 }
@@ -1505,7 +1307,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.7rem 1.5rem;
+    padding: 0.8rem 1.8rem;
     background: white;
     color: #3498db;
     text-decoration: none;
@@ -1519,26 +1321,14 @@ export default {
     transform: translateY(-2px);
 }
 
-/* ============================================ */
-/* RESPONSIVE                                   */
-/* ============================================ */
+/* Responsive */
 @media (max-width: 768px) {
-    .hero-section {
-        height: 40vh;
-        min-height: 33300px;
-        max-height: 300px;
-    }
-    
     .slide-title {
         font-size: 1.5rem;
     }
     
     .slide-text {
-        font-size: 0.8rem;
-    }
-    
-    .slide-content {
-        bottom: 10%;
+        font-size: 0.85rem;
     }
     
     .president-grid {
@@ -1574,16 +1364,6 @@ export default {
         grid-template-columns: 1fr;
     }
     
-    .partenaire-card {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .partenaire-logo {
-        width: 80px;
-        height: 80px;
-    }
-    
     .newsletter-form {
         flex-direction: column;
     }
@@ -1594,14 +1374,9 @@ export default {
     }
     
     .prev, .next {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-        padding: 8px;
-    }
-    
-    .expertise-features {
-        grid-template-columns: 1fr;
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
     }
 }
 
