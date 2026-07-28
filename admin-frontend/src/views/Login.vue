@@ -63,6 +63,19 @@
             Mot de passe oublié ?
           </router-link>
         </div>
+
+        <!-- ✅ NOUVEAU : Lien vers l'inscription -->
+        <div class="register-section">
+          <div class="divider">
+            <span>ou</span>
+          </div>
+          <p class="register-text">
+            Vous n'avez pas de compte ?
+            <router-link to="/register" class="register-link">
+              Créer un compte <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </p>
+        </div>
       </form>
 
       <div v-if="message" class="message" :class="messageType">
@@ -292,6 +305,67 @@ export default {
 
 .forgot-link:hover {
   text-decoration: underline;
+}
+
+/* ✅ NOUVEAU STYLE - Section d'inscription */
+.register-section {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.divider span {
+  padding: 0 16px;
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.register-text {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.register-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1a472a;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: #f0f7f0;
+}
+
+.register-link:hover {
+  background: #e0f0e0;
+  gap: 10px;
+  transform: translateX(2px);
+}
+
+.register-link i {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.register-link:hover i {
+  transform: translateX(4px);
 }
 
 .message {
