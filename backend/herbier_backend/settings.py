@@ -20,7 +20,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'herbier-universite-man.onrender.com',
-    '.onrender.com',  # Accepte tous les sous-domaines render
+    '.onrender.com',
+    'herbier-backend.onrender.com',# Accepte tous les sous-domaines render
 ]
 
 # Application definition
@@ -110,7 +111,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://herbier-universite-man.onrender.com",
     "https://herbier-frontend-public.onrender.com",
-    "https://herbier-admin-frontend.onrender.com",  # Pas de slash à la fin
+    "https://herbier-admin-frontend.onrender.com", 
+    "https://herbier-backend-public.onrender.com",# Pas de slash à la fin
 ]
 
 
