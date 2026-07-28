@@ -29,6 +29,7 @@ class SuperAdminManager(models.Manager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'it_admin')
+        extra_fields.setdefault('requires_2fa', True)  # ✅ AJOUT
         return self.create_user(email, nom, telephone, password, **extra_fields)
 
 class SuperAdmin(models.Model):
@@ -49,6 +50,9 @@ class SuperAdmin(models.Model):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(null=True, blank=True)
+    
+    # ✅ AJOUT DU CHAMP REQUIS POUR LA 2FA
+    requires_2fa = models.BooleanField(default=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nom', 'telephone']
@@ -104,7 +108,6 @@ class UserToken(models.Model):
 
 # ========== MODÈLES POUR LES DONNÉES ==========
 
-# ✅ CORRECTION : Utilisation de ImageField au lieu de TextField
 class Plante(models.Model):
     nom = models.CharField(max_length=200)
     famille = models.CharField(max_length=200, blank=True, null=True)
@@ -112,7 +115,7 @@ class Plante(models.Model):
     description = models.TextField(blank=True, null=True)
     habitat = models.CharField(max_length=300, blank=True, null=True)
     statut_conservation = models.CharField(max_length=100, blank=True, null=True)
-    image = models.ImageField(upload_to='plantes/', blank=True, null=True)  # ✅ CORRECTION
+    image = models.ImageField(upload_to='plantes/', blank=True, null=True)
     actif = models.BooleanField(default=True)
     date_creation = models.DateTimeField(default=timezone.now)
     
@@ -129,7 +132,7 @@ class Equipe(models.Model):
     poste = models.CharField(max_length=200)
     email = models.EmailField(blank=True, null=True)
     specialite = models.CharField(max_length=200, blank=True, null=True)
-    photo = models.ImageField(upload_to='equipe/', blank=True, null=True)  # ✅ CORRECTION
+    photo = models.ImageField(upload_to='equipe/', blank=True, null=True)
     ordre = models.IntegerField(default=0)
     actif = models.BooleanField(default=True)
     
@@ -144,7 +147,7 @@ class Equipe(models.Model):
 class Slide(models.Model):
     titre = models.CharField(max_length=200)
     texte_botanique = models.TextField()
-    image = models.ImageField(upload_to='slides/', blank=True, null=True)  # ✅ CORRECTION
+    image = models.ImageField(upload_to='slides/', blank=True, null=True)
     ordre = models.IntegerField(default=0)
     actif = models.BooleanField(default=True)
     
@@ -176,7 +179,7 @@ class Projet(models.Model):
     annee = models.CharField(max_length=50, blank=True, null=True)
     lieu = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='projets/', blank=True, null=True)  # ✅ CORRECTION
+    image = models.ImageField(upload_to='projets/', blank=True, null=True)
     
     class Meta:
         verbose_name = "Projet"
@@ -192,7 +195,7 @@ class Activite(models.Model):
     description_courte = models.TextField()
     description_longue = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=100, default='fas fa-leaf')
-    image = models.ImageField(upload_to='activites/', blank=True, null=True)  # ✅ AJOUT
+    image = models.ImageField(upload_to='activites/', blank=True, null=True)
     ordre = models.IntegerField(default=0)
     actif = models.BooleanField(default=True)
     
@@ -207,7 +210,7 @@ class Activite(models.Model):
 class Partenaire(models.Model):
     nom = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
-    logo = models.ImageField(upload_to='partenaires/', blank=True, null=True)  # ✅ CORRECTION
+    logo = models.ImageField(upload_to='partenaires/', blank=True, null=True)
     site_web = models.URLField(blank=True, null=True)
     type = models.CharField(max_length=100, blank=True, null=True)
     ordre = models.IntegerField(default=0)
@@ -226,7 +229,7 @@ class Temoignage(models.Model):
     poste = models.CharField(max_length=200)
     organisation = models.CharField(max_length=200)
     texte = models.TextField()
-    photo = models.ImageField(upload_to='temoignages/', blank=True, null=True)  # ✅ CORRECTION
+    photo = models.ImageField(upload_to='temoignages/', blank=True, null=True)
     note = models.IntegerField(default=5)
     ordre = models.IntegerField(default=0)
     actif = models.BooleanField(default=True)
