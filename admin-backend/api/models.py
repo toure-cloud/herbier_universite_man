@@ -50,8 +50,6 @@ class SuperAdmin(models.Model):
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(null=True, blank=True)
-    
-    # ✅ AJOUT DU CHAMP REQUIS POUR LA 2FA
     requires_2fa = models.BooleanField(default=True)
     
     USERNAME_FIELD = 'email'
