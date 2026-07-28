@@ -615,9 +615,9 @@ export default {
 /* ============================================ */
 .hero-section {
     position: relative;
-    height: 70vh;
-    min-height: 600px;
-    max-height: 700px;
+    height: 30vh;
+    min-height: 500px;
+    max-height: 600px;
     overflow: hidden;
 }
 
