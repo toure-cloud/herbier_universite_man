@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-    <!-- Background avec effet de feuilles -->
     <div class="login-bg">
       <div class="bg-leaf leaf-1"></div>
       <div class="bg-leaf leaf-2"></div>
@@ -24,7 +23,6 @@
         </div>
 
         <form @submit.prevent="handleRegister" class="login-form">
-          <!-- Nom complet -->
           <div class="form-group" :class="{ 'error': errors.nom, 'focused': focusedField === 'nom' }">
             <label><i class="fas fa-user"></i> Nom complet *</label>
             <div class="input-wrapper">
@@ -43,7 +41,6 @@
             </div>
           </div>
 
-          <!-- Email -->
           <div class="form-group" :class="{ 'error': errors.email, 'focused': focusedField === 'email' }">
             <label><i class="fas fa-envelope"></i> Email *</label>
             <div class="input-wrapper">
@@ -62,7 +59,6 @@
             </div>
           </div>
 
-          <!-- Pays et Téléphone -->
           <div class="form-row">
             <div class="form-group half" :class="{ 'error': errors.pays, 'focused': focusedField === 'pays' }">
               <label><i class="fas fa-globe-africa"></i> Pays *</label>
@@ -111,7 +107,6 @@
             </div>
           </div>
 
-          <!-- Mot de passe -->
           <div class="form-group" :class="{ 'error': errors.password, 'focused': focusedField === 'password' }">
             <label><i class="fas fa-lock"></i> Mot de passe *</label>
             <div class="input-wrapper">
@@ -136,7 +131,6 @@
             </div>
           </div>
 
-          <!-- Confirmation mot de passe -->
           <div class="form-group" :class="{ 'error': errors.password2, 'focused': focusedField === 'password2' }">
             <label><i class="fas fa-lock"></i> Confirmer le mot de passe *</label>
             <div class="input-wrapper">
@@ -158,7 +152,6 @@
             </div>
           </div>
 
-          <!-- Conditions -->
           <div class="form-group">
             <label class="checkbox">
               <input type="checkbox" v-model="form.acceptTerms">
@@ -167,7 +160,6 @@
             </label>
           </div>
 
-          <!-- Bouton -->
           <button type="submit" class="btn-login" :disabled="isLoading">
             <span v-if="!isLoading">
               <i class="fas fa-user-plus"></i> Créer le compte
@@ -193,29 +185,28 @@
       </div>
     </div>
 
-    <!-- Modal de succès -->
+    <!-- ✅ MODAL DE SUCCÈS AVEC REDIRECTION 2FA -->
     <div class="modal-success" :class="{ active: showSuccessModal }">
       <div class="modal-overlay" @click="closeSuccessModal"></div>
       <div class="modal-content">
         <div class="modal-icon success">
           <i class="fas fa-check-circle"></i>
         </div>
-        <h3>Compte créé avec succès !</h3>
+        <h3>✅ Compte créé avec succès !</h3>
         <p>{{ successMessage }}</p>
         <div class="modal-buttons">
-          <button class="btn-primary" @click="goToLogin">
+          <button class="btn-primary" @click="goToVerify2FA">
+            <i class="fas fa-shield-alt"></i>
+            Vérifier maintenant
+          </button>
+          <button class="btn-secondary" @click="goToLogin">
             <i class="fas fa-sign-in-alt"></i>
             Se connecter
-          </button>
-          <button class="btn-secondary" @click="closeSuccessModal">
-            <i class="fas fa-times"></i>
-            Fermer
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Modal d'erreur -->
     <div class="modal-error" :class="{ active: showErrorModal }">
       <div class="modal-overlay" @click="closeErrorModal"></div>
       <div class="modal-content">
@@ -257,13 +248,14 @@ export default {
       focusedField: null,
       errors: {},
       
-      // Modals
       showSuccessModal: false,
       successMessage: '',
       showErrorModal: false,
       errorMessage: '',
       
-      // Liste des pays
+      // ✅ Stocker l'email pour la redirection 2FA
+      registeredEmail: '',
+      
       countries: [
         { code: 'CI', name: 'Côte d\'Ivoire', flag: '🇨🇮', dialCode: '+225', minLength: 10, maxLength: 10, format: 'XX XX XX XX XX' },
         { code: 'FR', name: 'France', flag: '🇫🇷', dialCode: '+33', minLength: 9, maxLength: 9, format: 'X XX XX XX XX' },
@@ -438,6 +430,14 @@ export default {
       this.showSuccessModal = false
     },
     
+    // ✅ NOUVELLE MÉTHODE : Redirection vers 2FA
+    goToVerify2FA() {
+      this.closeSuccessModal()
+      const authStore = useAuthStore()
+      authStore.setEmail(this.registeredEmail)
+      this.$router.push('/verify-2fa')
+    },
+    
     goToLogin() {
       this.closeSuccessModal()
       this.$router.push('/login')
@@ -474,11 +474,17 @@ export default {
       }
       
       try {
-        // ✅ Utiliser le store qui utilise les variables d'environnement
         const result = await authStore.register(registerData)
         
         if (result.success) {
-          this.showSuccessModalMessage(result.message || 'Votre compte a été créé avec succès. Un code de vérification a été envoyé à votre email et téléphone.')
+          // ✅ Stocker l'email pour la redirection 2FA
+          this.registeredEmail = this.form.email
+          
+          this.showSuccessModalMessage(
+            'Votre compte a été créé avec succès ! ' +
+            'Un code de vérification (OTP) a été envoyé à votre adresse email. ' +
+            'Veuillez le saisir pour activer votre compte.'
+          )
         } else {
           const errorMsg = result.message || 'Une erreur est survenue'
           this.showErrorModalMessage(errorMsg)
@@ -515,7 +521,6 @@ export default {
   padding: 40px 0;
 }
 
-/* Background animations */
 .login-bg {
   position: fixed;
   top: 0;
@@ -567,7 +572,6 @@ export default {
   transform: translateY(-5px);
 }
 
-/* Header */
 .login-header {
   text-align: center;
   margin-bottom: 32px;
@@ -623,7 +627,6 @@ export default {
   font-size: 14px;
 }
 
-/* Form row */
 .form-row {
   display: flex;
   gap: 15px;
@@ -635,7 +638,6 @@ export default {
   margin-bottom: 20px;
 }
 
-/* Form styles */
 .form-group {
   margin-bottom: 20px;
 }
@@ -748,7 +750,6 @@ export default {
   color: #32CD32;
 }
 
-/* Password strength */
 .password-strength {
   margin-top: 8px;
 }
@@ -780,7 +781,6 @@ export default {
   color: #666;
 }
 
-/* Checkbox */
 .checkbox {
   display: flex;
   align-items: center;
@@ -808,7 +808,6 @@ export default {
   text-decoration: underline;
 }
 
-/* Button */
 .btn-login {
   width: 100%;
   padding: 14px;
@@ -837,7 +836,6 @@ export default {
   cursor: not-allowed;
 }
 
-/* Divider */
 .login-divider {
   text-align: center;
   margin: 24px 0;
@@ -869,7 +867,6 @@ export default {
   font-size: 13px;
 }
 
-/* Footer */
 .login-footer {
   text-align: center;
 }
@@ -908,7 +905,6 @@ export default {
   margin-right: 6px;
 }
 
-/* Modal Styles */
 .modal-success, .modal-error {
   position: fixed;
   top: 0;
@@ -1038,7 +1034,6 @@ export default {
   background: #e0e0e0;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .login-card {
     padding: 32px 24px;

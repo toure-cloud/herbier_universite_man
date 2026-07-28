@@ -64,7 +64,6 @@
           </router-link>
         </div>
 
-        <!-- ✅ NOUVEAU : Lien vers l'inscription -->
         <div class="register-section">
           <div class="divider">
             <span>ou</span>
@@ -103,7 +102,6 @@ export default {
   },
   methods: {
     async handleLogin() {
-      // Validation des champs
       if (!this.email || !this.password) {
         this.setMessage('Veuillez remplir tous les champs', 'error')
         return
@@ -124,14 +122,11 @@ export default {
         
         console.log('📥 Réponse du login:', result)
         
-        // ✅ Vérifier si la connexion a réussi
         if (result.success) {
-          // ✅ Vérifier si 2FA est requis
           if (result.requires2FA) {
             console.log('✅ 2FA requis - Redirection vers /verify-2fa')
             this.setMessage('📧 Un code de vérification a été envoyé à votre email', 'success')
             
-            // ✅ Rediriger vers la page de vérification 2FA
             setTimeout(() => {
               this.$router.push('/verify-2fa')
             }, 1500)
@@ -144,13 +139,31 @@ export default {
             }, 1000)
           }
         } else {
-          // ❌ Erreur de connexion
           console.log('❌ Erreur de connexion:', result.message)
           this.setMessage(result.message || 'Email ou mot de passe incorrect', 'error')
         }
       } catch (error) {
         console.error('❌ Erreur lors de la connexion:', error)
-        this.setMessage('Erreur de connexion au serveur', 'error')
+        
+        // ✅ Gestion améliorée des erreurs
+        let errorMessage = 'Erreur de connexion au serveur'
+        if (error.response) {
+          // Le serveur a répondu avec un code d'erreur
+          if (error.response.status === 500) {
+            errorMessage = 'Erreur interne du serveur. Veuillez réessayer plus tard.'
+          } else if (error.response.status === 401) {
+            errorMessage = 'Email ou mot de passe incorrect'
+          } else if (error.response.data?.message) {
+            errorMessage = error.response.data.message
+          } else if (error.response.data?.error) {
+            errorMessage = error.response.data.error
+          }
+        } else if (error.request) {
+          // La requête a été faite mais pas de réponse
+          errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.'
+        }
+        
+        this.setMessage(errorMessage, 'error')
       } finally {
         this.loading = false
       }
@@ -161,7 +174,6 @@ export default {
     }
   },
   mounted() {
-    // ✅ Rediriger si déjà connecté
     const authStore = useAuthStore()
     if (authStore.isAuthenticated) {
       this.$router.push('/dashboard')
@@ -307,7 +319,6 @@ export default {
   text-decoration: underline;
 }
 
-/* ✅ NOUVEAU STYLE - Section d'inscription */
 .register-section {
   margin-top: 24px;
   text-align: center;
