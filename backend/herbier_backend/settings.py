@@ -10,7 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8x9y2z3a4b5c6d7e8f9g0h1i2j3k4l5m6n7o8p9q0r')
-ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'http://localhost:8001/api')
+ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'https://herbier-admin-backend.onrender.com/api')
+API_URL = os.environ.get('API_URL', 'https://herbier-backend.onrender.com/api')
+
+# Ou pour le backend public
+BASE_URL = os.environ.get('BASE_URL', 'https://herbier-backend.onrender.com')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
@@ -21,7 +25,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'herbier-universite-man.onrender.com',
     '.onrender.com',
-    'herbier-backend.onrender.com',# Accepte tous les sous-domaines render
+    'herbier-backend.onrender.com',
 ]
 
 # Application definition
@@ -110,13 +114,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://herbier-universite-man.onrender.com",
+    "https://herbier-universite-man.onrender.com",
     "https://herbier-frontend-public.onrender.com",
     "https://herbier-admin-frontend.onrender.com", 
     "https://herbier-backend-public.onrender.com",# Pas de slash à la fin
 ]
 
-
-# Permettre les requêtes de l'admin
 CORS_ALLOW_CREDENTIALS = True
 
 
