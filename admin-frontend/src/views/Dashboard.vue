@@ -1,1284 +1,866 @@
 <template>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <nav class="sidebar">
-      <div class="logo">
-        <i class="fas fa-leaf"></i>
-        <span>Herbier Admin</span>
-      </div>
-      <div class="nav-menu">
-        <div class="nav-section">
-          <div class="nav-section-title">📊 TABLEAU DE BORD</div>
-          <router-link to="/dashboard" class="nav-item">
-            <i class="fas fa-tachometer-alt"></i> Accueil
-          </router-link>
-        </div>
+  <div class="dashboard-layout" :class="{ 'superit-theme': auth.isSuperIT }">
+    <Sidebar
+      :user="auth.user"
+      :is-super-it="auth.isSuperIT"
+      :collapsed="sidebarCollapsed"
+      @toggle="sidebarCollapsed = !sidebarCollapsed"
+      @logout="handleLogout"
+    />
 
-        <div class="nav-section">
-          <div class="nav-section-title">🌿 CONTENU PRINCIPAL</div>
-          <button @click="activeTab = 'plantes'" :class="['nav-item', { active: activeTab === 'plantes' }]">
-            <i class="fas fa-leaf"></i> Plantes
-          </button>
-          <button @click="activeTab = 'equipe'" :class="['nav-item', { active: activeTab === 'equipe' }]">
-            <i class="fas fa-users"></i> Équipe
-          </button>
-          <button @click="activeTab = 'slides'" :class="['nav-item', { active: activeTab === 'slides' }]">
-            <i class="fas fa-images"></i> Slides
-          </button>
-          <button @click="activeTab = 'projets'" :class="['nav-item', { active: activeTab === 'projets' }]">
-            <i class="fas fa-project-diagram"></i> Projets
-          </button>
-          <button @click="activeTab = 'activites'" :class="['nav-item', { active: activeTab === 'activites' }]">
-            <i class="fas fa-chart-line"></i> Activités
-          </button>
-          <button @click="activeTab = 'partenaires'" :class="['nav-item', { active: activeTab === 'partenaires' }]">
-            <i class="fas fa-handshake"></i> Partenaires
-          </button>
-        </div>
+    <main class="main-content" :class="{ expanded: sidebarCollapsed }">
+      <!-- ============ TOP BAR ============ -->
+      <TopBar
+        :title="greeting"
+        :subtitle="auth.isSuperIT ? 'Console SuperIT — Contrôle total' : 'Espace administrateur'"
+        :icon="auth.isSuperIT ? 'fas fa-shield-alt' : 'fas fa-leaf'"
+        :show-refresh="true"
+        :loading="loading"
+        @refresh="loadAll"
+      >
+        <template #actions>
+          <div
+            v-if="auth.isSuperIT"
+            class="live-indicator"
+            :title="`${onlineCount} admin(s) actif(s)`"
+          >
+            <span class="pulse"></span>
+            <span>{{ onlineCount }} en ligne</span>
+          </div>
+        </template>
+      </TopBar>
 
-        <div class="nav-section">
-          <div class="nav-section-title">⚙️ ADMINISTRATION</div>
-          
-          <button @click="goToITAdmin" class="nav-item it-admin-btn">
-            <i class="fas fa-shield-alt"></i> Administration IT
-            <span class="nav-badge">🔒</span>
-          </button>
+      <!-- ============ ONGLETS INTERNES ============ -->
+      <nav class="dashboard-tabs">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="tab-btn"
+          :class="{ active: activeTab === tab.id }"
+          @click="activeTab = tab.id"
+        >
+          <i :class="tab.icon"></i>
+          <span>{{ tab.label }}</span>
+          <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
+        </button>
+      </nav>
 
-          <div v-if="isSuperAdmin">
-            <button @click="openMembresModal" class="nav-item">
-              <i class="fas fa-users-cog"></i> Gestion admins
-            </button>
-          </div>
-          <button @click="syncAllData" class="nav-item" :disabled="syncing">
-            <i class="fas fa-sync-alt" :class="{ 'fa-spin': syncing }"></i>
-            {{ syncing ? 'Synchronisation...' : 'Synchroniser' }}
-          </button>
-          <button @click="logout" class="nav-item logout">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-          </button>
-        </div>
-      </div>
-    </nav>
+      <!-- ============ CHARGEMENT ============ -->
+      <section v-if="loading" class="loading-block">
+        <div class="spinner"></div>
+        <p>Chargement…</p>
+      </section>
 
-    <div class="main-content">
-      <div class="top-bar">
-        <h1>{{ getTabTitle() }}</h1>
-        <div class="user-info">
-          <div class="user-badge" :class="{ 'super-admin': isSuperAdmin }">
-            <i v-if="isSuperAdmin" class="fas fa-shield-alt"></i>
-            <span>{{ currentUserRole }}</span>
-          </div>
-          <span class="user-name">{{ currentUserName }}</span>
-          <div class="avatar">{{ (currentUserName || 'A').charAt(0) }}</div>
-        </div>
-      </div>
+      <template v-else>
+        <!-- ============================================================ -->
+        <!-- ONGLET 1 : VUE D'ENSEMBLE                                     -->
+        <!-- ============================================================ -->
+        <div v-show="activeTab === 'overview'">
+          <!-- ✅ CARTES DE STATISTIQUES -->
+          <section class="stats-grid">
+            <StatCard
+              v-for="s in currentStats"
+              :key="s.label"
+              :value="s.value"
+              :label="s.label"
+              :icon="s.icon"
+              :color="s.color"
+            />
+          </section>
 
-      <div class="content">
-        <!-- Loading -->
-        <div v-if="loading" class="loading-container">
-          <div class="spinner"></div>
-          <p>Chargement...</p>
-        </div>
-
-        <!-- SECTION PLANTES -->
-        <div v-show="activeTab === 'plantes'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-leaf"></i> Gestion des plantes</h2>
-            <button class="btn-add" @click="openAddModal('plante')">
-              <i class="fas fa-plus"></i> Nouvelle plante
-            </button>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Image</th>
-                  <th>Nom</th>
-                  <th>Famille</th>
-                  <th>Nom scientifique</th>
-                  <th>Statut</th>
-                  <th>Actif</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in plantes" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.image))">
-                      <img v-if="getFullImageUrl(item.image)" :src="getFullImageUrl(item.image)" :alt="item.nom" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-image"></i></div>
-                    </div>
-                  </td>
-                  <td><strong>{{ item.nom }}</strong></td>
-                  <td>{{ item.famille?.nom || item.famille || '-' }}</td>
-                  <td><em>{{ item.nom_scientifique || '-' }}</em></td>
-                  <td>{{ item.statut_conservation || '-' }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.actif ? 'active' : 'inactive'">
-                      {{ item.actif ? 'Actif' : 'Inactif' }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('plante', item)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('plante', item.id)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!plantes.length">
-                  <td colspan="7" class="empty-row">Aucune plante trouvée</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- SECTION EQUIPE -->
-        <div v-show="activeTab === 'equipe'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-users"></i> Gestion de l'équipe</h2>
-            <button class="btn-add" @click="openAddModal('equipe')" v-if="isSuperAdmin">
-              <i class="fas fa-plus"></i> Nouveau membre
-            </button>
-            <span v-else class="permission-badge">🔒 Réservé aux administrateurs</span>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr><th>Photo</th><th>Nom</th><th>Poste</th><th>Email</th><th>Spécialité</th><th>Actif</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in equipe" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.photo || item.image))">
-                      <img v-if="getFullImageUrl(item.photo || item.image)" :src="getFullImageUrl(item.photo || item.image)" :alt="item.nom" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-user"></i></div>
-                    </div>
-                  </td>
-                  <td><strong>{{ item.nom }}</strong></td>
-                  <td>{{ item.poste }}</td>
-                  <td>{{ item.email || '-' }}</td>
-                  <td>{{ item.specialite || '-' }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.actif ? 'active' : 'inactive'">
-                      {{ item.actif ? 'Actif' : 'Inactif' }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('equipe', item)" :disabled="!isSuperAdmin">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('equipe', item.id)" :disabled="!isSuperAdmin">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!equipe.length">
-                  <td colspan="7" class="empty-row">Aucun membre trouvé</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- SECTION SLIDES -->
-        <div v-show="activeTab === 'slides'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-images"></i> Gestion des slides</h2>
-            <button class="btn-add" @click="openAddModal('slide')">
-              <i class="fas fa-plus"></i> Nouveau slide
-            </button>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr><th>Image</th><th>Titre</th><th>Texte botanique</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in slides" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.image))">
-                      <img v-if="getFullImageUrl(item.image)" :src="getFullImageUrl(item.image)" :alt="item.titre" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-image"></i></div>
-                    </div>
-                  </td>
-                  <td><strong>{{ item.titre }}</strong></td>
-                  <td>{{ truncate(item.texte_botanique, 50) }}</td>
-                  <td>{{ item.ordre }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.actif ? 'active' : 'inactive'">
-                      {{ item.actif ? 'Actif' : 'Inactif' }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('slide', item)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('slide', item.id)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!slides.length">
-                  <td colspan="6" class="empty-row">Aucun slide trouvé</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- SECTION PROJETS -->
-        <div v-show="activeTab === 'projets'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-project-diagram"></i> Gestion des projets</h2>
-            <button class="btn-add" @click="openAddModal('projet')">
-              <i class="fas fa-plus"></i> Nouveau projet
-            </button>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr><th>Image</th><th>Titre</th><th>Catégorie</th><th>Statut</th><th>Année</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in projets" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.image))">
-                      <img v-if="getFullImageUrl(item.image)" :src="getFullImageUrl(item.image)" :alt="item.titre" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-image"></i></div>
-                    </div>
-                  </td>
-                  <td><strong>{{ item.titre }}</strong></td>
-                  <td>{{ item.categorie }}</td>
-                  <td><span class="badge">{{ item.statut }}</span></td>
-                  <td>{{ item.annee }}</td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('projet', item)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('projet', item.id)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!projets.length">
-                  <td colspan="6" class="empty-row">Aucun projet trouvé</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- SECTION ACTIVITES -->
-        <div v-show="activeTab === 'activites'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-chart-line"></i> Gestion des activités</h2>
-            <button class="btn-add" @click="openAddModal('activite')">
-              <i class="fas fa-plus"></i> Nouvelle activité
-            </button>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr><th>Image</th><th>Icône</th><th>Titre</th><th>Titre court</th><th>Description</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in activites" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.image))">
-                      <img v-if="getFullImageUrl(item.image)" :src="getFullImageUrl(item.image)" :alt="item.titre" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-image"></i></div>
-                    </div>
-                  </td>
-                  <td><i :class="item.icon" style="font-size:24px"></i></td>
-                  <td><strong>{{ item.titre }}</strong></td>
-                  <td>{{ item.titre_court }}</td>
-                  <td>{{ truncate(item.description_courte, 30) }}</td>
-                  <td>{{ item.ordre }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.actif ? 'active' : 'inactive'">
-                      {{ item.actif ? 'Actif' : 'Inactif' }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('activite', item)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('activite', item.id)">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!activites.length">
-                  <td colspan="8" class="empty-row">Aucune activité trouvée</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- SECTION PARTENAIRES -->
-        <div v-show="activeTab === 'partenaires'" class="data-section">
-          <div class="section-header">
-            <h2><i class="fas fa-handshake"></i> Gestion des partenaires</h2>
-            <button class="btn-add" @click="openAddModal('partenaire')" v-if="isSuperAdmin">
-              <i class="fas fa-plus"></i> Nouveau partenaire
-            </button>
-            <span v-else class="permission-badge">🔒 Réservé aux administrateurs</span>
-          </div>
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr><th>Logo</th><th>Nom</th><th>Description</th><th>Site web</th><th>Type</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in partenaires" :key="item.id">
-                  <td>
-                    <div class="table-image" @click="openImagePreview(getFullImageUrl(item.logo || item.image))">
-                      <img v-if="getFullImageUrl(item.logo || item.image)" :src="getFullImageUrl(item.logo || item.image)" :alt="item.nom" class="thumbnail" @error="handleImageError">
-                      <div v-else class="no-image"><i class="fas fa-building"></i></div>
-                    </div>
-                  </td>
-                  <td><strong>{{ item.nom }}</strong></td>
-                  <td>{{ truncate(item.description, 40) }}</td>
-                  <td><a v-if="item.site_web" :href="item.site_web" target="_blank"><i class="fas fa-external-link-alt"></i></a><span v-else>-</span></td>
-                  <td>{{ item.type || '-' }}</td>
-                  <td>{{ item.ordre }}</td>
-                  <td>
-                    <span class="status-badge" :class="item.actif ? 'active' : 'inactive'">
-                      {{ item.actif ? 'Actif' : 'Inactif' }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <button class="btn-edit" @click="openEditModal('partenaire', item)" :disabled="!isSuperAdmin">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" @click="deleteItem('partenaire', item.id)" :disabled="!isSuperAdmin">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!partenaires.length">
-                  <td colspan="8" class="empty-row">Aucun partenaire trouvé</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- STATS -->
-        <div class="stats-section">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <i class="fas fa-leaf"></i>
-              <div><h3>{{ plantes.length }}</h3><p>Plantes</p></div>
+          <!-- Actions rapides -->
+          <section class="quick-actions" :class="{ 'superit-actions': auth.isSuperIT }">
+            <div class="section-head">
+              <h2><i class="fas fa-bolt"></i> Actions rapides</h2>
             </div>
-            <div class="stat-card">
-              <i class="fas fa-users"></i>
-              <div><h3>{{ equipe.length }}</h3><p>Équipe</p></div>
-            </div>
-            <div class="stat-card">
-              <i class="fas fa-images"></i>
-              <div><h3>{{ slides.length }}</h3><p>Slides</p></div>
-            </div>
-            <div class="stat-card">
-              <i class="fas fa-project-diagram"></i>
-              <div><h3>{{ projets.length }}</h3><p>Projets</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL AJOUT/MODIFICATION -->
-    <div v-if="showModal" class="modal" @click.self="closeModal">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2>{{ modalTitle }}</h2>
-          <button class="close" @click="closeModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="saveItem">
-            <div v-for="(field, key) in currentFields" :key="key" class="form-group">
-              <label>{{ field.label }}</label>
-              <input v-if="field.type === 'text' || field.type === 'email' || field.type === 'url'" 
-                     :type="field.type" v-model="formData[field.name]" class="form-control"
-                     :required="field.required">
-              <textarea v-else-if="field.type === 'textarea'" 
-                        v-model="formData[field.name]" class="form-control" rows="3"></textarea>
-              <select v-else-if="field.type === 'select'" 
-                      v-model="formData[field.name]" class="form-control">
-                <option v-for="opt in field.options" :key="opt" :value="opt">{{ opt }}</option>
-              </select>
-              <input v-else-if="field.type === 'number'" 
-                     type="number" v-model="formData[field.name]" class="form-control">
-              <input v-else-if="field.type === 'checkbox'" 
-                     type="checkbox" v-model="formData[field.name]" class="form-checkbox">
-            </div>
-            
-            <!-- Upload d'image -->
-            <div v-if="modalType === 'plante' || modalType === 'slide' || modalType === 'equipe' || modalType === 'projet' || modalType === 'activite' || modalType === 'partenaire'" class="form-group">
-              <label>Image / Logo</label>
-              <div class="image-upload-area" 
-                   @dragover.prevent @drop.prevent="handleDrop" 
-                   @click="triggerFileInput"
-                   :class="{ 'has-image': formData.image_preview }">
-                <div v-if="formData.image_preview" class="image-preview">
-                  <img :src="formData.image_preview" alt="Aperçu">
-                  <button type="button" class="remove-image" @click.stop="removeImage">✕</button>
+            <div class="actions-grid">
+              <router-link
+                v-for="action in quickActions"
+                :key="action.to"
+                :to="action.to"
+                class="action-card"
+              >
+                <i :class="action.icon"></i>
+                <div>
+                  <span class="action-title">{{ action.title }}</span>
+                  <span class="action-desc">{{ action.desc }}</span>
                 </div>
-                <div v-else class="upload-placeholder">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <p>Cliquez ou déposez une image ici</p>
-                  <span class="upload-hint">PNG, JPG, JPEG, WEBP</span>
+              </router-link>
+            </div>
+          </section>
+
+          <!-- Vue d'ensemble du contenu — SUPERIT UNIQUEMENT -->
+          <section v-if="auth.isSuperIT" class="panel content-overview">
+            <div class="panel-head">
+              <h3><i class="fas fa-layer-group"></i> Vue d'ensemble du contenu</h3>
+            </div>
+            <div class="content-grid">
+              <router-link to="/plantes" class="content-item">
+                <i class="fas fa-leaf"></i>
+                <span class="content-value">{{ stats.total_plantes || 0 }}</span>
+                <span class="content-label">Plantes</span>
+              </router-link>
+              <router-link to="/projets" class="content-item">
+                <i class="fas fa-project-diagram"></i>
+                <span class="content-value">{{ stats.total_projets || 0 }}</span>
+                <span class="content-label">Projets</span>
+              </router-link>
+              <router-link to="/activites" class="content-item">
+                <i class="fas fa-chart-line"></i>
+                <span class="content-value">{{ stats.total_activites || 0 }}</span>
+                <span class="content-label">Activités</span>
+              </router-link>
+              <router-link to="/publications" class="content-item">
+                <i class="fas fa-book"></i>
+                <span class="content-value">{{ stats.total_publications || 0 }}</span>
+                <span class="content-label">Publications</span>
+              </router-link>
+              <router-link to="/equipe" class="content-item">
+                <i class="fas fa-users"></i>
+                <span class="content-value">{{ stats.total_equipe || 0 }}</span>
+                <span class="content-label">Équipe</span>
+              </router-link>
+              <router-link to="/partenaires" class="content-item">
+                <i class="fas fa-handshake"></i>
+                <span class="content-value">{{ stats.total_partenaires || 0 }}</span>
+                <span class="content-label">Partenaires</span>
+              </router-link>
+            </div>
+          </section>
+
+          <!-- Bandeau bienvenue — ADMIN UNIQUEMENT -->
+          <section v-else class="welcome-card">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <h3>{{ greeting }}, content de vous revoir</h3>
+              <p>
+                Vous pouvez gérer les <strong>plantes</strong>, <strong>projets</strong>,
+                <strong>activités</strong> et <strong>publications</strong>.
+                Chaque modification est tracée automatiquement.
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ONGLET 2 : ACTIVITÉ                                           -->
+        <!-- ============================================================ -->
+        <div v-show="activeTab === 'activity'">
+          <!-- Alertes (SuperIT) -->
+          <section v-if="auth.isSuperIT && alerts.length" class="alerts-panel">
+            <div class="alert-head">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>Alertes de sécurité ({{ alerts.length }})</h3>
+            </div>
+            <ul class="alert-list">
+              <li v-for="alert in alerts" :key="alert.id" class="alert-item">
+                <i :class="alert.icon"></i>
+                <span>{{ alert.message }}</span>
+                <span class="alert-time">{{ formatRelativeTime(alert.created_at) }}</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Graphique 7 jours (SuperIT) -->
+          <section v-if="auth.isSuperIT" class="panel chart-panel">
+            <div class="panel-head">
+              <h3><i class="fas fa-chart-area"></i> Activité des 7 derniers jours</h3>
+            </div>
+            <div class="chart-wrap">
+              <div
+                v-for="(bar, i) in weeklyActivity"
+                :key="i"
+                class="chart-bar"
+                :title="`${bar.count} action(s) le ${bar.day}`"
+              >
+                <div class="bar-value">{{ bar.count }}</div>
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    :style="{ height: `${(bar.count / maxWeekly) * 100}%` }"
+                  ></div>
                 </div>
-                <input type="file" ref="fileInput" @change="handleFileSelect" accept="image/*" style="display:none">
+                <div class="bar-label">{{ bar.day }}</div>
               </div>
-              <small class="form-help" v-if="formData._existing_image">Image actuelle</small>
             </div>
+          </section>
 
-            <div class="form-actions">
-              <button type="submit" class="btn-save" :disabled="loading">
-                <i v-if="loading" class="fas fa-spinner fa-spin"></i>
-                {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
-              </button>
-              <button type="button" class="btn-cancel" @click="closeModal">Annuler</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL GESTION ADMINS -->
-    <div v-if="showUsersModal" class="modal" @click.self="closeUsersModal">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2><i class="fas fa-users-cog"></i> Gestion des administrateurs</h2>
-          <button class="close" @click="closeUsersModal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="add-user-form">
-            <h3>Ajouter un administrateur</h3>
-            <form @submit.prevent="createUser">
-              <div class="form-row">
-                <input type="text" v-model="newUser.nom" placeholder="Nom" required>
-                <input type="email" v-model="newUser.email" placeholder="Email" required>
+          <!-- 2 colonnes (SuperIT) -->
+          <div v-if="auth.isSuperIT" class="two-columns">
+            <section class="panel">
+              <div class="panel-head">
+                <h3><i class="fas fa-stream"></i> Dernières actions</h3>
+                <router-link to="/audit" class="link-see-all">Voir tout →</router-link>
               </div>
-              <div class="form-row">
-                <input type="tel" v-model="newUser.telephone" placeholder="Téléphone" required>
-                <select v-model="newUser.role">
-                  <option value="admin">Admin</option>
-                  <option value="it_admin">IT Admin</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <input type="password" v-model="newUser.password" placeholder="Mot de passe" required>
-                <input type="password" v-model="newUser.password2" placeholder="Confirmer" required>
-              </div>
-              <button type="submit" class="btn-add">➕ Ajouter</button>
-            </form>
-          </div>
-          <div class="users-list">
-            <h3>Liste des administrateurs</h3>
-            <div class="users-table">
-              <table>
-                <thead>
-                  <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                  <tr v-for="user in adminUsers" :key="user.id">
-                    <td>{{ user.nom }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                      <span :class="'role-badge ' + user.role">
-                        {{ user.role === 'it_admin' ? 'IT Admin' : 'Admin' }}
+              <ul v-if="recentActivities.length" class="activity-list">
+                <li v-for="log in recentActivities" :key="log.id" class="activity-item">
+                  <div class="activity-icon" :class="log.action.toLowerCase()">
+                    <i :class="actionIcon(log.action)"></i>
+                  </div>
+                  <div class="activity-body">
+                    <p class="activity-message">
+                      <strong>{{ log.user_nom || 'Système' }}</strong>
+                      · {{ log.action_label }}
+                      <span v-if="log.object_repr" class="activity-obj">
+                        : {{ log.object_repr }}
                       </span>
-                    </td>
-                    <td>
-                      <span class="status-badge" :class="user.is_active ? 'active' : 'inactive'">
-                        {{ user.is_active ? 'Actif' : 'Inactif' }}
-                      </span>
-                    </td>
-                    <td class="actions">
-                      <button @click="toggleUserStatus(user)" class="btn-status">
-                        <i :class="user.is_active ? 'fas fa-ban' : 'fas fa-check-circle'"></i>
-                      </button>
-                      <button @click="deleteUser(user.id)" class="btn-delete">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr v-if="!adminUsers.length">
-                    <td colspan="5" class="empty-row">Aucun administrateur</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                    </p>
+                    <span class="activity-time">
+                      {{ formatRelativeTime(log.created_at) }}
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <p v-else class="empty-text">Aucune action récente</p>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h3><i class="fas fa-users"></i> Administrateurs en ligne</h3>
+                <router-link to="/administrateurs" class="link-see-all">Gérer →</router-link>
+              </div>
+              <ul v-if="admins.length" class="admin-list">
+                <li
+                  v-for="a in admins.slice(0, 5)"
+                  :key="a.id"
+                  class="admin-item"
+                  :class="{ online: isOnline(a) }"
+                >
+                  <div class="admin-avatar" :class="{ super: a.role === 'it_admin' }">
+                    {{ getInitials(a.nom) }}
+                    <span v-if="isOnline(a)" class="online-dot"></span>
+                  </div>
+                  <div class="admin-info">
+                    <span class="admin-name">{{ a.nom }}</span>
+                    <span class="admin-role">
+                      {{ a.role === 'it_admin' ? 'SuperIT' : 'Admin' }}
+                      <span v-if="isOnline(a)" class="online-label">· En ligne</span>
+                    </span>
+                  </div>
+                  <span class="admin-status" :class="a.is_active ? 'active' : 'inactive'">
+                    {{ a.is_active ? 'Actif' : 'Inactif' }}
+                  </span>
+                </li>
+              </ul>
+              <p v-else class="empty-text">Aucun administrateur</p>
+            </section>
           </div>
+
+          <!-- Mes activités — ADMIN UNIQUEMENT -->
+          <section v-else class="panel my-activity-panel">
+            <div class="panel-head">
+              <h3><i class="fas fa-user-clock"></i> Mes dernières actions</h3>
+            </div>
+            <ul v-if="myActivities.length" class="activity-list">
+              <li v-for="log in myActivities" :key="log.id" class="activity-item">
+                <div class="activity-icon" :class="log.action.toLowerCase()">
+                  <i :class="actionIcon(log.action)"></i>
+                </div>
+                <div class="activity-body">
+                  <p class="activity-message">
+                    {{ log.action_label }}
+                    <span v-if="log.object_repr" class="activity-obj">
+                      : {{ log.object_repr }}
+                    </span>
+                  </p>
+                  <span class="activity-time">
+                    {{ formatRelativeTime(log.created_at) }}
+                  </span>
+                </div>
+              </li>
+            </ul>
+            <p v-else class="empty-text">
+              Aucune activité récente. Commencez par créer du contenu.
+            </p>
+          </section>
         </div>
-      </div>
-    </div>
+      </template>
+    </main>
 
-    <!-- IMAGE PREVIEW MODAL -->
-    <div v-if="showImagePreview" class="modal image-preview-modal" @click.self="closeImagePreview">
-      <div class="image-preview-container" @click.stop>
-        <button class="close-preview" @click="closeImagePreview">&times;</button>
-        <img :src="previewImage" alt="Aperçu" class="preview-image-full" @error="handleImageError">
-      </div>
-    </div>
-
-    <!-- Toast -->
-    <div v-if="toast.show" class="toast" :class="toast.type">
-      <i :class="toast.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
-      {{ toast.message }}
-    </div>
+    <Toast />
   </div>
 </template>
 
-<script>
-import { adminAPI, authAPI } from '../services/api'
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import Sidebar from '../components/Sidebar.vue'
+import TopBar from '../components/TopBar.vue'
+import Toast from '../components/Toast.vue'
+import StatCard from '../components/StatCard.vue'
 import { useAuthStore } from '../stores/auth'
+import { useToast } from '../composables/useToast'
+import { adminApi, adminAPI, authAPI } from '../utils/api'
+import { logger } from '../utils/logger'
+import { getGreetingFor } from '../utils/greeting'
 
-const endpoints = {
-  plante: 'plantes',
-  equipe: 'equipe',
-  slide: 'slides',
-  projet: 'projets',
-  activite: 'activites',
-  partenaire: 'partenaires'
+const router = useRouter()
+const auth = useAuthStore()
+const toast = useToast()
+
+const sidebarCollapsed = ref(false)
+const loading = ref(false)
+const activeTab = ref('overview')
+
+const tabs = computed(() => ([
+  { id: 'overview', label: "Vue d'ensemble", icon: 'fas fa-th-large' },
+  { id: 'activity', label: 'Activité',       icon: 'fas fa-wave-square' },
+]))
+
+const stats = ref({})
+const recentActivities = ref([])
+const myActivities = ref([])
+const admins = ref([])
+const onlineUsers = ref([])
+const alerts = ref([])
+let refreshInterval = null
+
+const greeting = computed(() => getGreetingFor(auth.user))
+
+/* ============================================================
+   STATS — SUPERIT (8 cartes) vs ADMIN (4 cartes)
+   ============================================================ */
+const superitStats = computed(() => [
+  { label: 'Plantes',         value: stats.value.total_plantes ?? 0,        icon: 'fas fa-leaf',            color: 'green' },
+  { label: 'Projets',         value: stats.value.total_projets ?? 0,        icon: 'fas fa-project-diagram', color: 'purple' },
+  { label: 'Activités',       value: stats.value.total_activites ?? 0,      icon: 'fas fa-chart-line',      color: 'orange' },
+  { label: 'Publications',    value: stats.value.total_publications ?? 0,   icon: 'fas fa-book',            color: 'blue' },
+  { label: 'Équipe',          value: stats.value.total_equipe ?? 0,         icon: 'fas fa-users',           color: 'teal' },
+  { label: 'Partenaires',     value: stats.value.total_partenaires ?? 0,    icon: 'fas fa-handshake',       color: 'amber' },
+  { label: 'Administrateurs', value: admins.value.length,                   icon: 'fas fa-users-cog',       color: 'indigo' },
+  { label: 'En ligne',        value: onlineCount.value,                     icon: 'fas fa-signal',          color: 'red' },
+])
+
+// ✅ Admin : uniquement le contenu qu'il gère (ni équipe, ni partenaires, ni admins)
+const adminStats = computed(() => [
+  { label: 'Plantes',      value: stats.value.total_plantes ?? 0,      icon: 'fas fa-leaf',            color: 'green' },
+  { label: 'Projets',      value: stats.value.total_projets ?? 0,      icon: 'fas fa-project-diagram', color: 'purple' },
+  { label: 'Activités',    value: stats.value.total_activites ?? 0,    icon: 'fas fa-chart-line',      color: 'orange' },
+  { label: 'Publications', value: stats.value.total_publications ?? 0, icon: 'fas fa-book',            color: 'blue' },
+])
+
+const currentStats = computed(() => (auth.isSuperIT ? superitStats.value : adminStats.value))
+const onlineCount = computed(() => onlineUsers.value.length)
+
+const quickActions = computed(() => {
+  if (auth.isSuperIT) {
+    return [
+      { to: '/administrateurs', title: 'Nouvel admin',       desc: 'Créer un compte',    icon: 'fas fa-user-plus' },
+      { to: '/audit',           title: "Journal d'audit",    desc: 'Toutes les actions', icon: 'fas fa-history' },
+      { to: '/maintenance',     title: 'Maintenance',        desc: 'Backup & export',    icon: 'fas fa-tools' },
+      { to: '/herbier-data',    title: 'Synchronisation',    desc: 'Site public',        icon: 'fas fa-database' },
+    ]
+  }
+  return [
+    { to: '/plantes',       title: 'Plantes',       desc: `${stats.value.total_plantes || 0} enregistrées`,  icon: 'fas fa-leaf' },
+    { to: '/projets',       title: 'Projets',       desc: `${stats.value.total_projets || 0} actifs`,        icon: 'fas fa-project-diagram' },
+    { to: '/activites',     title: 'Activités',     desc: `${stats.value.total_activites || 0} publiées`,    icon: 'fas fa-chart-line' },
+    { to: '/publications',  title: 'Publications',  desc: `${stats.value.total_publications || 0} articles`, icon: 'fas fa-book' },
+  ]
+})
+
+const weeklyActivity = computed(() => {
+  const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+  const result = []
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dayIndex = (date.getDay() + 6) % 7
+    const dayLabel = days[dayIndex]
+    const dayStr = date.toISOString().slice(0, 10)
+    const count = recentActivities.value.filter((a) => a.created_at?.startsWith(dayStr)).length
+    result.push({ day: dayLabel, count })
+  }
+  return result
+})
+
+const maxWeekly = computed(() => Math.max(...weeklyActivity.value.map((b) => b.count), 1))
+
+const getInitials = (name) => {
+  if (!name) return '?'
+  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
 }
 
-export default {
-  name: 'Dashboard',
-  data() {
-    return {
-      activeTab: 'plantes',
-      loading: false,
-      syncing: false,
-      plantes: [],
-      equipe: [],
-      slides: [],
-      projets: [],
-      activites: [],
-      partenaires: [],
-      adminUsers: [],
-      currentUser: null,
-      isSuperAdmin: false,
-      isITAdmin: false,
-      currentUserName: '',
-      currentUserRole: '',
-      showModal: false,
-      showUsersModal: false,
-      showImagePreview: false,
-      previewImage: '',
-      modalMode: 'add',
-      modalType: '',
-      modalTitle: '',
-      formData: {},
-      currentItemId: null,
-      toast: { show: false, message: '', type: 'success' },
-      newUser: { 
-        nom: '', 
-        email: '', 
-        telephone: '', 
-        role: 'admin', 
-        password: '', 
-        password2: '' 
-      },
-      fieldsMap: {
-        plante: [
-          { name: 'nom', label: 'Nom *', type: 'text', required: true },
-          { name: 'famille', label: 'Famille', type: 'text' },
-          { name: 'nom_scientifique', label: 'Nom scientifique', type: 'text' },
-          { name: 'description', label: 'Description', type: 'textarea' },
-          { name: 'habitat', label: 'Habitat', type: 'text' },
-          { name: 'statut_conservation', label: 'Statut de conservation', type: 'select', options: ['', 'En danger critique', 'En danger', 'Vulnérable', 'Quasi menacé', 'Préoccupation mineure'] },
-          { name: 'actif', label: 'Actif', type: 'checkbox' }
-        ],
-        equipe: [
-          { name: 'nom', label: 'Nom *', type: 'text', required: true },
-          { name: 'poste', label: 'Poste *', type: 'text', required: true },
-          { name: 'email', label: 'Email', type: 'email' },
-          { name: 'specialite', label: 'Spécialité', type: 'text' },
-          { name: 'photo', label: 'Photo URL', type: 'text' },
-          { name: 'ordre', label: 'Ordre', type: 'number' },
-          { name: 'actif', label: 'Actif', type: 'checkbox' }
-        ],
-        slide: [
-          { name: 'titre', label: 'Titre *', type: 'text', required: true },
-          { name: 'texte_botanique', label: 'Texte botanique *', type: 'textarea', required: true },
-          { name: 'ordre', label: 'Ordre', type: 'number' },
-          { name: 'actif', label: 'Actif', type: 'checkbox' }
-        ],
-        projet: [
-          { name: 'titre', label: 'Titre *', type: 'text', required: true },
-          { name: 'categorie', label: 'Catégorie', type: 'select', options: ['recherche', 'conservation', 'formation', 'developpement'] },
-          { name: 'statut', label: 'Statut', type: 'select', options: ['termine', 'encours', 'planifie'] },
-          { name: 'annee', label: 'Année', type: 'text' },
-          { name: 'lieu', label: 'Lieu', type: 'text' },
-          { name: 'description', label: 'Description', type: 'textarea' }
-        ],
-        activite: [
-          { name: 'titre', label: 'Titre *', type: 'text', required: true },
-          { name: 'titre_court', label: 'Titre court *', type: 'text', required: true },
-          { name: 'description_courte', label: 'Description courte *', type: 'textarea', required: true },
-          { name: 'description_longue', label: 'Description longue', type: 'textarea' },
-          { name: 'icon', label: 'Icône', type: 'text' },
-          { name: 'ordre', label: 'Ordre', type: 'number' },
-          { name: 'actif', label: 'Actif', type: 'checkbox' }
-        ],
-        partenaire: [
-          { name: 'nom', label: 'Nom *', type: 'text', required: true },
-          { name: 'description', label: 'Description', type: 'textarea' },
-          { name: 'logo', label: 'Logo URL', type: 'text' },
-          { name: 'site_web', label: 'Site web', type: 'url' },
-          { name: 'type', label: 'Type de partenaire', type: 'text' },
-          { name: 'ordre', label: 'Ordre', type: 'number' },
-          { name: 'actif', label: 'Actif', type: 'checkbox' }
-        ]
-      }
-    }
-  },
-  computed: {
-    currentFields() { return this.fieldsMap[this.modalType] || [] }
-  },
-  mounted() {
-    const isItAuthenticated = localStorage.getItem('it_admin_authenticated')
-    if (isItAuthenticated === 'true') {
-      this.isITAdmin = true
-      this.isSuperAdmin = true
-      this.currentUserRole = 'IT Admin'
-      this.currentUserName = 'IT Administrator'
-      this.loadAllData()
-      this.loadUserData()
-    } else {
-      this.loadUserData()
-      this.loadAllData()
-    }
-    document.addEventListener('keydown', this.handleEscapeKey)
-  },
-  beforeUnmount() {
-    document.removeEventListener('keydown', this.handleEscapeKey)
-  },
-  methods: {
-    // ============================================
-    // GESTION DES TOUCHES (Escape pour fermer)
-    // ============================================
-    handleEscapeKey(event) {
-      if (event.key === 'Escape') {
-        if (this.showModal) this.closeModal()
-        if (this.showUsersModal) this.closeUsersModal()
-        if (this.showImagePreview) this.closeImagePreview()
-      }
-    },
+const isOnline = (admin) => onlineUsers.value.some((u) => u.id === admin.id)
 
-    // ============================================
-    // CHARGEMENT DES DONNÉES
-    // ============================================
-    async loadAllData() {
-      this.loading = true
-      try {
-        const [plantes, equipe, slides, projets, activites, partenaires] = await Promise.all([
-          adminAPI.getPlantes(),
-          adminAPI.getEquipe(),
-          adminAPI.getSlides(),
-          adminAPI.getProjets(),
-          adminAPI.getActivites(),
-          adminAPI.getPartenaires()
-        ])
-        this.plantes = plantes.data || []
-        this.equipe = equipe.data || []
-        this.slides = slides.data || []
-        this.projets = projets.data || []
-        this.activites = activites.data || []
-        this.partenaires = partenaires.data || []
-      } catch (error) {
-        console.error('Erreur chargement:', error)
-        this.showToast('Erreur lors du chargement des données', 'error')
-      } finally {
-        this.loading = false
-      }
-    },
+const actionIcon = (action) => ({
+  CREATE: 'fas fa-plus-circle', UPDATE: 'fas fa-edit', DELETE: 'fas fa-trash',
+  LOGIN: 'fas fa-sign-in-alt', LOGOUT: 'fas fa-sign-out-alt',
+  LOGIN_FAILED: 'fas fa-exclamation-triangle', SYNC: 'fas fa-sync-alt', EXPORT: 'fas fa-download',
+}[action] || 'fas fa-circle')
 
-    async loadUserData() {
-      const token = localStorage.getItem('access_token')
-      if (!token) { this.$router.push('/login'); return }
-      try {
-        const res = await authAPI.getCurrentUser()
-        this.currentUser = res.data
-        this.currentUserName = res.data.nom
-        this.isSuperAdmin = res.data.role === 'it_admin' || res.data.is_superuser
-        this.currentUserRole = this.isSuperAdmin ? 'Super Admin' : 'Admin'
-        if (this.isSuperAdmin) {
-          const usersRes = await adminAPI.getUsers()
-          this.adminUsers = usersRes.data || []
-        }
-      } catch (error) {
-        if (error.response?.status === 401) this.$router.push('/login')
-        else this.showToast('Erreur de chargement utilisateur', 'error')
-      }
-    },
+const formatRelativeTime = (d) => {
+  if (!d) return ''
+  const diff = (Date.now() - new Date(d).getTime()) / 1000
+  if (diff < 60) return "à l'instant"
+  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
+  if (diff < 604800) return `il y a ${Math.floor(diff / 86400)} j`
+  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+}
 
-    // ============================================
-    // GESTION DES IMAGES - ✅ CORRIGÉE
-    // ============================================
-    getFullImageUrl(imagePath) {
-      if (!imagePath) return ''
-      
-      // ✅ Utiliser les variables d'environnement
-      const baseUrl = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8001'
-      
-      // Si c'est déjà une URL complète
-      if (imagePath.startsWith('http://') || 
-          imagePath.startsWith('https://') || 
-          imagePath.startsWith('data:')) {
-        return imagePath
-      }
-      
-      // Si c'est un chemin /media/
-      if (imagePath.startsWith('/media/')) {
-        return `${baseUrl.replace('/api', '')}${imagePath}`
-      }
-      
-      // Si c'est un chemin media/
-      if (imagePath.startsWith('media/')) {
-        return `${baseUrl.replace('/api', '')}/${imagePath}`
-      }
-      
-      // Si c'est un chemin uploads/
-      if (imagePath.startsWith('uploads/')) {
-        return `${baseUrl.replace('/api', '')}/media/${imagePath}`
-      }
-      
-      return imagePath
-    },
+const maskEmail = (email) => {
+  if (!email) return 'inconnu'
+  const [user, domain] = email.split('@')
+  if (!domain) return 'inconnu'
+  return `${user.slice(0, 2)}***@${domain}`
+}
 
-    handleImageError(event) {
-      event.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dy=".3em"%3EPas d\'image%3C/text%3E%3C/svg%3E'
-      event.target.style.objectFit = 'contain'
-      event.target.style.padding = '10px'
-    },
-
-    openImagePreview(imageUrl) {
-      if (!imageUrl) return
-      this.previewImage = imageUrl
-      this.showImagePreview = true
-      document.body.style.overflow = 'hidden'
-    },
-
-    closeImagePreview() {
-      this.showImagePreview = false
-      this.previewImage = ''
-      document.body.style.overflow = 'auto'
-    },
-
-    // ============================================
-    // GESTION DES MODALS
-    // ============================================
-    closeModal() {
-      this.showModal = false
-      this.formData = {}
-      this.currentItemId = null
-      document.body.style.overflow = 'auto'
-    },
-
-    closeUsersModal() {
-      this.showUsersModal = false
-      document.body.style.overflow = 'auto'
-    },
-
-    openAddModal(type) {
-      if ((type === 'equipe' || type === 'partenaire') && !this.isSuperAdmin) {
-        this.showToast('Vous n\'avez pas les droits pour effectuer cette action', 'error')
-        return
-      }
-      this.modalMode = 'add'
-      this.modalType = type
-      this.modalTitle = `Ajouter ${this.getTypeLabel(type)}`
-      
-      this.formData = { 
-        actif: true,
-        image_preview: null,
-        image_file: null,
-        _existing_image: null
-      }
-      this.currentItemId = null
-      this.showModal = true
-      document.body.style.overflow = 'hidden'
-    },
-
-    openEditModal(type, item) {
-      if ((type === 'equipe' || type === 'partenaire') && !this.isSuperAdmin) {
-        this.showToast('Vous n\'avez pas les droits pour effectuer cette action', 'error')
-        return
-      }
-      this.modalMode = 'edit'
-      this.modalType = type
-      this.modalTitle = `Modifier ${item.nom || item.titre || ''}`
-      
-      let existingImage = ''
-      if (type === 'equipe') {
-        existingImage = item.photo || item.image || ''
-      } else if (type === 'partenaire') {
-        existingImage = item.logo || item.image || ''
-      } else {
-        existingImage = item.image || ''
-      }
-      
-      this.formData = { 
-        ...item,
-        image_preview: existingImage ? this.getFullImageUrl(existingImage) : null,
-        _existing_image: existingImage,
-        image_file: null
-      }
-      
-      this.currentItemId = item.id
-      this.showModal = true
-      document.body.style.overflow = 'hidden'
-    },
-
-    // ============================================
-    // UPLOAD D'IMAGES
-    // ============================================
-    triggerFileInput() { 
-      this.$refs.fileInput?.click() 
-    },
-
-    handleFileSelect(event) {
-      const file = event.target.files[0]
-      if (!file) return
-      
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('L\'image ne doit pas dépasser 5MB', 'error')
-        event.target.value = ''
-        return
-      }
-      
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
-      if (!validTypes.includes(file.type)) {
-        this.showToast('Format d\'image non supporté (JPEG, PNG, GIF, WEBP, SVG)', 'error')
-        event.target.value = ''
-        return
-      }
-      
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        this.formData.image_preview = e.target.result
-        this.formData.image_file = file
-        this.formData._existing_image = null
-      }
-      reader.readAsDataURL(file)
-    },
-
-    handleDrop(event) {
-      const file = event.dataTransfer.files[0]
-      if (!file || !file.type.startsWith('image/')) {
-        this.showToast('Veuillez déposer une image', 'error')
-        return
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('L\'image ne doit pas dépasser 5MB', 'error')
-        return
-      }
-      
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        this.formData.image_preview = e.target.result
-        this.formData.image_file = file
-        this.formData._existing_image = null
-      }
-      reader.readAsDataURL(file)
-    },
-
-    removeImage() {
-      this.formData.image_preview = null
-      this.formData.image_file = null
-      this.formData._existing_image = null
-      
-      if (this.modalType === 'equipe') {
-        this.formData.photo = null
-      } else if (this.modalType === 'partenaire') {
-        this.formData.logo = null
-      } else {
-        this.formData.image = null
-      }
-    },
-
-    // ============================================
-    // CRUD OPERATIONS
-    // ============================================
-    async saveItem() {
-      const endpoint = endpoints[this.modalType]
-      
-      const requiredFields = this.currentFields.filter(f => f.required)
-      for (const field of requiredFields) {
-        if (!this.formData[field.name] || this.formData[field.name].trim() === '') {
-          this.showToast(`Le champ "${field.label}" est obligatoire`, 'error')
-          return
-        }
-      }
-      
-      const data = { ...this.formData }
-      
-      const tempFields = ['image_preview', 'image_file', '_existing_image']
-      tempFields.forEach(key => {
-        if (data[key] !== undefined) delete data[key]
-      })
-      
-      Object.keys(data).forEach(key => {
-        if (data[key] === null || data[key] === undefined || data[key] === '') {
-          delete data[key]
-        }
-      })
-
-      if (this.formData.image_file instanceof File) {
-        let imageFieldName = 'image'
-        if (this.modalType === 'equipe') imageFieldName = 'photo'
-        else if (this.modalType === 'partenaire') imageFieldName = 'logo'
-        
-        data[imageFieldName] = this.formData.image_file
-        
-        if (this.modalMode === 'edit') {
-          delete data.image
-          delete data.photo
-          delete data.logo
-        }
-      } else if (this.modalMode === 'edit' && this.formData._existing_image) {
-        let imageFieldName = 'image'
-        if (this.modalType === 'equipe') imageFieldName = 'photo'
-        else if (this.modalType === 'partenaire') imageFieldName = 'logo'
-        data[imageFieldName] = this.formData._existing_image
-      }
-      
-      try {
-        this.loading = true
-        if (this.modalMode === 'add') {
-          await adminAPI.createItem(endpoint, data)
-          this.showToast('Ajouté avec succès', 'success')
-        } else {
-          await adminAPI.updateItem(endpoint, this.currentItemId, data)
-          this.showToast('Modifié avec succès', 'success')
-        }
-        
-        this.closeModal()
-        await this.loadAllData()
-      } catch (error) {
-        console.error('❌ Erreur:', error)
-        this.showToast('Erreur lors de l\'enregistrement', 'error')
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async deleteItem(type, id) {
-      if (type === 'equipe' || type === 'partenaire') {
-        if (!this.isSuperAdmin) {
-          this.showToast('Vous n\'avez pas les droits pour effectuer cette action', 'error')
-          return
-        }
-      }
-      if (!confirm('Supprimer définitivement ? Cette action est irréversible.')) return
-      const endpoint = endpoints[type]
-      try {
-        await adminAPI.deleteItem(endpoint, id)
-        this.showToast('Supprimé avec succès', 'success')
-        await this.loadAllData()
-      } catch (error) {
-        console.error('Erreur suppression:', error)
-        this.showToast('Erreur lors de la suppression', 'error')
-      }
-    },
-
-    // ============================================
-    // GESTION DES UTILISATEURS
-    // ============================================
-    async createUser() {
-      if (this.newUser.password !== this.newUser.password2) {
-        this.showToast('Les mots de passe ne correspondent pas', 'error')
-        return
-      }
-      if (this.newUser.password.length < 8) {
-        this.showToast('Le mot de passe doit contenir au moins 8 caractères', 'error')
-        return
-      }
-      
-      try {
-        await adminAPI.createUser(this.newUser)
-        this.showToast('Utilisateur créé avec succès', 'success')
-        this.newUser = { nom: '', email: '', telephone: '', role: 'admin', password: '', password2: '' }
-        const res = await adminAPI.getUsers()
-        this.adminUsers = res.data || []
-      } catch (error) {
-        console.error('Erreur création utilisateur:', error)
-        this.showToast('Erreur lors de la création de l\'utilisateur', 'error')
-      }
-    },
-
-    async toggleUserStatus(user) {
-      if (!confirm(`${user.is_active ? 'Désactiver' : 'Activer'} ${user.nom} ?`)) return
-      try {
-        await adminAPI.toggleUserStatus(user.id, { is_active: !user.is_active })
-        this.showToast(`Utilisateur ${user.is_active ? 'désactivé' : 'activé'}`, 'success')
-        const res = await adminAPI.getUsers()
-        this.adminUsers = res.data || []
-      } catch (error) {
-        this.showToast('Erreur lors du changement de statut', 'error')
-      }
-    },
-
-    async deleteUser(id) {
-      if (!confirm('Supprimer définitivement cet utilisateur ?')) return
-      try {
-        await adminAPI.deleteUser(id)
-        this.showToast('Utilisateur supprimé', 'success')
-        const res = await adminAPI.getUsers()
-        this.adminUsers = res.data || []
-      } catch (error) {
-        this.showToast('Erreur lors de la suppression', 'error')
-      }
-    },
-
-    // ============================================
-    // BOUTON ADMINISTRATION IT
-    // ============================================
-    goToITAdmin() {
-      console.log('🔐 [goToITAdmin] Clic détecté')
-      console.log('🔐 [goToITAdmin] isSuperAdmin:', this.isSuperAdmin)
-      
-      if (this.isSuperAdmin) {
-        console.log('➡️ Redirection vers /administrateurs')
-        this.$router.push('/administrateurs').catch(err => {
-          console.error('❌ Erreur redirection:', err)
-          window.location.href = '/administrateurs'
-        })
-      } else {
-        console.log('➡️ Redirection vers /it-login')
-        this.$router.push('/it-login').catch(err => {
-          console.error('❌ Erreur redirection:', err)
-          window.location.href = '/it-login'
-        })
-      }
-    },
-
-    // ============================================
-    // AUTRES FONCTIONS
-    // ============================================
-    async syncAllData() {
-      this.syncing = true
-      try {
-        await adminAPI.syncAll()
-        this.showToast('Synchronisation terminée avec succès', 'success')
-        await this.loadAllData()
-      } catch (error) {
-        console.error('Erreur synchronisation:', error)
-        this.showToast('Erreur lors de la synchronisation', 'error')
-      } finally {
-        this.syncing = false
-      }
-    },
-
-    showToast(message, type = 'success') {
-      this.toast = { show: true, message, type }
-      setTimeout(() => { this.toast.show = false }, 4000)
-    },
-
-    truncate(text, len) { 
-      return text?.length > len ? text.substring(0, len) + '...' : text || '' 
-    },
-
-    getTabTitle() {
-      const titles = { 
-        plantes: '🌿 Plantes', 
-        equipe: '👥 Équipe', 
-        slides: '📸 Slides', 
-        projets: '📊 Projets',
-        activites: '⚡ Activités',
-        partenaires: '🤝 Partenaires'
-      }
-      return titles[this.activeTab] || 'Tableau de bord'
-    },
-
-    getTypeLabel(type) {
-      const labels = {
-        plante: 'Plante',
-        equipe: 'Membre de l\'équipe',
-        slide: 'Slide',
-        projet: 'Projet',
-        activite: 'Activité',
-        partenaire: 'Partenaire'
-      }
-      return labels[type] || type
-    },
-
-    openMembresModal() {
-      if (!this.isSuperAdmin) {
-        this.showToast('Vous n\'avez pas les droits pour accéder à cette section', 'error')
-        return
-      }
-      this.showUsersModal = true
-      document.body.style.overflow = 'hidden'
-    },
-
-    logout() {
-      if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-        localStorage.removeItem('it_admin_authenticated')
-        localStorage.removeItem('it_admin_username')
-        localStorage.removeItem('it_admin_login_time')
-        localStorage.removeItem('is_super_admin')
-        const authStore = useAuthStore()
-        authStore.logout()
-        this.$router.push('/login')
-      }
-    }
+/* ============================================================
+   CHARGEMENTS
+   ============================================================ */
+const loadStats = async () => {
+  try {
+    const { data } = await adminApi.get('/stats/')
+    stats.value = data
+  } catch {
+    logger.warn('Erreur stats')
   }
 }
+
+const loadRecentActivities = async () => {
+  if (!auth.isSuperIT) return
+  try {
+    const { data } = await adminAPI.getAuditLogs({ limit: 50 })
+    recentActivities.value = Array.isArray(data) ? data : []
+  } catch {
+    logger.warn('Erreur audit')
+  }
+}
+
+const loadMyActivities = async () => {
+  if (auth.isSuperIT) return
+  try {
+    const { data } = await adminApi.get('/me/activity/', { params: { limit: 10 } })
+    myActivities.value = Array.isArray(data) ? data : []
+  } catch {
+    logger.warn('Erreur mes activités')
+  }
+}
+
+const loadAdmins = async () => {
+  if (!auth.isSuperIT) return
+  try {
+    const { data } = await adminAPI.getUsers()
+    admins.value = Array.isArray(data) ? data : []
+    const thirtyMinAgo = Date.now() - 30 * 60 * 1000
+    onlineUsers.value = admins.value.filter(
+      (a) => a.last_login && new Date(a.last_login).getTime() > thirtyMinAgo
+    )
+  } catch {
+    logger.warn('Erreur admins')
+  }
+}
+
+const loadAlerts = async () => {
+  if (!auth.isSuperIT) return
+  try {
+    const { data } = await adminAPI.getAuditLogs({ action: 'LOGIN_FAILED', limit: 5 })
+    alerts.value = (Array.isArray(data) ? data : []).map((log) => ({
+      id: log.id,
+      level: 'danger',
+      icon: 'fas fa-exclamation-triangle',
+      message: `Tentative de connexion échouée : ${maskEmail(log.details?.email)}`,
+      created_at: log.created_at,
+    }))
+  } catch {
+    logger.warn('Erreur alertes')
+  }
+}
+
+const loadAll = async () => {
+  loading.value = true
+  try {
+    await Promise.all([
+      loadStats(),
+      loadRecentActivities(),
+      loadMyActivities(),
+      loadAdmins(),
+      loadAlerts(),
+    ])
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleLogout = async () => {
+  await auth.logout()
+  router.push(auth.isSuperIT ? '/it-login' : '/admin-login')
+}
+
+onMounted(() => {
+  if (!auth.isAuthenticated) {
+    router.push('/it-login')
+    return
+  }
+  loadAll()
+  if (auth.isSuperIT) {
+    refreshInterval = setInterval(() => {
+      loadRecentActivities()
+      loadAdmins()
+      loadAlerts()
+    }, 30000)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (refreshInterval) clearInterval(refreshInterval)
+})
 </script>
 
-
 <style scoped>
-.dashboard { display: flex; min-height: 100vh; background: #f5f7fa; }
-.sidebar { width: 280px; background: linear-gradient(180deg, #1a472a 0%, #0d3b0f 100%); color: white; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
-.logo { padding: 30px 20px; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.logo i { font-size: 28px; color: #FFD700; }
-.nav-menu { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 5px; }
-.nav-section { margin-top: 20px; }
-.nav-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); padding: 10px 16px 5px; }
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 10px; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-size: 14px; }
-.nav-item:hover, .nav-item.active { background: #FFD700; color: #1a472a; }
-.logout { margin-top: auto; color: #ff6b6b; }
-
-.it-admin-btn {
-  background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,165,0,0.12));
-  border: 1px solid rgba(255,215,0,0.25);
-  margin-top: 5px;
+/* ============================================================
+   ONGLETS INTERNES
+   ============================================================ */
+.dashboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 6px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow-x: auto;
+}
+.superit-theme .dashboard-tabs {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
   border-radius: 10px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
 }
-
-.it-admin-btn:hover {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #1a472a;
-}
-
-.it-admin-btn .nav-badge {
-  background: #FFD700;
-  color: #1a472a;
+.tab-btn i { font-size: 14px; }
+.tab-btn:hover { background: #f8fafc; color: #0f172a; }
+.superit-theme .tab-btn { color: #94a3b8; }
+.superit-theme .tab-btn:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.tab-btn.active { background: #ecfdf5; color: #059669; }
+.superit-theme .tab-btn.active { background: rgba(99, 102, 241, 0.15); color: #c7d2fe; }
+.tab-badge {
   font-size: 10px;
+  background: #f59e0b;
+  color: #1a1a1a;
   padding: 2px 8px;
-  border-radius: 12px;
-  margin-left: auto;
+  border-radius: 10px;
+  font-weight: 700;
 }
 
-.main-content { flex: 1; margin-left: 280px; }
-.top-bar { background: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.top-bar h1 { font-size: 24px; color: #1a472a; margin: 0; }
-.user-info { display: flex; align-items: center; gap: 15px; }
-.user-badge { background: #e8f5e9; color: #2e7d32; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
-.user-badge.super-admin { background: #1a472a; color: #FFD700; }
-.avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #32CD32, #228B22); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-.content { padding: 30px; }
-.loading-container { text-align: center; padding: 60px; }
-.spinner { width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: #3498db; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.dashboard-layout { min-height: 100vh; background: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+.superit-theme { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+.main-content { margin-left: 260px; padding: 24px 28px 40px; transition: margin-left 0.3s ease; }
+.main-content.expanded { margin-left: 76px; }
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+.loading-block { background: rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 80px 20px; text-align: center; }
+.superit-theme .loading-block { border: 1px solid rgba(255, 255, 255, 0.1); }
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #818cf8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-.btn-add { background: #32CD32; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-.btn-add:hover { background: #28a428; }
-.btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
-.permission-badge { background: #fff3cd; color: #856404; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
-.data-section { background: white; border-radius: 20px; padding: 20px; overflow-x: auto; margin-bottom: 30px; }
-.data-table { width: 100%; overflow-x: auto; }
-.data-table table { width: 100%; border-collapse: collapse; }
-.data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-.badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; background: #e0e0e0; }
-.status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-.status-badge.active { background: #d4edda; color: #155724; }
-.status-badge.inactive { background: #f8d7da; color: #721c24; }
-.role-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-.role-badge.it_admin { background: #1a472a; color: #FFD700; }
-.role-badge.admin { background: #e3f2fd; color: #1976d2; }
-.actions { display: flex; gap: 8px; }
-.btn-edit, .btn-delete, .btn-status { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 5px; transition: all 0.2s; }
-.btn-edit { color: #2196F3; }
-.btn-edit:hover:not(:disabled) { background: #e3f2fd; }
-.btn-edit:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-delete { color: #f44336; }
-.btn-delete:hover:not(:disabled) { background: #fce4ec; }
-.btn-delete:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-status { color: #ff9800; }
-.btn-status:hover { background: #fff3e0; }
-.empty-row { text-align: center; color: #999; padding: 30px; }
+.loading-block p { color: #94a3b8; margin: 0; }
 
-.table-image { width: 50px; height: 50px; cursor: pointer; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
-.thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s; }
-.thumbnail:hover { transform: scale(1.05); }
-.no-image { width: 100%; height: 100%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 20px; }
+/* ============================================================
+   ALERTES
+   ============================================================ */
+.alerts-panel {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.alert-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.alert-head i { color: #ef4444; font-size: 18px; }
+.alert-head h3 { font-size: 14px; color: #fecaca; margin: 0; font-weight: 700; }
+.alert-list { list-style: none; padding: 0; margin: 0; }
+.alert-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+  font-size: 13px; color: #fca5a5;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-item i { color: #ef4444; font-size: 13px; }
+.alert-time { margin-left: auto; font-size: 11px; color: #f87171; opacity: 0.7; }
 
-.stats-section { margin-top: 30px; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
-.stat-card { background: white; border-radius: 15px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.stat-card i { font-size: 30px; color: #32CD32; }
-.stat-card h3 { font-size: 24px; margin: 0; color: #1a472a; }
-.stat-card p { margin: 0; color: #666; font-size: 12px; }
+/* ============================================================
+   STATS
+   ============================================================ */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
 
-.modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
-.modal-container { background: white; border-radius: 20px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: modalSlideIn 0.3s ease; }
-@keyframes modalSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-header { padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 1; border-radius: 20px 20px 0 0; }
-.modal-header h2 { margin: 0; font-size: 20px; color: #1a472a; }
-.close { background: none; border: none; font-size: 28px; cursor: pointer; color: #999; padding: 0 8px; transition: color 0.3s; }
-.close:hover { color: #f44336; transform: rotate(90deg); }
-.modal-body { padding: 24px; }
-.form-group { margin-bottom: 18px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #333; }
-.form-control { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
-.form-control:focus { border-color: #32CD32; outline: none; box-shadow: 0 0 0 3px rgba(50, 205, 50, 0.1); }
-.form-checkbox { width: 20px; height: 20px; cursor: pointer; }
-.form-help { display: block; color: #888; font-size: 12px; margin-top: 5px; }
+/* ============================================================
+   PANELS
+   ============================================================ */
+.panel {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+.superit-theme .panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.superit-theme .panel-head { border-bottom-color: rgba(255, 255, 255, 0.08); }
+.panel-head h3 {
+  font-size: 14.5px; color: #0f172a; margin: 0; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.superit-theme .panel-head h3 { color: #e2e8f0; }
+.superit-theme .panel-head h3 i { color: #818cf8; }
+.link-see-all { font-size: 12.5px; color: #10b981; text-decoration: none; font-weight: 600; }
+.superit-theme .link-see-all { color: #818cf8; }
 
-.image-upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; min-height: 150px; display: flex; align-items: center; justify-content: center; }
-.image-upload-area:hover { border-color: #32CD32; background: #f8fafc; }
-.image-upload-area.has-image { border-color: #32CD32; background: #f8fafc; }
-.image-preview { position: relative; width: 100%; max-height: 300px; overflow: hidden; border-radius: 8px; }
-.image-preview img { width: 100%; height: auto; max-height: 300px; object-fit: contain; }
-.remove-image { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; background: #e74c3c; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
-.remove-image:hover { background: #c0392b; }
-.upload-placeholder { padding: 20px; }
-.upload-placeholder i { font-size: 48px; color: #32CD32; margin-bottom: 10px; }
-.upload-hint { display: block; font-size: 12px; color: #999; margin-top: 5px; }
+/* ============================================================
+   GRAPHIQUE
+   ============================================================ */
+.chart-panel { margin-bottom: 20px; }
+.chart-wrap {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 12px; height: 180px; padding: 10px 0;
+}
+.chart-bar {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 6px; height: 100%; justify-content: flex-end; cursor: help;
+}
+.bar-value { font-size: 11px; font-weight: 700; color: #818cf8; }
+.bar-track {
+  width: 100%; flex: 1;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 6px 6px 0 0;
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, #818cf8, #6366f1);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.4s ease;
+  min-height: 4px;
+}
+.bar-label { font-size: 11px; color: #94a3b8; font-weight: 500; }
 
-.image-preview-modal .image-preview-container { position: relative; max-width: 90vw; max-height: 90vh; }
-.image-preview-modal .close-preview { position: absolute; top: -20px; right: -20px; width: 40px; height: 40px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
-.image-preview-modal .close-preview:hover { background: rgba(0,0,0,0.9); }
-.preview-image-full { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 8px; }
+/* ============================================================
+   ACTIONS RAPIDES
+   ============================================================ */
+.quick-actions {
+  background: #fff; border-radius: 14px;
+  padding: 20px 24px; margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.superit-theme .quick-actions {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+.section-head { margin-bottom: 16px; }
+.section-head h2 {
+  font-size: 16px; color: #0f172a; margin: 0; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.superit-theme .section-head h2 { color: #e2e8f0; }
+.superit-theme .section-head h2 i { color: #facc15; }
+.actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.action-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px; border-radius: 12px;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  color: #334155; text-decoration: none; transition: all 0.15s;
+}
+.action-card:hover {
+  background: #ecfdf5; border-color: #10b981;
+  color: #059669; transform: translateY(-2px);
+}
+.action-card i { font-size: 20px; color: #10b981; flex-shrink: 0; }
+.action-card > div { display: flex; flex-direction: column; }
+.action-title { font-size: 13.5px; font-weight: 600; line-height: 1.2; }
+.action-desc { font-size: 11.5px; color: #64748b; margin-top: 2px; }
+.superit-actions .action-card {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #c7d2fe;
+}
+.superit-actions .action-card:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: #818cf8;
+  color: #e0e7ff; transform: translateY(-2px);
+}
+.superit-actions .action-card i { color: #818cf8; }
+.superit-actions .action-desc { color: #a5b4fc; }
 
-.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; }
-.btn-save { background: #32CD32; color: white; border: none; padding: 10px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: background 0.3s; }
-.btn-save:hover:not(:disabled) { background: #28a428; }
-.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-cancel { background: #f5f5f5; border: 1px solid #ddd; padding: 10px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: background 0.3s; }
-.btn-cancel:hover { background: #e8e8e8; }
+/* ============================================================
+   TWO COLUMNS
+   ============================================================ */
+.two-columns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media (max-width: 1024px) { .two-columns { grid-template-columns: 1fr; } }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-.add-user-form { background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px; }
-.users-table { overflow-x: auto; }
-.users-table table { width: 100%; border-collapse: collapse; }
-.users-table th, .users-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+/* ============================================================
+   ACTIVITÉS
+   ============================================================ */
+.activity-list { list-style: none; padding: 0; margin: 0; }
+.activity-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.superit-theme .activity-item { border-bottom-color: rgba(255, 255, 255, 0.05); }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 34px; height: 34px;
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 13px;
+}
+.activity-icon.create { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-icon.update { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.activity-icon.delete { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.activity-icon.login { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-icon.login_failed { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.activity-icon.sync { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.activity-body { flex: 1; min-width: 0; }
+.activity-message { font-size: 13px; color: #334155; margin: 0; line-height: 1.4; }
+.superit-theme .activity-message { color: #cbd5e1; }
+.activity-message strong { color: #0f172a; font-weight: 600; }
+.superit-theme .activity-message strong { color: #fff; }
+.activity-obj { color: #64748b; font-style: italic; }
+.superit-theme .activity-obj { color: #94a3b8; }
+.activity-time { font-size: 11px; color: #94a3b8; margin-top: 2px; display: block; }
 
-.toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 24px; border-radius: 12px; z-index: 2000; animation: slideIn 0.3s ease; background: #28a745; color: white; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: 500; }
-.toast.error { background: #dc3545; }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+/* ============================================================
+   ADMINS
+   ============================================================ */
+.admin-list { list-style: none; padding: 0; margin: 0; }
+.admin-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.superit-theme .admin-item { border-bottom-color: rgba(255, 255, 255, 0.05); }
+.admin-item:last-child { border-bottom: none; }
+.admin-avatar {
+  position: relative; width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.admin-avatar.super { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.online-dot {
+  position: absolute; bottom: 0; right: 0;
+  width: 11px; height: 11px; background: #10b981;
+  border: 2px solid #1e1b4b; border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+.admin-info { flex: 1; min-width: 0; }
+.admin-name { font-size: 13.5px; font-weight: 600; color: #0f172a; display: block; }
+.superit-theme .admin-name { color: #fff; }
+.admin-role { font-size: 11.5px; color: #64748b; display: block; margin-top: 1px; }
+.superit-theme .admin-role { color: #94a3b8; }
+.online-label { color: #10b981; font-weight: 600; }
+.admin-status { font-size: 10.5px; padding: 3px 8px; border-radius: 10px; font-weight: 600; flex-shrink: 0; }
+.admin-status.active { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.admin-status.inactive { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
-@media (max-width: 768px) { 
-  .sidebar { width: 70px; } 
-  .logo span, .nav-item span, .nav-section-title { display: none; } 
-  .main-content { margin-left: 70px; } 
-  .form-row { grid-template-columns: 1fr; }
-  .data-table table { font-size: 12px; }
-  .data-table th, .data-table td { padding: 8px; }
-  .table-image { width: 35px; height: 35px; }
-  .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .section-header { flex-direction: column; align-items: flex-start; }
+/* ============================================================
+   CONTENT OVERVIEW
+   ============================================================ */
+.content-overview { margin-bottom: 20px; }
+.content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.content-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 18px 12px; background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px; text-decoration: none; transition: all 0.15s;
+}
+.content-item:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: #818cf8; transform: translateY(-2px);
+}
+.content-item i { font-size: 22px; color: #818cf8; margin-bottom: 8px; }
+.content-value { font-size: 24px; font-weight: 700; color: #fff; line-height: 1; }
+.content-label { font-size: 11.5px; color: #94a3b8; margin-top: 4px; font-weight: 500; }
+
+/* ============================================================
+   WELCOME (Admin)
+   ============================================================ */
+.welcome-card {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-radius: 14px; padding: 20px 24px; margin-bottom: 20px;
+  border-left: 4px solid #10b981;
+}
+.welcome-card i { font-size: 26px; color: #059669; flex-shrink: 0; margin-top: 2px; }
+.welcome-card h3 { font-size: 15px; color: #0f172a; margin: 0 0 6px; font-weight: 700; }
+.welcome-card p { font-size: 13px; color: #475569; margin: 0; line-height: 1.5; }
+.welcome-card strong { color: #059669; }
+.my-activity-panel { margin-bottom: 20px; }
+
+/* ============================================================
+   LIVE INDICATOR
+   ============================================================ */
+.live-indicator {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px; font-size: 12.5px; font-weight: 600;
+  color: #10b981; cursor: help;
+}
+.pulse {
+  width: 8px; height: 8px; background: #10b981;
+  border-radius: 50%; animation: pulse-live 1.5s infinite;
+}
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* ============================================================
+   EMPTY
+   ============================================================ */
+.empty-text { text-align: center; color: #94a3b8; font-size: 13px; padding: 24px 0; margin: 0; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .main-content { margin-left: 76px; padding: 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .actions-grid { grid-template-columns: 1fr; }
+  .content-grid { grid-template-columns: repeat(3, 1fr); }
 }
 </style>

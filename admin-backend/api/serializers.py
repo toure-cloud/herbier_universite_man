@@ -2,7 +2,6 @@
 import os
 import uuid
 import re
-
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -10,7 +9,7 @@ from rest_framework import serializers
 from .models import (
     Partenaire, Plante, Equipe, Slide, Projet, Activite, 
     Temoignage, Publication, FAQ, Statistique, Methodologie,
-    SuperAdmin
+    SuperAdmin, AuditLog,
 )
 
 # ==================== SERIALIZERS DES MODÈLES ====================
@@ -315,3 +314,20 @@ class PartenaireSerializer(FileUploadMixin, serializers.ModelSerializer):
         if not value or value.strip() == '':
             raise serializers.ValidationError("Le nom est obligatoire")
         return value.strip()
+    
+    # ==================== SERIALIZER AUDIT ====================
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    user_nom = serializers.CharField(source='user.nom', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    action_label = serializers.CharField(source='get_action_display', read_only=True)
+
+    class Meta:
+        model = AuditLog
+        fields = [
+            'id', 'user', 'user_nom', 'user_email',
+            'action', 'action_label',
+            'model_name', 'object_id', 'object_repr',
+            'details', 'ip_address', 'user_agent', 'created_at',
+        ]
+        read_only_fields = fields

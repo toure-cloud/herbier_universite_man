@@ -1,13 +1,13 @@
 <template>
-  <aside class="sidebar" :class="{ collapsed, superit: isSuperIT }">
+  <aside class="sidebar" :class="{ collapsed, superit: reallySuperIT }">
     <div class="sidebar-header">
       <div class="logo">
-        <div class="logo-icon" :class="{ it: isSuperIT }">
-          <i :class="isSuperIT ? 'fas fa-shield-alt' : 'fas fa-leaf'"></i>
+        <div class="logo-icon" :class="{ it: reallySuperIT }">
+          <i :class="reallySuperIT ? 'fas fa-shield-alt' : 'fas fa-leaf'"></i>
         </div>
         <div v-if="!collapsed" class="logo-text">
-          <span class="logo-title">{{ isSuperIT ? 'SuperIT' : 'Herbier Admin' }}</span>
-          <span class="logo-subtitle">{{ isSuperIT ? 'Console système' : 'Université de Man' }}</span>
+          <span class="logo-title">{{ reallySuperIT ? 'SuperIT' : 'Herbier Admin' }}</span>
+          <span class="logo-subtitle">{{ reallySuperIT ? 'Console système' : 'Université de Man' }}</span>
         </div>
       </div>
       <button class="toggle-btn" @click="$emit('toggle')" aria-label="Basculer">
@@ -27,10 +27,10 @@
 
     <div class="sidebar-footer">
       <div v-if="!collapsed" class="user-info">
-        <div class="user-avatar" :class="{ it: isSuperIT }">{{ initials }}</div>
+        <div class="user-avatar" :class="{ it: reallySuperIT }">{{ initials }}</div>
         <div class="user-details">
           <span class="user-name">{{ user?.nom || 'Utilisateur' }}</span>
-          <span class="user-role">{{ isSuperIT ? 'SuperIT' : 'Administrateur' }}</span>
+          <span class="user-role">{{ reallySuperIT ? 'SuperIT' : 'Administrateur' }}</span>
         </div>
       </div>
       <button class="logout-btn" @click="$emit('logout')">
@@ -52,44 +52,59 @@ const props = defineProps({
 
 defineEmits(['toggle', 'logout'])
 
+// ✅ Calcul robuste : accepte la prop OU le rôle du user
+//    Évite un menu réduit si un parent oublie de passer :is-super-it
+const reallySuperIT = computed(() => {
+  if (props.isSuperIT === true) return true
+  const r = (props.user?.role || '').trim().toLowerCase()
+  return r === 'it_admin' || r === 'it-admin' || r === 'super_admin' || r === 'superit'
+})
+
 const initials = computed(() => {
   if (!props.user?.nom) return '?'
   return props.user.nom.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
 })
 
-// ✅ Menu adapté au rôle
+// ============================================================
+// ✅ MENU ADAPTÉ AU RÔLE
+// ============================================================
 const menuItems = computed(() => {
+  // ✅ Éléments communs (Admin + SuperIT)
   const common = [
     { to: '/dashboard', label: 'Tableau de bord', icon: 'fas fa-tachometer-alt' },
   ]
 
-  // ✅ Contenu accessible aux 2 rôles (Slides retiré)
+  // ✅ Contenu accessible aux DEUX rôles
   const content = [
     { to: '/plantes', label: 'Plantes', icon: 'fas fa-leaf' },
     { to: '/projets', label: 'Projets', icon: 'fas fa-project-diagram' },
     { to: '/activites', label: 'Activités', icon: 'fas fa-chart-line' },
     { to: '/publications', label: 'Publications', icon: 'fas fa-book' },
-    { to: '/equipe', label: 'Équipe', icon: 'fas fa-users' },
-    { to: '/partenaires', label: 'Partenaires', icon: 'fas fa-handshake' },
     { to: '/temoignages', label: 'Témoignages', icon: 'fas fa-comment-dots' },
   ]
 
-  // ✅ SuperIT uniquement
+  // ✅ Exclusivités SuperIT (jamais visibles pour Admin)
   const superitOnly = [
+    { to: '/equipe', label: 'Équipe', icon: 'fas fa-users' },
+    { to: '/partenaires', label: 'Partenaires', icon: 'fas fa-handshake' },
     { to: '/administrateurs', label: 'Administrateurs', icon: 'fas fa-users-cog' },
-    { to: '/audit', label: 'Journal d\'audit', icon: 'fas fa-history', badge: 'Live' },
+    { to: '/audit', label: "Journal d'audit", icon: 'fas fa-history', badge: 'Live' },
     { to: '/maintenance', label: 'Maintenance', icon: 'fas fa-tools' },
     { to: '/herbier-data', label: 'Données Herbier', icon: 'fas fa-database' },
+    { to: '/stats', label: 'Statistiques', icon: 'fas fa-chart-bar' },
   ]
 
   const commonFooter = [
     { to: '/settings', label: 'Paramètres', icon: 'fas fa-cog' },
   ]
 
-  if (props.isSuperIT) {
-    return [...common, ...content, ...superitOnly, ...commonFooter]
+  // ✅ Admin Lambda : uniquement commun + contenu
+  if (!reallySuperIT.value) {
+    return [...common, ...content]
   }
-  return [...common, ...content, ...commonFooter]
+
+  // ✅ SuperIT : tout
+  return [...common, ...content, ...superitOnly, ...commonFooter]
 })
 </script>
 
@@ -108,6 +123,7 @@ const menuItems = computed(() => {
   z-index: 100;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
 }
+/* ✅ Thème indigo pour SuperIT */
 .sidebar.superit {
   background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
 }
@@ -132,6 +148,7 @@ const menuItems = computed(() => {
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
+/* ✅ Icône indigo pour SuperIT */
 .logo-icon.it {
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
@@ -175,7 +192,7 @@ const menuItems = computed(() => {
 .nav-item i { width: 18px; text-align: center; font-size: 15px; }
 .nav-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
 
-/* Émeraude (Admin) */
+/* ✅ Émeraude (Admin) */
 .nav-item.active {
   background: rgba(16, 185, 129, 0.15);
   color: #10b981;
@@ -183,7 +200,7 @@ const menuItems = computed(() => {
   box-shadow: inset 3px 0 0 #10b981;
 }
 
-/* Indigo (SuperIT) */
+/* ✅ Indigo (SuperIT) */
 .sidebar.superit .nav-item.active {
   background: rgba(99, 102, 241, 0.2);
   color: #c7d2fe;

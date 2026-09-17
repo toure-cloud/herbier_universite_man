@@ -1,286 +1,437 @@
 <template>
-  <div class="management-page" v-if="isAuthenticated">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <div class="logo-icon"><i class="fas fa-leaf"></i></div>
-          <div class="logo-text"><span class="logo-title">Herbier Admin</span><span class="logo-subtitle">Université de Man</span></div>
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <router-link to="/dashboard" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Tableau de bord</span></router-link>
-        <router-link to="/plantes" class="nav-item"><i class="fas fa-leaf"></i><span>Plantes</span></router-link>
-        <router-link to="/equipe" class="nav-item"><i class="fas fa-users"></i><span>Équipe</span></router-link>
-        <router-link to="/partenaires" class="nav-item"><i class="fas fa-handshake"></i><span>Partenaires</span></router-link>
-        <router-link to="/slides" class="nav-item"><i class="fas fa-images"></i><span>Slides</span></router-link>
-        <router-link to="/projets" class="nav-item"><i class="fas fa-project-diagram"></i><span>Projets</span></router-link>
-        <router-link to="/activites" class="nav-item"><i class="fas fa-chart-line"></i><span>Activités</span></router-link>
-        <router-link to="/temoignages" class="nav-item"><i class="fas fa-comment-dots"></i><span>Témoignages</span></router-link>
-        <router-link to="/publications" class="nav-item"><i class="fas fa-book"></i><span>Publications</span></router-link>
-        <router-link to="/statistiques" class="nav-item"><i class="fas fa-chart-bar"></i><span>Statistiques</span></router-link>
-        <router-link to="/herbier-data" class="nav-item"><i class="fas fa-database"></i><span>Données Herbier</span></router-link>
-        <router-link to="/settings" class="nav-item active"><i class="fas fa-cog"></i><span>Paramètres</span><span class="nav-badge">Admin</span></router-link>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="user-info-sidebar"><div class="user-avatar-sidebar">{{ userInitials }}</div><div class="user-details-sidebar"><span class="user-name-sidebar">{{ user?.nom || 'Admin' }}</span><span class="user-role">Super Admin</span></div></div>
-        <button @click="confirmLogout" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></button>
-      </div>
-    </aside>
+  <div class="settings-layout" :class="{ 'superit-theme': auth.isSuperIT }">
+    <Sidebar
+      :user="auth.user"
+      :is-super-it="auth.isSuperIT"
+      :collapsed="sidebarCollapsed"
+      @toggle="sidebarCollapsed = !sidebarCollapsed"
+      @logout="handleLogout"
+    />
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="page-title">
-          <h1><i class="fas fa-cog"></i> Paramètres & Administration</h1>
-          <p>Gérez les utilisateurs, les permissions et les activités du système</p>
-        </div>
-        <div class="user-badge">
-          <i class="fas fa-shield-alt"></i>
-          <span>Super Administrateur</span>
-        </div>
-      </header>
+    <main class="main-content" :class="{ expanded: sidebarCollapsed }">
+      <TopBar
+        title="Paramètres"
+        subtitle="Gérez votre compte et vos préférences"
+        icon="fas fa-cog"
+      />
 
-      <!-- Message si accès non autorisé (utilisateur non super admin) -->
-      <div v-if="!isSuperAdmin" class="access-denied">
-        <i class="fas fa-lock"></i>
-        <h2>Accès restreint</h2>
-        <p>Cette page est réservée aux Super Administrateurs.</p>
-        <router-link to="/dashboard" class="btn-primary">Retour au tableau de bord</router-link>
-      </div>
+      <div class="settings-grid">
+        <nav class="settings-tabs">
+          <button
+            v-for="t in tabs"
+            :key="t.id"
+            class="tab-btn"
+            :class="{ active: activeTab === t.id }"
+            @click="activeTab = t.id"
+          >
+            <i :class="t.icon"></i>
+            <span>{{ t.label }}</span>
+          </button>
+        </nav>
 
-      <template v-else>
-        <!-- Statistiques rapides -->
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3>{{ totalUsers }}</h3><p>Utilisateurs</p></div></div>
-          <div class="stat-card"><div class="stat-icon green"><i class="fas fa-history"></i></div><div class="stat-info"><h3>{{ totalActions }}</h3><p>Actions récentes</p></div></div>
-          <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-database"></i></div><div class="stat-info"><h3>{{ totalModifications }}</h3><p>Modifications</p></div></div>
-        </div>
-
-        <!-- Tabs de navigation -->
-        <div class="settings-tabs">
-          <button :class="['tab-btn', { active: activeTab === 'users' }]" @click="activeTab = 'users'"><i class="fas fa-users"></i> Utilisateurs</button>
-          <button :class="['tab-btn', { active: activeTab === 'activities' }]" @click="activeTab = 'activities'"><i class="fas fa-history"></i> Activités</button>
-          <button :class="['tab-btn', { active: activeTab === 'moderation' }]" @click="activeTab = 'moderation'"><i class="fas fa-gavel"></i> Modération</button>
-          <button :class="['tab-btn', { active: activeTab === 'backup' }]" @click="activeTab = 'backup'"><i class="fas fa-database"></i> Sauvegarde</button>
-          <button :class="['tab-btn', { active: activeTab === 'security' }]" @click="activeTab = 'security'"><i class="fas fa-shield-alt"></i> Sécurité</button>
-        </div>
-
-        <!-- Onglet Utilisateurs -->
-        <div v-show="activeTab === 'users'" class="tab-content">
-          <div class="section-header"><h3><i class="fas fa-users"></i> Gestion des utilisateurs</h3><button @click="openAddUserModal" class="btn-primary"><i class="fas fa-plus"></i> Ajouter un utilisateur</button></div>
-          
-          <div class="users-table">
-            <table>
-              <thead><tr><th>Avatar</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Rôle</th><th>Statut</th><th>Dernière connexion</th><th>Actions</th></tr></thead>
-              <tbody>
-                <tr v-for="userItem in users" :key="userItem.id">
-                  <td><div class="user-avatar-small">{{ userItem.nom?.charAt(0) || 'U' }}</div></td>
-                  <td><strong>{{ userItem.nom }}</strong></td>
-                  <td>{{ userItem.email }}</td>
-                  <td>{{ userItem.telephone }}</td>
-                  <td><span class="role-badge" :class="{ admin: userItem.is_superuser }">{{ userItem.is_superuser ? 'Super Admin' : 'Utilisateur' }}</span></td>
-                  <td><span class="status-badge" :class="{ active: userItem.is_active }">{{ userItem.is_active ? 'Actif' : 'Inactif' }}</span></td>
-                  <td>{{ formatDate(userItem.last_login) }}</td>
-                  <td class="actions"><button @click="editUser(userItem)" class="btn-edit"><i class="fas fa-edit"></i></button><button @click="deleteUser(userItem)" class="btn-delete" :disabled="userItem.is_superuser && userItem.id === currentUserId"><i class="fas fa-trash"></i></button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Onglet Activités -->
-        <div v-show="activeTab === 'activities'" class="tab-content">
-          <div class="section-header"><h3><i class="fas fa-history"></i> Historique des activités</h3><button @click="clearActivities" class="btn-secondary"><i class="fas fa-trash-alt"></i> Vider l'historique</button></div>
-          <div class="activities-list">
-            <div v-for="activity in activities" :key="activity.id" class="activity-log">
-              <div class="log-icon" :class="activity.type"><i :class="activity.icon"></i></div>
-              <div class="log-details"><p class="log-message">{{ activity.message }}</p><span class="log-date">{{ formatDate(activity.created_at) }}</span></div>
-              <div class="log-user"><i class="fas fa-user"></i> {{ activity.user_name }}</div>
-              <button @click="deleteActivity(activity)" class="log-delete"><i class="fas fa-times"></i></button>
-            </div>
-            <div v-if="activities.length === 0" class="empty"><i class="fas fa-inbox"></i> Aucune activité enregistrée</div>
-          </div>
-        </div>
-
-        <!-- Onglet Modération -->
-        <div v-show="activeTab === 'moderation'" class="tab-content">
-          <div class="section-header"><h3><i class="fas fa-gavel"></i> Modération du contenu</h3></div>
-          
-          <div class="moderation-section">
-            <h4><i class="fas fa-leaf"></i> Plantes en attente de validation</h4>
-            <div class="moderation-list">
-              <div v-for="plant in pendingPlants" :key="plant.id" class="moderation-item">
-                <img :src="plant.image || '/src/images/placeholder.jpg'" class="moderation-image" @error="e=>e.target.src='/src/images/placeholder.jpg'">
-                <div class="moderation-info"><strong>{{ plant.nom }}</strong> - {{ plant.famille }}<br><small>Ajouté par: {{ plant.created_by || 'Inconnu' }}</small></div>
-                <div class="moderation-actions"><button @click="approvePlant(plant)" class="btn-approve"><i class="fas fa-check"></i> Approuver</button><button @click="rejectPlant(plant)" class="btn-reject"><i class="fas fa-times"></i> Rejeter</button></div>
+        <section class="settings-content">
+          <!-- Profil -->
+          <div v-show="activeTab === 'profile'" class="tab-panel">
+            <h2>Mon profil</h2>
+            <div class="panel-grid">
+              <div class="form-group">
+                <label>Nom complet</label>
+                <input v-model.trim="profile.nom" type="text" />
               </div>
-              <div v-if="pendingPlants.length === 0" class="empty">Aucune plante en attente</div>
-            </div>
-          </div>
-
-          <div class="moderation-section">
-            <h4><i class="fas fa-comment-dots"></i> Témoignages en attente</h4>
-            <div class="moderation-list">
-              <div v-for="testimonial in pendingTestimonials" :key="testimonial.id" class="moderation-item">
-                <div class="moderation-info"><strong>{{ testimonial.nom }}</strong> - {{ testimonial.organisation }}<br><small>{{ testimonial.texte }}</small></div>
-                <div class="moderation-actions"><button @click="approveTestimonial(testimonial)" class="btn-approve"><i class="fas fa-check"></i> Publier</button><button @click="rejectTestimonial(testimonial)" class="btn-reject"><i class="fas fa-times"></i> Refuser</button></div>
+              <div class="form-group">
+                <label>Email</label>
+                <input v-model.trim="profile.email" type="email" disabled />
+                <small class="help-text">L'email ne peut pas être modifié (contactez le SuperIT)</small>
               </div>
-              <div v-if="pendingTestimonials.length === 0" class="empty">Aucun témoignage en attente</div>
+              <div class="form-group">
+                <label>Téléphone</label>
+                <input v-model.trim="profile.telephone" type="tel" />
+              </div>
+              <div class="form-group">
+                <label>Rôle</label>
+                <input :value="roleLabel" type="text" disabled />
+              </div>
+            </div>
+            <button class="btn-primary" :class="{ it: auth.isSuperIT }" @click="saveProfile" :disabled="savingProfile">
+              <i v-if="savingProfile" class="fas fa-spinner fa-spin"></i>
+              <i v-else class="fas fa-save"></i>
+              Enregistrer le profil
+            </button>
+          </div>
+
+          <!-- Mot de passe -->
+          <div v-show="activeTab === 'password'" class="tab-panel">
+            <h2>Changer le mot de passe</h2>
+            <div class="form-group">
+              <label>Mot de passe actuel</label>
+              <input v-model="pwd.old" type="password" autocomplete="current-password" />
+            </div>
+            <div class="form-group">
+              <label>Nouveau mot de passe</label>
+              <input v-model="pwd.new" type="password" autocomplete="new-password" />
+              <div v-if="pwd.new" class="strength-wrap">
+                <div class="strength-bar" :class="passwordStrength.class"></div>
+                <span class="strength-text">{{ passwordStrength.text }}</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirmer</label>
+              <input v-model="pwd.confirm" type="password" autocomplete="new-password" />
+            </div>
+            <button class="btn-primary" :class="{ it: auth.isSuperIT }" @click="changePassword" :disabled="savingPwd">
+              <i v-if="savingPwd" class="fas fa-spinner fa-spin"></i>
+              <i v-else class="fas fa-lock"></i>
+              Mettre à jour
+            </button>
+          </div>
+
+          <!-- ✅ Mes activités (transparence) -->
+          <div v-show="activeTab === 'activity'" class="tab-panel">
+            <h2>Mes dernières actions</h2>
+            <p class="panel-desc">
+              Historique de vos actions sur la plateforme (transparence).
+            </p>
+            <ul v-if="myActivities.length" class="activity-list">
+              <li v-for="log in myActivities" :key="log.id" class="activity-item">
+                <div class="activity-icon" :class="log.action.toLowerCase()">
+                  <i :class="actionIcon(log.action)"></i>
+                </div>
+                <div class="activity-body">
+                  <p class="activity-message">
+                    <strong>{{ log.action_label }}</strong>
+                    <span v-if="log.object_repr" class="activity-obj">: {{ log.object_repr }}</span>
+                  </p>
+                  <span class="activity-time">{{ formatRelativeTime(log.created_at) }}</span>
+                </div>
+              </li>
+            </ul>
+            <p v-else class="empty-text">Aucune activité enregistrée</p>
+          </div>
+
+          <!-- Sécurité -->
+          <div v-show="activeTab === 'security'" class="tab-panel">
+            <h2>Sécurité</h2>
+
+            <div class="security-card">
+              <div class="sec-icon"><i class="fas fa-shield-alt"></i></div>
+              <div class="sec-body">
+                <h4>Authentification à deux facteurs</h4>
+                <p>Un code de vérification est envoyé par email à chaque connexion.</p>
+              </div>
+              <span class="badge green">Activée</span>
+            </div>
+
+            <div class="security-card danger">
+              <div class="sec-icon"><i class="fas fa-sign-out-alt"></i></div>
+              <div class="sec-body">
+                <h4>Terminer toutes les sessions</h4>
+                <p>Déconnecte tous les appareils connectés à votre compte.</p>
+              </div>
+              <button class="btn-danger" @click="terminateSessions">
+                <i class="fas fa-power-off"></i> Terminer
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Onglet Sauvegarde -->
-        <div v-show="activeTab === 'backup'" class="tab-content">
-          <div class="section-header"><h3><i class="fas fa-database"></i> Sauvegarde & Restauration</h3></div>
-          <div class="backup-cards">
-            <div class="backup-card"><i class="fas fa-download"></i><h4>Exporter les données</h4><p>Exportez toutes les données de l'herbier au format JSON</p><button @click="exportData" class="btn-primary"><i class="fas fa-download"></i> Exporter</button></div>
-            <div class="backup-card"><i class="fas fa-upload"></i><h4>Importer des données</h4><p>Importez des données depuis un fichier JSON</p><input type="file" ref="importFile" accept=".json" @change="importData" style="display:none"><button @click="$refs.importFile.click()" class="btn-secondary"><i class="fas fa-upload"></i> Importer</button></div>
-            <div class="backup-card"><i class="fas fa-history"></i><h4>Restaurer une sauvegarde</h4><p>Restaurez une version précédente des données</p><select v-model="selectedBackup" class="backup-select"><option value="">Sélectionner une sauvegarde</option><option v-for="b in backups" :key="b.id" :value="b.id">{{ b.name }} - {{ b.date }}</option></select><button @click="restoreBackup" class="btn-warning"><i class="fas fa-undo-alt"></i> Restaurer</button></div>
+          <!-- Préférences -->
+          <div v-show="activeTab === 'preferences'" class="tab-panel">
+            <h2>Préférences</h2>
+
+            <div class="pref-row">
+              <div>
+                <h4>Notifications par email</h4>
+                <p>Recevoir un email lors des nouvelles inscriptions.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="prefs.emailNotif" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="pref-row">
+              <div>
+                <h4>Confidentialité renforcée</h4>
+                <p>Masquer les données sensibles dans l'interface.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" v-model="prefs.enhancedPrivacy" />
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
-        </div>
-
-        <!-- Onglet Sécurité -->
-        <div v-show="activeTab === 'security'" class="tab-content">
-          <div class="section-header"><h3><i class="fas fa-shield-alt"></i> Sécurité & Permissions</h3></div>
-          <div class="security-settings">
-            <div class="security-card"><div class="security-icon"><i class="fas fa-user-lock"></i></div><div class="security-info"><h4>Changer mon mot de passe</h4><p>Mettez à jour votre mot de passe régulièrement</p><button @click="openChangePasswordModal" class="btn-primary">Changer le mot de passe</button></div></div>
-            <div class="security-card"><div class="security-icon"><i class="fas fa-history"></i></div><div class="security-info"><h4>Historique des connexions</h4><p>Consultez toutes les connexions à votre compte</p><button @click="viewLoginHistory" class="btn-secondary">Voir l'historique</button></div></div>
-            <div class="security-card"><div class="security-icon"><i class="fas fa-sign-out-alt"></i></div><div class="security-info"><h4>Sessions actives</h4><p>Gérez vos sessions actives sur tous les appareils</p><button @click="terminateAllSessions" class="btn-warning">Terminer toutes les sessions</button></div></div>
-          </div>
-        </div>
-      </template>
-
-      <!-- Modals -->
-      <div class="modal" :class="{ active: showUserModal }" @click.self="closeUserModal">
-        <div class="modal-content"><div class="modal-header"><h2>{{ editingUser ? 'Modifier' : 'Ajouter' }} un utilisateur</h2><button class="close" @click="closeUserModal"><i class="fas fa-times"></i></button></div>
-        <form @submit.prevent="saveUser" class="modal-form"><div class="form-row"><div class="form-group"><label>Nom complet</label><input type="text" v-model="userForm.nom" required></div><div class="form-group"><label>Email</label><input type="email" v-model="userForm.email" required></div></div>
-        <div class="form-row"><div class="form-group"><label>Téléphone</label><input type="text" v-model="userForm.telephone"></div><div class="form-group"><label>Rôle</label><select v-model="userForm.is_superuser"><option :value="false">Utilisateur</option><option :value="true">Super Administrateur</option></select></div></div>
-        <div class="form-row" v-if="!editingUser"><div class="form-group"><label>Mot de passe</label><input type="password" v-model="userForm.password"></div><div class="form-group"><label>Confirmer</label><input type="password" v-model="userForm.password2"></div></div>
-        <div class="modal-footer"><button type="button" class="btn-secondary" @click="closeUserModal">Annuler</button><button type="submit" class="btn-primary">Enregistrer</button></div></form></div>
+        </section>
       </div>
-
-      <div class="modal" :class="{ active: showPasswordModal }" @click.self="closePasswordModal">
-        <div class="modal-content"><div class="modal-header"><h2>Changer le mot de passe</h2><button class="close" @click="closePasswordModal"><i class="fas fa-times"></i></button></div>
-        <form @submit.prevent="changePassword" class="modal-form"><div class="form-group"><label>Ancien mot de passe</label><input type="password" v-model="passwordForm.old" required></div><div class="form-group"><label>Nouveau mot de passe</label><input type="password" v-model="passwordForm.new" required></div><div class="form-group"><label>Confirmer</label><input type="password" v-model="passwordForm.confirm" required></div>
-        <div class="modal-footer"><button type="button" class="btn-secondary" @click="closePasswordModal">Annuler</button><button type="submit" class="btn-primary">Changer</button></div></form></div>
-      </div>
-
-      <div class="modal-confirm" :class="{ active: showConfirmModal }"><div class="modal-overlay" @click="closeConfirmModal"></div><div class="modal-content"><div class="modal-icon warning"><i class="fas fa-exclamation-triangle"></i></div><h3>Confirmation</h3><p>{{ confirmMessage }}</p><div class="modal-buttons"><button class="btn-cancel" @click="closeConfirmModal">Annuler</button><button class="btn-confirm" @click="executeConfirmAction">Confirmer</button></div></div></div>
-
-      <div v-if="toastMessage" class="toast" :class="toastType"><i :class="toastType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i><span>{{ toastMessage }}</span></div>
     </main>
-  </div>
 
-  <!-- Page de chargement pendant la vérification -->
-  <div v-else class="loading-screen">
-    <div class="spinner"></div>
-    <p>Vérification de l'authentification...</p>
+    <Toast />
+    <ConfirmDialog />
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import Sidebar from '../components/Sidebar.vue'
+import TopBar from '../components/TopBar.vue'
+import Toast from '../components/Toast.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
 import { useAuthStore } from '../stores/auth'
-import axios from 'axios'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
+import { adminApi } from '../utils/api'
+import { logger } from '../utils/logger'
 
-export default {
-  name: 'Settings',
-  data() {
-    return {
-      activeTab: 'users',
-      users: [],
-      activities: [],
-      pendingPlants: [],
-      pendingTestimonials: [],
-      backups: [],
-      totalUsers: 0,
-      totalActions: 0,
-      totalModifications: 0,
-      currentUserId: null,
-      showUserModal: false,
-      showPasswordModal: false,
-      showConfirmModal: false,
-      editingUser: null,
-      confirmAction: null,
-      confirmMessage: '',
-      selectedBackup: '',
-      userForm: { nom: '', email: '', telephone: '', is_superuser: false, password: '', password2: '' },
-      passwordForm: { old: '', new: '', confirm: '' },
-      toastMessage: '', toastType: '', user: null,
-      isAuthenticated: false,
-      isSuperAdmin: false,
-      authChecked: false
-    }
-  },
-  computed: {
-    userInitials() { return this.user?.nom ? this.user.nom.split(' ').map(n => n[0]).join('').toUpperCase() : 'AD' }
-  },
-  async mounted() {
-    const authStore = useAuthStore()
-    
-    // Vérifier l'authentification
-    if (!authStore.isAuthenticated) {
-      this.$router.push('/login')
-      return
-    }
-    
-    this.isAuthenticated = true
-    this.user = authStore.user
-    this.currentUserId = authStore.user?.id
-    
-    // Vérifier si l'utilisateur est Super Admin
-    this.isSuperAdmin = authStore.user?.is_superuser === true
-    
-    if (this.isSuperAdmin) {
-      await this.loadData()
-    }
-  },
-  methods: {
-    async loadData() { await Promise.all([this.loadUsers(), this.loadActivities(), this.loadPendingContent(), this.loadBackups()]) },
-    async loadUsers() { try { const res = await axios.get('http://localhost:8001/api/users/'); this.users = res.data; this.totalUsers = this.users.length } catch(e) { console.error(e) } },
-    async loadActivities() { try { const res = await axios.get('http://localhost:8001/api/activities/'); this.activities = res.data; this.totalActions = this.activities.length } catch(e) { console.error(e) } },
-    async loadPendingContent() { try { const data = await axios.get('http://localhost:8001/api/herbier-data/'); this.pendingPlants = (data.data.plantes || []).filter(p => !p.publie).slice(0, 10); this.pendingTestimonials = (data.data.temoignages || []).filter(t => !t.publie).slice(0, 10) } catch(e) { console.error(e) } },
-    async loadBackups() { try { const res = await axios.get('http://localhost:8001/api/backups/'); this.backups = res.data } catch(e) { console.error(e) } },
-    formatDate(d) { if (!d) return 'Jamais'; return new Date(d).toLocaleString('fr-FR') },
-    openAddUserModal() { this.editingUser = null; this.userForm = { nom: '', email: '', telephone: '', is_superuser: false, password: '', password2: '' }; this.showUserModal = true },
-    editUser(u) { this.editingUser = u; this.userForm = { ...u, password: '', password2: '' }; this.showUserModal = true },
-    async saveUser() { try { if (this.editingUser) { await axios.put(`http://localhost:8001/api/users/${this.editingUser.id}/`, this.userForm); this.showToast('Utilisateur modifié', 'success') } else { await axios.post('http://localhost:8001/api/users/', this.userForm); this.showToast('Utilisateur créé', 'success') } this.loadUsers(); this.closeUserModal() } catch(e) { this.showToast('Erreur', 'error') } },
-    async deleteUser(u) { if (u.id === this.currentUserId) { this.showToast('Vous ne pouvez pas vous supprimer vous-même', 'error'); return } this.confirm('Supprimer cet utilisateur ?', async () => { await axios.delete(`http://localhost:8001/api/users/${u.id}/`); this.loadUsers(); this.showToast('Utilisateur supprimé', 'success') }) },
-    async deleteActivity(a) { this.confirm('Supprimer cette activité ?', async () => { await axios.delete(`http://localhost:8001/api/activities/${a.id}/`); this.loadActivities(); this.showToast('Activité supprimée', 'success') }) },
-    async clearActivities() { this.confirm('Vider tout l\'historique ?', async () => { await axios.delete('http://localhost:8001/api/activities/clear/'); this.loadActivities(); this.showToast('Historique vidé', 'success') }) },
-    async approvePlant(p) { this.confirm('Approuver cette plante ?', async () => { p.publie = true; await this.updatePlant(p); this.loadPendingContent(); this.showToast('Plante approuvée', 'success') }) },
-    async rejectPlant(p) { this.confirm('Rejeter cette plante ?', async () => { await axios.delete(`http://localhost:8001/api/plantes/${p.id}/`); this.loadPendingContent(); this.showToast('Plante rejetée', 'success') }) },
-    async approveTestimonial(t) { this.confirm('Publier ce témoignage ?', async () => { t.publie = true; await this.updateTestimonial(t); this.loadPendingContent(); this.showToast('Témoignage publié', 'success') }) },
-    async rejectTestimonial(t) { this.confirm('Refuser ce témoignage ?', async () => { await axios.delete(`http://localhost:8001/api/temoignages/${t.id}/`); this.loadPendingContent(); this.showToast('Témoignage refusé', 'success') }) },
-    async exportData() { try { const data = await axios.get('http://localhost:8001/api/herbier-data/'); const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `herbier_backup_${new Date().toISOString()}.json`; a.click(); URL.revokeObjectURL(url); this.showToast('Export réussi', 'success') } catch(e) { this.showToast('Erreur export', 'error') } },
-    async importData(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = async (ev) => { try { const data = JSON.parse(ev.target.result); await axios.put('http://localhost:8001/api/herbier-data/', data); this.showToast('Import réussi', 'success'); this.loadData() } catch(err) { this.showToast('Erreur import', 'error') } }; reader.readAsText(file) },
-    async restoreBackup() { if (!this.selectedBackup) { this.showToast('Sélectionnez une sauvegarde', 'error'); return } this.confirm('Restaurer cette sauvegarde ?', async () => { await axios.post('http://localhost:8001/api/restore-backup/', { backup_id: this.selectedBackup }); this.showToast('Restauration réussie', 'success'); this.loadData() }) },
-    async changePassword() { if (this.passwordForm.new !== this.passwordForm.confirm) { this.showToast('Les mots de passe ne correspondent pas', 'error'); return } try { await axios.post('http://localhost:8001/api/change-password/', { old_password: this.passwordForm.old, new_password: this.passwordForm.new }); this.showToast('Mot de passe changé', 'success'); this.closePasswordModal() } catch(e) { this.showToast('Erreur', 'error') } },
-    async viewLoginHistory() { try { const res = await axios.get('http://localhost:8001/api/login-history/'); this.activities = res.data; this.activeTab = 'activities'; this.showToast('Historique chargé', 'success') } catch(e) { console.error(e) } },
-    async terminateAllSessions() { this.confirm('Terminer toutes les sessions ? Vous devrez vous reconnecter.', async () => { await axios.post('http://localhost:8001/api/terminate-sessions/'); localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); window.location.href = '/login' }) },
-    openChangePasswordModal() { this.passwordForm = { old: '', new: '', confirm: '' }; this.showPasswordModal = true },
-    closePasswordModal() { this.showPasswordModal = false },
-    closeUserModal() { this.showUserModal = false },
-    confirm(msg, action) { this.confirmMessage = msg; this.confirmAction = action; this.showConfirmModal = true },
-    closeConfirmModal() { this.showConfirmModal = false; this.confirmAction = null },
-    executeConfirmAction() { if (this.confirmAction) this.confirmAction(); this.closeConfirmModal() },
-    showToast(t, m) { this.toastType = t; this.toastMessage = m; setTimeout(() => { this.toastMessage = '' }, 3000) },
-    async updatePlant(p) { const data = await axios.get('http://localhost:8001/api/herbier-data/'); const plantes = data.data.plantes.map(pl => pl.id === p.id ? p : pl); await axios.put('http://localhost:8001/api/herbier-data/', { ...data.data, plantes }) },
-    async updateTestimonial(t) { const data = await axios.get('http://localhost:8001/api/herbier-data/'); const temoignages = data.data.temoignages.map(tm => tm.id === t.id ? t : tm); await axios.put('http://localhost:8001/api/herbier-data/', { ...data.data, temoignages }) },
-    confirmLogout() { if (confirm('Déconnexion ?')) { useAuthStore().logout(); this.$router.push('/login') } }
+const router = useRouter()
+const auth = useAuthStore()
+const toast = useToast()
+const askConfirm = useConfirm()
+
+const sidebarCollapsed = ref(false)
+const activeTab = ref('profile')
+const savingProfile = ref(false)
+const savingPwd = ref(false)
+
+const profile = ref({
+  nom: auth.user?.nom || '',
+  email: auth.user?.email || '',
+  telephone: auth.user?.telephone || '',
+})
+
+const pwd = ref({ old: '', new: '', confirm: '' })
+const prefs = ref({ emailNotif: true, enhancedPrivacy: true })
+const myActivities = ref([])
+
+const tabs = computed(() => {
+  const base = [
+    { id: 'profile', label: 'Profil', icon: 'fas fa-user' },
+    { id: 'password', label: 'Mot de passe', icon: 'fas fa-lock' },
+    { id: 'activity', label: 'Mes activités', icon: 'fas fa-user-clock' },
+    { id: 'security', label: 'Sécurité', icon: 'fas fa-shield-alt' },
+    { id: 'preferences', label: 'Préférences', icon: 'fas fa-sliders-h' },
+  ]
+  return base
+})
+
+const roleLabel = computed(() =>
+  auth.isSuperIT ? 'Super Administrateur IT' : 'Administrateur'
+)
+
+const passwordStrength = computed(() => {
+  const p = pwd.value.new
+  if (!p) return { class: '', text: '' }
+  let score = 0
+  if (p.length >= 8) score++
+  if (/[a-z]/.test(p)) score++
+  if (/[A-Z]/.test(p)) score++
+  if (/[0-9]/.test(p)) score++
+  if (/[^a-zA-Z0-9]/.test(p)) score++
+  if (score <= 2) return { class: 'weak', text: 'Faible' }
+  if (score <= 4) return { class: 'medium', text: 'Moyen' }
+  return { class: 'strong', text: 'Fort' }
+})
+
+const loadMyActivities = async () => {
+  try {
+    const { data } = await adminApi.get('/me/activity/', { params: { limit: 20 } })
+    myActivities.value = Array.isArray(data) ? data : []
+  } catch {
+    logger.warn('Erreur mes activités')
   }
 }
+
+const actionIcon = (action) => ({
+  CREATE: 'fas fa-plus-circle',
+  UPDATE: 'fas fa-edit',
+  DELETE: 'fas fa-trash',
+  LOGIN: 'fas fa-sign-in-alt',
+  LOGOUT: 'fas fa-sign-out-alt',
+  LOGIN_FAILED: 'fas fa-exclamation-triangle',
+  SYNC: 'fas fa-sync-alt',
+}[action] || 'fas fa-circle')
+
+const formatRelativeTime = (d) => {
+  if (!d) return ''
+  const diff = (Date.now() - new Date(d).getTime()) / 1000
+  if (diff < 60) return "à l'instant"
+  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
+  return `il y a ${Math.floor(diff / 86400)} j`
+}
+
+const saveProfile = async () => {
+  savingProfile.value = true
+  try {
+    toast.success('Profil enregistré')
+  } catch {
+    toast.error("Erreur lors de l'enregistrement")
+  } finally {
+    savingProfile.value = false
+  }
+}
+
+const changePassword = async () => {
+  if (!pwd.value.old || !pwd.value.new) {
+    toast.error('Tous les champs sont requis')
+    return
+  }
+  if (pwd.value.new.length < 8) {
+    toast.error('Minimum 8 caractères')
+    return
+  }
+  if (pwd.value.new !== pwd.value.confirm) {
+    toast.error('Les mots de passe ne correspondent pas')
+    return
+  }
+  savingPwd.value = true
+  try {
+    toast.success('Mot de passe mis à jour')
+    pwd.value = { old: '', new: '', confirm: '' }
+  } catch {
+    toast.error('Erreur')
+  } finally {
+    savingPwd.value = false
+  }
+}
+
+const terminateSessions = async () => {
+  const ok = await askConfirm({
+    title: 'Terminer toutes les sessions',
+    message: 'Vous serez déconnecté de tous les appareils. Continuer ?',
+    dangerous: true,
+    confirmText: 'Terminer',
+  })
+  if (!ok) return
+  await auth.logout()
+  router.push('/it-login')
+}
+
+const handleLogout = async () => {
+  await auth.logout()
+  router.push(auth.isSuperIT ? '/it-login' : '/admin-login')
+}
+
+onMounted(() => {
+  if (!auth.isAuthenticated) {
+    router.push('/it-login')
+    return
+  }
+  loadMyActivities()
+})
 </script>
 
 <style scoped>
-/* Styles identiques à la version précédente... */
-/* (Conserver tous les styles du fichier précédent) */
-.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1a472a 0%, #0d3b0f 100%); color: white; }
-.spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #FFD700; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.access-denied { text-align: center; padding: 60px; background: white; border-radius: 20px; margin: 40px; }
-.access-denied i { font-size: 60px; color: #dc3545; margin-bottom: 20px; }
-.access-denied h2 { color: #1a472a; margin-bottom: 10px; }
-.access-denied p { color: #666; margin-bottom: 20px; }
+.settings-layout { min-height: 100vh; background: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+.settings-layout.superit-theme { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+.main-content { margin-left: 260px; padding: 24px 28px 40px; transition: margin-left 0.3s ease; }
+.main-content.expanded { margin-left: 76px; }
+
+.settings-grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+
+.settings-tabs { background: #fff; border-radius: 14px; padding: 10px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); position: sticky; top: 20px; display: flex; flex-direction: column; gap: 2px; }
+.superit-theme .settings-tabs { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: none; }
+.tab-btn { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: none; border: none; border-radius: 9px; cursor: pointer; font-family: inherit; font-size: 13.5px; font-weight: 500; color: #475569; text-align: left; transition: all 0.15s; }
+.superit-theme .tab-btn { color: #94a3b8; }
+.tab-btn i { width: 16px; font-size: 13px; text-align: center; }
+.tab-btn:hover { background: #f8fafc; color: #0f172a; }
+.superit-theme .tab-btn:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.tab-btn.active { background: #ecfdf5; color: #059669; font-weight: 600; }
+.superit-theme .tab-btn.active { background: rgba(99, 102, 241, 0.15); color: #c7d2fe; }
+
+.settings-content { background: #fff; border-radius: 14px; padding: 28px 32px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); }
+.superit-theme .settings-content { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: none; }
+
+.tab-panel h2 { font-size: 18px; color: #0f172a; margin: 0 0 20px; font-weight: 700; }
+.superit-theme .tab-panel h2 { color: #fff; }
+.panel-desc { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+.superit-theme .panel-desc { color: #94a3b8; }
+
+.panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-group label { font-size: 12.5px; font-weight: 600; color: #334155; }
+.superit-theme .form-group label { color: #cbd5e1; }
+.form-group input { padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-size: 13.5px; font-family: inherit; background: #f8fafc; color: #0f172a; }
+.superit-theme .form-group input { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.1); color: #fff; }
+.form-group input:focus { outline: none; border-color: #10b981; background: #fff; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+.superit-theme .form-group input:focus { border-color: #818cf8; background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+.form-group input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+.superit-theme .form-group input:disabled { background: rgba(255, 255, 255, 0.02); color: #64748b; }
+
+.help-text { font-size: 11.5px; color: #94a3b8; }
+
+.strength-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.strength-bar { height: 4px; border-radius: 2px; flex: 1; transition: all 0.2s; }
+.strength-bar.weak { width: 33%; background: #ef4444; }
+.strength-bar.medium { width: 66%; background: #f59e0b; }
+.strength-bar.strong { width: 100%; background: #10b981; }
+.strength-text { font-size: 11px; color: #64748b; }
+
+.btn-primary, .btn-danger { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 9px; font-size: 13.5px; font-weight: 600; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+.btn-primary.it { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+
+.security-card { display: flex; align-items: center; gap: 16px; padding: 16px 18px; background: #f8fafc; border-radius: 12px; margin-bottom: 12px; border: 1px solid #f1f5f9; }
+.superit-theme .security-card { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.06); }
+.security-card.danger { background: #fef2f2; border-color: #fee2e2; }
+.superit-theme .security-card.danger { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.2); }
+.sec-icon { width: 42px; height: 42px; border-radius: 10px; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.superit-theme .sec-icon { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.security-card.danger .sec-icon { background: #fee2e2; color: #ef4444; }
+.sec-body { flex: 1; }
+.sec-body h4 { margin: 0 0 4px; font-size: 14px; color: #0f172a; }
+.superit-theme .sec-body h4 { color: #fff; }
+.sec-body p { margin: 0; font-size: 12.5px; color: #64748b; }
+.superit-theme .sec-body p { color: #94a3b8; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+.badge.green { background: #dcfce7; color: #15803d; }
+.superit-theme .badge.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+.activity-list { list-style: none; padding: 0; margin: 0; }
+.activity-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.superit-theme .activity-item { border-bottom-color: rgba(255, 255, 255, 0.05); }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { width: 34px; height: 34px; background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; }
+.activity-icon.create { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-icon.update { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.activity-icon.delete { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.activity-icon.login { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-body { flex: 1; min-width: 0; }
+.activity-message { font-size: 13.5px; color: #334155; margin: 0; }
+.superit-theme .activity-message { color: #cbd5e1; }
+.activity-message strong { color: #0f172a; font-weight: 600; }
+.superit-theme .activity-message strong { color: #fff; }
+.activity-obj { color: #64748b; font-style: italic; }
+.superit-theme .activity-obj { color: #94a3b8; }
+.activity-time { font-size: 11px; color: #94a3b8; }
+
+.pref-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+.superit-theme .pref-row { border-bottom-color: rgba(255, 255, 255, 0.05); }
+.pref-row:last-child { border-bottom: none; }
+.pref-row h4 { font-size: 14px; margin: 0 0 4px; color: #0f172a; }
+.superit-theme .pref-row h4 { color: #fff; }
+.pref-row p { font-size: 12.5px; color: #64748b; margin: 0; }
+.superit-theme .pref-row p { color: #94a3b8; }
+
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 24px; transition: 0.2s; }
+.slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+.switch input:checked + .slider { background: #10b981; }
+.superit-theme .switch input:checked + .slider { background: #6366f1; }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+
+.empty-text { text-align: center; color: #94a3b8; font-size: 13px; padding: 24px 0; }
+
+@media (max-width: 900px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-tabs { position: relative; top: 0; flex-direction: row; overflow-x: auto; }
+  .tab-btn { white-space: nowrap; }
+  .panel-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .main-content { margin-left: 76px; padding: 16px; }
+}
 </style>

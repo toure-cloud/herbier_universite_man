@@ -56,6 +56,10 @@ class SuperAdmin(models.Model):
     REQUIRED_FIELDS = ['nom', 'telephone']
     
     objects = SuperAdminManager()
+    totp_secret = models.CharField(max_length=64, blank=True, null=True)
+    totp_enabled = models.BooleanField(default=False)
+    totp_backup_codes = models.JSONField(default=list, blank=True)  # codes de secours
+    totp_last_used = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return f"{self.nom} ({self.get_role_display()})"
@@ -87,6 +91,7 @@ class OTPCode(models.Model):
     
     def is_valid(self):
         return not self.is_used and self.expires_at > timezone.now()
+    
 
 class UserToken(models.Model):
     user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='tokens')
@@ -103,6 +108,42 @@ class UserToken(models.Model):
     
     def is_valid(self):
         return self.is_active and self.expires_at > timezone.now()
+    
+    # ============================================================
+# ✅ AUDIT — Historique des actions (SuperIT only)
+# ============================================================
+class AuditLog(models.Model):
+    ACTION_CHOICES = [
+        ('CREATE', 'Création'),
+        ('UPDATE', 'Modification'),
+        ('DELETE', 'Suppression'),
+        ('LOGIN', 'Connexion'),
+        ('LOGOUT', 'Déconnexion'),
+        ('LOGIN_FAILED', 'Échec de connexion'),
+        ('SYNC', 'Synchronisation'),
+        ('EXPORT', 'Export'),
+    ]
+
+    user = models.ForeignKey(
+        SuperAdmin, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='audit_logs'
+    )
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=100, blank=True, null=True)
+    object_id = models.CharField(max_length=100, blank=True, null=True)
+    object_repr = models.CharField(max_length=255, blank=True, null=True)
+    details = models.JSONField(default=dict, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=500, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Log d'audit"
+        verbose_name_plural = "Logs d'audit"
+
+    def __str__(self):
+        return f"{self.created_at:%Y-%m-%d %H:%M} · {self.user} · {self.action} · {self.model_name}"
 
 # ========== MODÈLES POUR LES DONNÉES ==========
 
@@ -300,3 +341,66 @@ class Methodologie(models.Model):
     
     def __str__(self):
         return self.titre
+    
+    
+    
+    
+    # api/models.py
+class LoginAttempt(models.Model):
+    """Suivi des tentatives de connexion pour détecter les attaques."""
+    email = models.EmailField(db_index=True)
+    ip_address = models.GenericIPAddressField(db_index=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    success = models.BooleanField(default=False)
+    reason = models.CharField(max_length=50, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['email', '-created_at']),
+            models.Index(fields=['ip_address', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.email} @ {self.ip_address} ({'OK' if self.success else 'FAIL'})"
+
+
+class UserKnownIP(models.Model):
+    """Mémorise les IPs connues pour chaque utilisateur."""
+    user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='known_ips')
+    ip_address = models.GenericIPAddressField()
+    country_code = models.CharField(max_length=2, blank=True)
+    first_seen = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now=True)
+    login_count = models.IntegerField(default=1)
+
+    class Meta:
+        unique_together = ('user', 'ip_address')
+        ordering = ['-last_seen']
+
+    def __str__(self):
+        return f"{self.user.email} @ {self.ip_address}"
+
+
+class Notification(models.Model):
+    """Notifications pour le SuperIT (alertes sécurité, etc.)."""
+    TYPE_CHOICES = [
+        ('SECURITY', 'Sécurité'),
+        ('INFO', 'Information'),
+        ('WARNING', 'Avertissement'),
+    ]
+
+    user = models.ForeignKey(SuperAdmin, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='INFO')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    details = models.JSONField(default=dict, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.type}] {self.title}"

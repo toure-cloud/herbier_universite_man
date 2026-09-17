@@ -1,1203 +1,323 @@
 <template>
-  <div class="management-page">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <div class="logo-icon"><i class="fas fa-leaf"></i></div>
-          <div class="logo-text">
-            <span class="logo-title">Herbier Admin</span>
-            <span class="logo-subtitle">Université de Man</span>
-          </div>
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <router-link to="/dashboard" class="nav-item">
-          <i class="fas fa-tachometer-alt"></i><span>Tableau de bord</span>
-        </router-link>
-        <router-link to="/plantes" class="nav-item">
-          <i class="fas fa-leaf"></i><span>Plantes</span>
-        </router-link>
-        <router-link to="/equipe" class="nav-item">
-          <i class="fas fa-users"></i><span>Équipe</span>
-        </router-link>
-        <router-link to="/partenaires" class="nav-item">
-          <i class="fas fa-handshake"></i><span>Partenaires</span>
-        </router-link>
-        <router-link to="/slides" class="nav-item">
-          <i class="fas fa-images"></i><span>Slides</span>
-        </router-link>
-        <router-link to="/projets" class="nav-item">
-          <i class="fas fa-project-diagram"></i><span>Projets</span>
-        </router-link>
-        <router-link to="/activites" class="nav-item">
-          <i class="fas fa-chart-line"></i><span>Activités</span>
-        </router-link>
-        <router-link to="/temoignages" class="nav-item">
-          <i class="fas fa-comment-dots"></i><span>Témoignages</span>
-        </router-link>
-        <router-link to="/publications" class="nav-item">
-          <i class="fas fa-book"></i><span>Publications</span>
-        </router-link>
-        <router-link to="/statistiques" class="nav-item">
-          <i class="fas fa-chart-bar"></i><span>Statistiques</span>
-        </router-link>
-        <router-link to="/administrateurs" class="nav-item">
-          <i class="fas fa-user-shield"></i><span>Administrateurs</span>
-          <span class="nav-badge">Admin</span>
-        </router-link>
-        <router-link to="/herbier-data" class="nav-item active">
-          <i class="fas fa-database"></i><span>Données Herbier</span>
-          <span class="nav-badge">Sync</span>
-        </router-link>
-        <router-link to="/settings" class="nav-item">
-          <i class="fas fa-cog"></i><span>Paramètres</span>
-        </router-link>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="user-info-sidebar">
-          <div class="user-avatar-sidebar">{{ userInitials }}</div>
-          <div class="user-details-sidebar">
-            <span class="user-name-sidebar">{{ user?.nom || 'Admin' }}</span>
-            <span class="user-role">{{ isSuperAdmin ? 'Super Admin' : 'Admin' }}</span>
-          </div>
-        </div>
-        <button @click="confirmLogout" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
-        </button>
-      </div>
-    </aside>
+  <div class="herbier-layout">
+    <Sidebar
+      :user="auth.user"
+      :is-super-it="true"
+      :collapsed="sidebarCollapsed"
+      @toggle="sidebarCollapsed = !sidebarCollapsed"
+      @logout="handleLogout"
+    />
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="page-title">
-          <h1><i class="fas fa-database"></i> Données de l'Herbier</h1>
-          <p>Visualisez et synchronisez toutes les données avec le site public</p>
-        </div>
-        <div class="top-actions">
-          <button @click="refreshData" class="btn-secondary" :disabled="loading">
+    <main class="main-content" :class="{ expanded: sidebarCollapsed }">
+      <TopBar
+        title="Données de l'Herbier"
+        subtitle="Synchronisation avec le site public (SuperIT)"
+        icon="fas fa-database"
+      >
+        <template #actions>
+          <button class="btn-secondary" @click="refresh" :disabled="loading">
             <i class="fas fa-sync-alt" :class="{ 'fa-spin': loading }"></i>
             Rafraîchir
           </button>
-          <button @click="syncWithPublicSite" class="btn-primary" :disabled="syncing || !isSuperAdmin">
+          <button class="btn-primary" @click="syncNow" :disabled="syncing">
             <i class="fas fa-cloud-upload-alt" :class="{ 'fa-spin': syncing }"></i>
-            {{ syncing ? 'Synchronisation...' : 'Synchroniser' }}
+            {{ syncing ? 'Synchronisation…' : 'Synchroniser' }}
           </button>
-        </div>
-      </header>
+        </template>
+      </TopBar>
 
-      <!-- Statistiques globales -->
-      <div class="stats-overview">
-        <div class="stat-box">
-          <div class="stat-icon green"><i class="fas fa-leaf"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalPlantes }}</h3>
-            <p>Plantes</p>
+      <section class="overview-grid">
+        <div v-for="s in overview" :key="s.key" class="overview-card">
+          <div class="ov-icon" :class="s.color"><i :class="s.icon"></i></div>
+          <div class="ov-body">
+            <span class="ov-value">{{ s.count }}</span>
+            <span class="ov-label">{{ s.label }}</span>
           </div>
         </div>
-        <div class="stat-box">
-          <div class="stat-icon orange"><i class="fas fa-users"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalEquipe }}</h3>
-            <p>Équipe</p>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-icon blue"><i class="fas fa-handshake"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalPartenaires }}</h3>
-            <p>Partenaires</p>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-icon purple"><i class="fas fa-project-diagram"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalProjets }}</h3>
-            <p>Projets</p>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-icon teal"><i class="fas fa-images"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalSlides }}</h3>
-            <p>Slides</p>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-icon pink"><i class="fas fa-comment-dots"></i></div>
-          <div class="stat-info">
-            <h3>{{ stats.totalTemoignages }}</h3>
-            <p>Témoignages</p>
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <!-- Sections de données -->
-      <div class="data-sections">
-        <!-- Plantes -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-leaf"></i> Plantes</h3>
-            <span class="badge">{{ data.plantes?.length || 0 }}</span>
-          </div>
+      <section v-if="loading" class="loading-block">
+        <div class="spinner"></div>
+        <p>Chargement…</p>
+      </section>
+
+      <section v-else class="data-sections">
+        <article v-for="section in sections" :key="section.key" class="data-card">
+          <header class="data-card-header">
+            <div class="header-left">
+              <i :class="section.icon"></i>
+              <h3>{{ section.label }}</h3>
+            </div>
+            <span class="badge">{{ (section.items || []).length }}</span>
+          </header>
+
           <div class="data-preview">
-            <div v-for="p in (data.plantes || []).slice(0, 5)" :key="p.id" class="preview-item">
-              <span class="preview-name">{{ p.nom }}</span>
-              <span class="preview-famille">{{ p.famille || '-' }}</span>
+            <div v-if="!section.items?.length" class="preview-empty">
+              <i class="fas fa-inbox"></i>
+              <p>Aucune donnée</p>
             </div>
-            <div v-if="(data.plantes || []).length > 5" class="preview-more">
-              + {{ (data.plantes || []).length - 5 }} autres
-            </div>
+            <ul v-else class="preview-list">
+              <li v-for="(item, i) in section.items.slice(0, 5)" :key="item.id ?? i">
+                <span class="preview-name">{{ previewName(item, section.key) }}</span>
+                <span class="preview-extra">{{ previewExtra(item, section.key) }}</span>
+              </li>
+              <li v-if="section.items.length > 5" class="preview-more">
+                + {{ section.items.length - 5 }} autre(s)
+              </li>
+            </ul>
           </div>
-        </div>
+        </article>
+      </section>
 
-        <!-- Équipe -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-users"></i> Équipe</h3>
-            <span class="badge">{{ data.equipe?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="m in (data.equipe || []).slice(0, 5)" :key="m.id" class="preview-item">
-              <span class="preview-name">{{ m.nom }}</span>
-              <span class="preview-famille">{{ m.poste }}</span>
-            </div>
-            <div v-if="(data.equipe || []).length > 5" class="preview-more">
-              + {{ (data.equipe || []).length - 5 }} autres
-            </div>
-          </div>
+      <section class="sync-history">
+        <div class="sync-head">
+          <i class="fas fa-history"></i>
+          <h3>Dernière synchronisation</h3>
         </div>
-
-        <!-- Partenaires -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-handshake"></i> Partenaires</h3>
-            <span class="badge">{{ data.partenaires?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="p in (data.partenaires || []).slice(0, 5)" :key="p.id" class="preview-item">
-              <span class="preview-name">{{ p.nom }}</span>
-              <span class="preview-famille">{{ p.type || '-' }}</span>
-            </div>
-            <div v-if="(data.partenaires || []).length > 5" class="preview-more">
-              + {{ (data.partenaires || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Projets -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-project-diagram"></i> Projets</h3>
-            <span class="badge">{{ data.projets?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="p in (data.projets || []).slice(0, 5)" :key="p.id" class="preview-item">
-              <span class="preview-name">{{ p.titre }}</span>
-              <span class="preview-famille">{{ p.categorie }}</span>
-            </div>
-            <div v-if="(data.projets || []).length > 5" class="preview-more">
-              + {{ (data.projets || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Slides -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-images"></i> Slides</h3>
-            <span class="badge">{{ data.slides?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="s in (data.slides || []).slice(0, 5)" :key="s.id" class="preview-item">
-              <span class="preview-name">{{ s.titre }}</span>
-              <span class="preview-famille">{{ s.actif ? 'Actif' : 'Inactif' }}</span>
-            </div>
-            <div v-if="(data.slides || []).length > 5" class="preview-more">
-              + {{ (data.slides || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Activités -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-chart-line"></i> Activités</h3>
-            <span class="badge">{{ data.activites?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="a in (data.activites || []).slice(0, 5)" :key="a.id" class="preview-item">
-              <span class="preview-name">{{ a.titre }}</span>
-              <span class="preview-famille">{{ a.actif ? 'Actif' : 'Inactif' }}</span>
-            </div>
-            <div v-if="(data.activites || []).length > 5" class="preview-more">
-              + {{ (data.activites || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Témoignages -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-comment-dots"></i> Témoignages</h3>
-            <span class="badge">{{ data.temoignages?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="t in (data.temoignages || []).slice(0, 5)" :key="t.id" class="preview-item">
-              <span class="preview-name">{{ t.nom }}</span>
-              <span class="preview-famille">{{ t.organisation }}</span>
-            </div>
-            <div v-if="(data.temoignages || []).length > 5" class="preview-more">
-              + {{ (data.temoignages || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Publications -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-book"></i> Publications</h3>
-            <span class="badge">{{ data.publications?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="p in (data.publications || []).slice(0, 5)" :key="p.id" class="preview-item">
-              <span class="preview-name">{{ p.titre }}</span>
-              <span class="preview-famille">{{ p.annee }}</span>
-            </div>
-            <div v-if="(data.publications || []).length > 5" class="preview-more">
-              + {{ (data.publications || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Statistiques -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-chart-bar"></i> Statistiques</h3>
-            <span class="badge">{{ data.statistiques?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="s in (data.statistiques || []).slice(0, 5)" :key="s.id" class="preview-item">
-              <span class="preview-name">{{ s.titre }}</span>
-              <span class="preview-famille">{{ s.valeur }}{{ s.unite || '' }}</span>
-            </div>
-            <div v-if="(data.statistiques || []).length > 5" class="preview-more">
-              + {{ (data.statistiques || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- FAQs -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-question-circle"></i> FAQs</h3>
-            <span class="badge">{{ data.faqs?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="f in (data.faqs || []).slice(0, 5)" :key="f.id" class="preview-item">
-              <span class="preview-name">{{ f.question }}</span>
-              <span class="preview-famille">{{ f.actif ? 'Actif' : 'Inactif' }}</span>
-            </div>
-            <div v-if="(data.faqs || []).length > 5" class="preview-more">
-              + {{ (data.faqs || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-
-        <!-- Méthodologie -->
-        <div class="data-card">
-          <div class="data-header">
-            <h3><i class="fas fa-clipboard-list"></i> Méthodologie</h3>
-            <span class="badge">{{ data.methodologie?.length || 0 }}</span>
-          </div>
-          <div class="data-preview">
-            <div v-for="m in (data.methodologie || []).slice(0, 5)" :key="m.id" class="preview-item">
-              <span class="preview-name">{{ m.titre }}</span>
-              <span class="preview-famille">{{ m.actif ? 'Actif' : 'Inactif' }}</span>
-            </div>
-            <div v-if="(data.methodologie || []).length > 5" class="preview-more">
-              + {{ (data.methodologie || []).length - 5 }} autres
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Historique synchronisation -->
-      <div class="sync-history">
-        <div class="sync-header">
-          <h3><i class="fas fa-history"></i> Dernière synchronisation</h3>
-          <span class="sync-date">{{ lastSyncDate || 'Jamais synchronisé' }}</span>
-        </div>
-        <div class="sync-progress" v-if="syncing">
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: syncProgress + '%' }"></div>
-          </div>
-          <span>{{ syncProgress }}%</span>
-        </div>
-        <div class="sync-info" v-else>
-          <span class="sync-status" :class="{ synced: lastSyncDate }">
-            <i :class="lastSyncDate ? 'fas fa-check-circle' : 'fas fa-clock'"></i>
-            {{ lastSyncDate ? 'Synchronisé' : 'En attente de synchronisation' }}
+        <div class="sync-body">
+          <span v-if="lastSync" class="sync-date">
+            <i class="fas fa-check-circle"></i> {{ lastSync }}
+          </span>
+          <span v-else class="sync-empty">
+            <i class="fas fa-clock"></i> Jamais synchronisé
           </span>
         </div>
-      </div>
 
-      <!-- Message -->
-      <div v-if="toastMessage" class="toast" :class="toastType">
-        <i :class="toastType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
-        <span>{{ toastMessage }}</span>
-      </div>
+        <div v-if="syncing" class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: `${progress}%` }"></div>
+          </div>
+          <span class="progress-label">{{ progress }}%</span>
+        </div>
+      </section>
     </main>
+
+    <Toast />
+    <ConfirmDialog />
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import Sidebar from '../components/Sidebar.vue'
+import TopBar from '../components/TopBar.vue'
+import Toast from '../components/Toast.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
+import { adminApi, publicApi } from '../utils/api'
 import { useAuthStore } from '../stores/auth'
-import axios from 'axios'
-import { adminAPI } from '../services/api'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
+import { logger } from '../utils/logger'
 
-const API_BASE_URL = 'http://localhost:8001'
-const PUBLIC_API_URL = 'http://localhost:8000'
+const router = useRouter()
+const auth = useAuthStore()
+const toast = useToast()
+const askConfirm = useConfirm()
 
-export default {
-  name: 'HerbierData',
-  data() {
-    return {
-      data: {
-        plantes: [],
-        equipe: [],
-        partenaires: [],
-        slides: [],
-        projets: [],
-        activites: [],
-        temoignages: [],
-        publications: [],
-        faqs: [],
-        statistiques: [],
-        methodologie: []
-      },
-      loading: false,
-      syncing: false,
-      syncProgress: 0,
-      lastSyncDate: null,
-      toastMessage: '',
-      toastType: '',
-      user: null,
-      isSuperAdmin: false
-    }
-  },
-  computed: {
-    userInitials() {
-      return this.user?.nom ? this.user.nom.split(' ').map(n => n[0]).join('').toUpperCase() : 'AD'
-    },
-    stats() {
-      return {
-        totalPlantes: this.data.plantes?.length || 0,
-        totalEquipe: this.data.equipe?.length || 0,
-        totalPartenaires: this.data.partenaires?.length || 0,
-        totalProjets: this.data.projets?.length || 0,
-        totalSlides: this.data.slides?.length || 0,
-        totalTemoignages: this.data.temoignages?.length || 0
+const sidebarCollapsed = ref(false)
+const loading = ref(false)
+const syncing = ref(false)
+const progress = ref(0)
+const lastSync = ref(localStorage.getItem('last_sync_date') || '')
+
+const data = ref({
+  plantes: [], equipe: [], partenaires: [], slides: [],
+  projets: [], activites: [], temoignages: [],
+  publications: [], faqs: [], statistiques: [], methodologie: [],
+})
+
+const sections = computed(() => [
+  { key: 'plantes', label: 'Plantes', icon: 'fas fa-leaf', items: data.value.plantes },
+  { key: 'equipe', label: 'Équipe', icon: 'fas fa-users', items: data.value.equipe },
+  { key: 'partenaires', label: 'Partenaires', icon: 'fas fa-handshake', items: data.value.partenaires },
+  { key: 'projets', label: 'Projets', icon: 'fas fa-project-diagram', items: data.value.projets },
+  { key: 'activites', label: 'Activités', icon: 'fas fa-chart-line', items: data.value.activites },
+  { key: 'temoignages', label: 'Témoignages', icon: 'fas fa-comment-dots', items: data.value.temoignages },
+  { key: 'publications', label: 'Publications', icon: 'fas fa-book', items: data.value.publications },
+  { key: 'faqs', label: 'FAQs', icon: 'fas fa-question-circle', items: data.value.faqs },
+  { key: 'statistiques', label: 'Statistiques', icon: 'fas fa-chart-bar', items: data.value.statistiques },
+])
+
+const overview = computed(() =>
+  [
+    { key: 'plantes', label: 'Plantes', icon: 'fas fa-leaf', color: 'green' },
+    { key: 'equipe', label: 'Équipe', icon: 'fas fa-users', color: 'blue' },
+    { key: 'partenaires', label: 'Partenaires', icon: 'fas fa-handshake', color: 'teal' },
+    { key: 'projets', label: 'Projets', icon: 'fas fa-project-diagram', color: 'purple' },
+    { key: 'publications', label: 'Publications', icon: 'fas fa-book', color: 'orange' },
+    { key: 'temoignages', label: 'Témoignages', icon: 'fas fa-comment-dots', color: 'pink' },
+  ].map((s) => ({ ...s, count: (data.value[s.key] || []).length }))
+)
+
+const previewName = (item, key) => {
+  if (key === 'publications') return item.titre || '—'
+  if (key === 'faqs') return item.question || '—'
+  return item.nom || item.titre || '—'
+}
+
+const previewExtra = (item, key) => {
+  if (key === 'plantes') return item.famille || ''
+  if (key === 'equipe') return item.poste || ''
+  if (key === 'partenaires') return item.type || ''
+  if (key === 'projets') return item.categorie || ''
+  if (key === 'publications') return item.annee || ''
+  if (key === 'temoignages') return item.organisation || ''
+  return ''
+}
+
+const refresh = async () => {
+  loading.value = true
+  try {
+    const endpoints = [
+      ['plantes', 'plantes'], ['equipe', 'equipe'], ['partenaires', 'partenaires'],
+      ['projets', 'projets'], ['activites', 'activites'], ['temoignages', 'temoignages'],
+      ['publications', 'publications'], ['faqs', 'faqs'],
+      ['statistiques', 'statistiques'], ['methodologie', 'methodologie'],
+    ]
+
+    const results = await Promise.allSettled(
+      endpoints.map(([, path]) => adminApi.get(`/${path}/`))
+    )
+
+    endpoints.forEach(([key], i) => {
+      const res = results[i]
+      if (res.status === 'fulfilled') {
+        const payload = res.value.data
+        data.value[key] = Array.isArray(payload) ? payload : payload.results || []
+      } else {
+        data.value[key] = []
       }
-    }
-  },
-  mounted() {
-    const auth = useAuthStore()
-    this.user = auth.user
-    this.isSuperAdmin = this.user?.role === 'it_admin' || this.user?.is_superuser
-    this.loadData()
-    this.loadLastSyncDate()
-  },
-  methods: {
-    async loadData() {
-      this.loading = true
-      try {
-        // Utiliser adminAPI pour récupérer les données
-        const response = await adminAPI.getHerbierData()
-        this.data = response.data || this.data
-      } catch (error) {
-        console.error('Erreur chargement:', error)
-        // Fallback: essayer avec axios direct
-        try {
-          const res = await axios.get(`${API_BASE_URL}/api/herbier-data/`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
-          })
-          this.data = res.data || this.data
-        } catch (e) {
-          console.error('Erreur fallback:', e)
-          this.showToast('error', 'Erreur lors du chargement des données')
-        }
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async refreshData() {
-      await this.loadData()
-      this.showToast('success', 'Données rafraîchies avec succès')
-    },
-
-    async syncWithPublicSite() {
-      if (!this.isSuperAdmin) {
-        this.showToast('error', 'Vous n\'avez pas les droits pour synchroniser')
-        return
-      }
-
-      this.syncing = true
-      this.syncProgress = 0
-
-      try {
-        // Simuler la progression
-        const progressSteps = [10, 25, 40, 55, 70, 85, 95, 100]
-        for (const step of progressSteps) {
-          this.syncProgress = step
-          await new Promise(resolve => setTimeout(resolve, 200))
-        }
-
-        // Préparer les données à synchroniser
-        const syncData = {
-          plantes: this.data.plantes || [],
-          equipe: this.data.equipe || [],
-          partenaires: this.data.partenaires || [],
-          slides: this.data.slides || [],
-          projets: this.data.projets || [],
-          activites: this.data.activites || [],
-          temoignages: this.data.temoignages || [],
-          publications: this.data.publications || [],
-          faqs: this.data.faqs || [],
-          statistiques: this.data.statistiques || [],
-          methodologie: this.data.methodologie || [],
-          sync_date: new Date().toISOString()
-        }
-
-        // Envoyer au site public (backend public - port 8000)
-        await axios.post(`${PUBLIC_API_URL}/api/sync-herbier-data/`, syncData, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-
-        // Mettre à jour la date de synchronisation
-        this.lastSyncDate = new Date().toLocaleString('fr-FR', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-        localStorage.setItem('last_sync_date', this.lastSyncDate)
-
-        this.showToast('success', 'Synchronisation réussie !')
-      } catch (error) {
-        console.error('Erreur synchronisation:', error)
-        const errorMsg = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        'Erreur lors de la synchronisation'
-        this.showToast('error', errorMsg)
-      } finally {
-        this.syncing = false
-        this.syncProgress = 0
-      }
-    },
-
-    loadLastSyncDate() {
-      const saved = localStorage.getItem('last_sync_date')
-      if (saved) {
-        this.lastSyncDate = saved
-      }
-    },
-
-    showToast(type, message) {
-      this.toastType = type
-      this.toastMessage = message
-      setTimeout(() => {
-        this.toastMessage = ''
-      }, 4000)
-    },
-
-    confirmLogout() {
-      if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-        localStorage.removeItem('it_admin_authenticated')
-        useAuthStore().logout()
-        this.$router.push('/login')
-      }
-    }
+    })
+  } catch {
+    toast.error('Impossible de charger les données')
+  } finally {
+    loading.value = false
   }
 }
+
+const syncNow = async () => {
+  const ok = await askConfirm({
+    title: 'Synchroniser',
+    message: 'Pousser toutes les données vers le site public ?',
+  })
+  if (!ok) return
+
+  syncing.value = true
+  progress.value = 0
+
+  const tick = setInterval(() => {
+    if (progress.value < 90) progress.value += Math.random() * 15
+    if (progress.value > 90) progress.value = 90
+  }, 200)
+
+  try {
+    await adminApi.post('/sync-all/', { source: 'admin' })
+
+    try {
+      await publicApi.post('/sync-herbier-data/', {
+        ...data.value,
+        sync_date: new Date().toISOString(),
+      })
+    } catch {
+      logger.warn('Sync public API échoué, admin OK')
+    }
+
+    progress.value = 100
+    const now = new Date().toLocaleString('fr-FR')
+    lastSync.value = now
+    localStorage.setItem('last_sync_date', now)
+    toast.success('Synchronisation réussie')
+  } catch {
+    toast.error('Erreur lors de la synchronisation')
+  } finally {
+    clearInterval(tick)
+    setTimeout(() => {
+      syncing.value = false
+      progress.value = 0
+    }, 800)
+  }
+}
+
+const handleLogout = async () => {
+  await auth.logout()
+  router.push('/it-login')
+}
+
+onMounted(() => {
+  if (!auth.isSuperIT) {
+    router.push('/dashboard')
+    return
+  }
+  refresh()
+})
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-.management-page {
-  display: flex;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e8 100%);
-  font-family: 'Inter', sans-serif;
-}
-
-/* ============================================
-   SIDEBAR
-   ============================================ */
-.sidebar {
-  width: 280px;
-  background: linear-gradient(180deg, #0d3b0f 0%, #1a472a 50%, #0a2412 100%);
-  color: white;
-  position: fixed;
-  height: 100vh;
-  left: 0;
-  top: 0;
-  box-shadow: 5px 0 30px rgba(0,0,0,0.1);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar-header {
-  padding: 30px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  margin-bottom: 20px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.logo-icon {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 15px rgba(255,215,0,0.3);
-}
-
-.logo-icon i {
-  font-size: 24px;
-  color: #1a472a;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.logo-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.logo-subtitle {
-  font-size: 10px;
-  opacity: 0.7;
-  margin-top: 2px;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 0 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow-y: auto;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  color: rgba(255,255,255,0.8);
-  text-decoration: none;
-  border-radius: 12px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #FFD700;
-  transform: scaleY(0);
-  transition: transform 0.3s;
-}
-
-.nav-item:hover::before,
-.nav-item.active::before {
-  transform: scaleY(1);
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.1);
-  color: white;
-  transform: translateX(5px);
-}
-
-.nav-item.active {
-  background: rgba(255,215,0,0.15);
-  color: #FFD700;
-}
-
-.nav-item i {
-  width: 22px;
-  font-size: 18px;
-}
-
-.nav-badge {
-  margin-left: auto;
-  font-size: 9px;
-  background: rgba(255,255,255,0.2);
-  padding: 2px 8px;
-  border-radius: 20px;
-}
-
-.sidebar-footer {
-  padding: 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: auto;
-}
-
-.user-info-sidebar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-}
-
-.user-avatar-sidebar {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 18px;
-  color: #1a472a;
-}
-
-.user-details-sidebar {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name-sidebar {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.user-role {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-.logout-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px;
-  background: rgba(220,53,69,0.2);
-  border: 1px solid rgba(220,53,69,0.5);
-  border-radius: 12px;
-  color: #ff6b6b;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 500;
-}
-
-.logout-btn:hover {
-  background: #dc3545;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(220,53,69,0.3);
-}
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-.main-content {
-  flex: 1;
-  margin-left: 280px;
-  padding: 20px 30px;
-}
-
-.top-bar {
-  background: white;
-  padding: 15px 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.page-title h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a472a;
-  margin-bottom: 4px;
-}
-
-.page-title h1 i {
-  color: #32CD32;
-  margin-right: 10px;
-}
-
-.page-title p {
-  color: #666;
-  font-size: 14px;
-}
-
-.top-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  transition: all 0.3s;
-  font-size: 14px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #32CD32, #228B22);
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(50,205,50,0.3);
-}
-
-.btn-secondary {
-  background: #f5f5f5;
-  color: #666;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #e0e0e0;
-}
-
-.btn-primary:disabled,
-.btn-secondary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ============================================
-   STATS OVERVIEW
-   ============================================ */
-.stats-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 25px;
-}
-
-.stat-box {
-  background: white;
-  border-radius: 16px;
-  padding: 16px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  transition: transform 0.3s;
-}
-
-.stat-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.stat-icon {
-  width: 45px;
-  height: 45px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stat-icon i {
-  font-size: 22px;
-  color: white;
-}
-
-.stat-icon.green {
-  background: linear-gradient(135deg, #32CD32, #228B22);
-}
-
-.stat-icon.orange {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-}
-
-.stat-icon.blue {
-  background: linear-gradient(135deg, #17a2b8, #0d6efd);
-}
-
-.stat-icon.purple {
-  background: linear-gradient(135deg, #6f42c1, #5538a8);
-}
-
-.stat-icon.teal {
-  background: linear-gradient(135deg, #20c997, #159775);
-}
-
-.stat-icon.pink {
-  background: linear-gradient(135deg, #dc3545, #c82333);
-}
-
-.stat-info h3 {
-  font-size: 24px;
-  font-weight: bold;
-  color: #1a472a;
-  margin-bottom: 2px;
-}
-
-.stat-info p {
-  color: #666;
-  font-size: 12px;
-  margin: 0;
-}
-
-/* ============================================
-   DATA SECTIONS
-   ============================================ */
-.data-sections {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-  margin-bottom: 25px;
-}
-
-.data-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  transition: all 0.3s;
-}
-
-.data-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.data-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  background: #f8fafc;
-  border-bottom: 1px solid #eee;
-}
-
-.data-header h3 {
-  font-size: 14px;
-  color: #1a472a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-
-.data-header h3 i {
-  color: #32CD32;
-}
-
-.badge {
-  background: #e8f5e8;
-  color: #32CD32;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.data-preview {
-  padding: 12px 18px;
-}
-
-.preview-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.preview-item:last-child {
-  border-bottom: none;
-}
-
-.preview-name {
-  font-weight: 500;
-  color: #333;
-  font-size: 13px;
-}
-
-.preview-famille {
-  color: #888;
-  font-size: 11px;
-}
-
-.preview-more {
-  text-align: center;
-  padding: 8px 0 2px;
-  color: #32CD32;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* ============================================
-   SYNC HISTORY
-   ============================================ */
-.sync-history {
-  background: white;
-  border-radius: 16px;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.sync-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sync-header h3 {
-  font-size: 14px;
-  color: #1a472a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-
-.sync-header h3 i {
-  color: #32CD32;
-}
-
-.sync-date {
-  color: #666;
-  font-size: 13px;
-}
-
-.sync-progress {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 150px;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #32CD32, #FFD700);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-
-.sync-progress span {
-  font-size: 12px;
-  color: #32CD32;
-  font-weight: 500;
-}
-
-.sync-info {
-  display: flex;
-  align-items: center;
-}
-
-.sync-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #999;
-}
-
-.sync-status.synced {
-  color: #28a745;
-}
-
-.sync-status i {
-  font-size: 16px;
-}
-
-/* ============================================
-   TOAST
-   ============================================ */
-.toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  padding: 14px 22px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 1100;
-  animation: slideInRight 0.3s;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  font-weight: 500;
-}
-
-.toast.success {
-  background: #28a745;
-  color: white;
-}
-
-.toast.error {
-  background: #dc3545;
-  color: white;
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.fa-spin {
-  animation: fa-spin 2s infinite linear;
-}
-
-@keyframes fa-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 992px) {
-  .data-sections {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
-}
+.herbier-layout { min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); font-family: 'Inter', system-ui, sans-serif; }
+.main-content { margin-left: 260px; padding: 24px 28px 40px; transition: margin-left 0.3s ease; }
+.main-content.expanded { margin-left: 76px; }
+
+.overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.overview-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; transition: transform 0.15s; }
+.overview-card:hover { transform: translateY(-2px); }
+.ov-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.ov-icon.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.ov-icon.blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.ov-icon.teal { background: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+.ov-icon.purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+.ov-icon.orange { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.ov-icon.pink { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
+.ov-body { display: flex; flex-direction: column; }
+.ov-value { font-size: 22px; font-weight: 700; color: #fff; line-height: 1; }
+.ov-label { font-size: 11.5px; color: #94a3b8; margin-top: 3px; }
+
+.loading-block { background: rgba(255, 255, 255, 0.04); border-radius: 12px; padding: 60px; text-align: center; }
+.spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.15); border-top-color: #818cf8; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-block p { color: #94a3b8; }
+
+.data-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.data-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; transition: all 0.15s; }
+.data-card:hover { transform: translateY(-2px); border-color: rgba(129, 140, 248, 0.4); }
+.data-card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-left i { font-size: 15px; color: #818cf8; }
+.header-left h3 { font-size: 13.5px; color: #fff; margin: 0; font-weight: 700; }
+.badge { background: rgba(99, 102, 241, 0.15); color: #c7d2fe; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+.data-preview { padding: 10px 16px 14px; }
+.preview-empty { text-align: center; padding: 20px 0; color: #64748b; }
+.preview-empty i { font-size: 24px; margin-bottom: 6px; display: block; }
+.preview-empty p { margin: 0; font-size: 12px; }
+.preview-list { list-style: none; padding: 0; margin: 0; }
+.preview-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 12.5px; }
+.preview-list li:last-child { border-bottom: none; }
+.preview-name { color: #cbd5e1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.preview-extra { color: #94a3b8; font-size: 11.5px; flex-shrink: 0; }
+.preview-more { justify-content: center !important; color: #818cf8 !important; font-weight: 600; font-size: 11.5px; }
+
+.sync-history { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+.sync-head { display: flex; align-items: center; gap: 10px; }
+.sync-head i { color: #818cf8; font-size: 16px; }
+.sync-head h3 { font-size: 14px; color: #fff; margin: 0; font-weight: 700; }
+.sync-body { display: flex; align-items: center; gap: 8px; }
+.sync-date { font-size: 13px; color: #10b981; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+.sync-empty { font-size: 13px; color: #94a3b8; display: inline-flex; align-items: center; gap: 6px; }
+.progress-wrap { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.progress-bar { flex: 1; height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #818cf8, #facc15); border-radius: 4px; transition: width 0.3s; }
+.progress-label { font-size: 12px; font-weight: 700; color: #818cf8; min-width: 40px; text-align: right; }
+
+.btn-primary, .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 9px; font-size: 13.5px; font-weight: 600; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-secondary { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+.btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+.btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 @media (max-width: 768px) {
-  .sidebar {
-    width: 80px;
-  }
-
-  .sidebar-nav span,
-  .sidebar-footer span,
-  .logo-text,
-  .user-info-sidebar,
-  .nav-badge {
-    display: none;
-  }
-
-  .nav-item {
-    justify-content: center;
-  }
-
-  .main-content {
-    margin-left: 80px;
-    padding: 15px;
-  }
-
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .top-actions {
-    width: 100%;
-    justify-content: stretch;
-  }
-
-  .top-actions .btn-primary,
-  .top-actions .btn-secondary {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .stats-overview {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .data-sections {
-    grid-template-columns: 1fr;
-  }
-
-  .sync-history {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .sync-header {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-overview {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-box {
-    padding: 12px 14px;
-  }
-
-  .stat-info h3 {
-    font-size: 20px;
-  }
+  .main-content { margin-left: 76px; padding: 16px; }
+  .overview-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
