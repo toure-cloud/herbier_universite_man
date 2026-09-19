@@ -80,24 +80,97 @@ class FileUploadMixin:
 
 
 # ==================== SERIALIZERS SPÉCIFIQUES ====================
-
 class PlanteSerializer(FileUploadMixin, serializers.ModelSerializer):
+    statut_conservation_label = serializers.CharField(
+        source='get_statut_conservation_display',
+        read_only=True
+    )
+
     class Meta:
         model = Plante
-        fields = ['id', 'nom', 'famille', 'nom_scientifique', 'description', 
-                  'habitat', 'statut_conservation', 'image', 'actif', 'date_creation']
+        fields = [
+            'id',
+            'nom_scientifique', 'famille', 'nom_vernaculaire',
+            'type_morphologique', 'type_biologique',
+            'affinite_chorologique', 'affinite_ecologique',
+            'statut_conservation', 'statut_conservation_label',
+            'lieu_collecte', 'habitat', 'description',
+            'image', 'images_galerie',
+            'actif', 'date_creation',
+        ]
         read_only_fields = ['id', 'date_creation']
-    
-    def validate_nom(self, value):
-        if not value or value.strip() == '':
-            raise serializers.ValidationError("Le nom est obligatoire")
-        return value.strip()
-    
-    def validate(self, data):
-        if not data.get('nom'):
-            raise serializers.ValidationError({"nom": "Le nom est obligatoire"})
-        return data
 
+    def validate_nom_scientifique(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Le nom scientifique est obligatoire")
+        return value.strip()
+
+    def create(self, validated_data):
+        # Traiter les images de la galerie (gallery_0, gallery_1, ...)
+        request = self.context.get('request')
+        galerie_chemins = []
+
+        if request and request.FILES:
+            for key, fichier in request.FILES.items():
+                if key.startswith('gallery_'):
+                    # Sauvegarder le fichier dans media/plantes/galerie/
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        galerie_chemins.append(chemin)
+
+        if galerie_chemins:
+            validated_data['images_galerie'] = galerie_chemins
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+
+        # Galerie existante conservée (envoyée en JSON dans 'images_galerie_existing')
+        existing_raw = request.data.get('images_galerie_existing') if request else None
+        existing_list = []
+        if existing_raw:
+            try:
+                import json
+                existing_list = json.loads(existing_raw)
+                if not isinstance(existing_list, list):
+                    existing_list = []
+            except (ValueError, TypeError):
+                existing_list = []
+
+        # Nouvelles images
+        new_paths = []
+        if request and request.FILES:
+            for key, fichier in request.FILES.items():
+                if key.startswith('gallery_'):
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        new_paths.append(chemin)
+
+        if existing_list or new_paths:
+            validated_data['images_galerie'] = existing_list + new_paths
+
+        return super().update(instance, validated_data)
+
+    def _save_gallery_file(self, fichier):
+        """Sauvegarde un fichier dans media/plantes/galerie/ et retourne son chemin relatif."""
+        import os
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
+
+        try:
+            # Générer un nom de fichier unique
+            import uuid
+            ext = os.path.splitext(fichier.name)[1] or '.jpg'
+            nom = f"plantes/galerie/{uuid.uuid4().hex}{ext}"
+
+            # Sauvegarder
+            chemin = default_storage.save(nom, ContentFile(fichier.read()))
+            return f"/media/{chemin}"
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Erreur sauvegarde image galerie: {e}")
+            return None
 
 class EquipeSerializer(FileUploadMixin, serializers.ModelSerializer):
     class Meta:
@@ -144,36 +217,21 @@ class ProjetSerializer(FileUploadMixin, serializers.ModelSerializer):
             raise serializers.ValidationError("Le titre est obligatoire")
         return value.strip()
 
-
 class ActiviteSerializer(FileUploadMixin, serializers.ModelSerializer):
     class Meta:
         model = Activite
-        fields = ['id', 'titre', 'titre_court', 'description_courte', 
-                  'description_longue', 'icon', 'image', 'ordre', 'actif']
+        fields = [
+            'id', 'titre', 'titre_court',
+            'description_courte', 'description_longue',
+            'icon', 'image', 'caption', 'points_forts',
+            'ordre', 'actif',
+        ]
         read_only_fields = ['id']
-    
+
     def validate_titre(self, value):
         if not value or value.strip() == '':
             raise serializers.ValidationError("Le titre est obligatoire")
         return value.strip()
-    
-    def validate_titre_court(self, value):
-        if not value or value.strip() == '':
-            raise serializers.ValidationError("Le titre court est obligatoire")
-        return value.strip()
-    
-    def validate_description_courte(self, value):
-        if not value or value.strip() == '':
-            raise serializers.ValidationError("La description courte est obligatoire")
-        return value.strip()
-    
-    def validate(self, data):
-        required_fields = ['titre', 'titre_court', 'description_courte']
-        for field in required_fields:
-            if not data.get(field):
-                raise serializers.ValidationError({field: f"Le champ {field} est obligatoire"})
-        return data
-
 
 class TemoignageSerializer(FileUploadMixin, serializers.ModelSerializer):
     class Meta:

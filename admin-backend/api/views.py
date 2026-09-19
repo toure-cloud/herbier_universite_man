@@ -946,3 +946,51 @@ def totp_disable(request):
     })
 
     return Response({'success': True, 'message': '2FA TOTP désactivée'})
+
+
+
+
+# ============================================================
+# AGRÉGATION — Données groupées pour le site public
+# ============================================================
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def get_activites_data(request):
+    """
+    Renvoie en un seul appel toutes les données nécessaires à la page
+    Activités du site public :
+      - activités (services)
+      - témoignages
+      - publications
+      - statistiques
+      - FAQ
+      - méthodologie
+    """
+    return Response({
+        'activites': ActiviteSerializer(
+            Activite.objects.filter(actif=True).order_by('ordre', 'titre'),
+            many=True
+        ).data,
+        'temoignages': TemoignageSerializer(
+            Temoignage.objects.filter(actif=True).order_by('ordre', 'nom'),
+            many=True
+        ).data,
+        'publications': PublicationSerializer(
+            Publication.objects.filter(actif=True).order_by('-annee', 'ordre')[:10],
+            many=True
+        ).data,
+        'statistiques': StatistiqueSerializer(
+            Statistique.objects.filter(actif=True).order_by('ordre', 'titre'),
+            many=True
+        ).data,
+        'faqs': FAQSerializer(
+            FAQ.objects.filter(actif=True).order_by('ordre', 'question'),
+            many=True
+        ).data,
+        'methodologie': MethodologieSerializer(
+            Methodologie.objects.filter(actif=True).order_by('ordre', 'titre'),
+            many=True
+        ).data,
+    })

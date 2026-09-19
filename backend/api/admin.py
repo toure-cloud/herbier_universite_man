@@ -7,10 +7,32 @@ from .models import (
 
 @admin.register(Plante)
 class PlanteAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'nom_scientifique', 'famille', 'date_creation')
-    search_fields = ('nom', 'nom_scientifique')
-    list_filter = ('famille', 'statut_conservation')
+    list_display = ('nom_scientifique', 'nom_vernaculaire', 'famille', 'statut_conservation', 'actif', 'date_creation')
+    list_filter = ('statut_conservation', 'actif', 'famille', 'type_morphologique', 'type_biologique')
+    search_fields = ('nom_scientifique', 'nom_vernaculaire', 'famille__nom', 'lieu_collecte')
     readonly_fields = ('date_creation',)
+    list_per_page = 25
+
+    fieldsets = (
+        ('Identification', {
+            'fields': ('nom_scientifique', 'nom_vernaculaire', 'famille', 'genre')
+        }),
+        ('Classification', {
+            'fields': ('type_morphologique', 'type_biologique', 'affinite_chorologique', 'affinite_ecologique')
+        }),
+        ('Conservation', {
+            'fields': ('statut_conservation',)
+        }),
+        ('Localisation et description', {
+            'fields': ('lieu_collecte', 'habitat', 'description', 'distribution', 'usages')
+        }),
+        ('Images', {
+            'fields': ('image', 'images_galerie')
+        }),
+        ('Métadonnées', {
+            'fields': ('featured', 'actif', 'date_creation')
+        }),
+    )
 
 @admin.register(FamilleBotanique)
 class FamilleBotaniqueAdmin(admin.ModelAdmin):

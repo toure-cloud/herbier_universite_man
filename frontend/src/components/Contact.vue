@@ -278,6 +278,7 @@
 
 <script>
 import axios from 'axios'
+import config from '../config.js'
 
 export default {
     name: 'Contact',

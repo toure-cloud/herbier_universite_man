@@ -1,7 +1,10 @@
 from django.db import models
 from django.utils import timezone
 
-# ========== MODÈLES PRINCIPAUX ==========
+
+# ============================================================
+# FAMILLES ET GENRES BOTANIQUES
+# ============================================================
 
 class FamilleBotanique(models.Model):
     """Modèle pour les familles botaniques"""
@@ -12,57 +15,218 @@ class FamilleBotanique(models.Model):
     image = models.ImageField(upload_to='familles/', blank=True, null=True, verbose_name="Image représentative")
     ordre = models.CharField(max_length=200, blank=True, verbose_name="Ordre botanique")
     nombre_especes = models.IntegerField(default=0, verbose_name="Nombre d'espèces")
-    
+
     class Meta:
         verbose_name = "Famille botanique"
         verbose_name_plural = "Familles botaniques"
         ordering = ['nom']
-    
+
     def __str__(self):
         return self.nom
+
 
 class GenreBotanique(models.Model):
     """Modèle pour les genres botaniques"""
     nom = models.CharField(max_length=200, unique=True, verbose_name="Nom du genre")
     nom_latin = models.CharField(max_length=200, blank=True, verbose_name="Nom latin")
-    famille = models.ForeignKey(FamilleBotanique, on_delete=models.CASCADE, related_name='genres', verbose_name="Famille")
+    famille = models.ForeignKey(
+        FamilleBotanique,
+        on_delete=models.CASCADE,
+        related_name='genres',
+        verbose_name="Famille"
+    )
     description = models.TextField(blank=True, verbose_name="Description")
     nombre_especes = models.IntegerField(default=0, verbose_name="Nombre d'espèces")
-    
+
     class Meta:
         verbose_name = "Genre botanique"
         verbose_name_plural = "Genres botaniques"
         ordering = ['nom']
-    
+
     def __str__(self):
         return self.nom
 
+
+# ============================================================
+# PLANTE — MODÈLE PRINCIPAL
+# ============================================================
+
 class Plante(models.Model):
-    """Modèle principal pour les plantes"""
-    nom = models.CharField(max_length=200, verbose_name="Nom de la plante")
-    nom_scientifique = models.CharField(max_length=200, blank=True, verbose_name="Nom scientifique")
-    famille = models.ForeignKey(FamilleBotanique, on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Famille")
-    genre = models.ForeignKey(GenreBotanique, on_delete=models.SET_NULL, null=True, blank=True, related_name='plantes', verbose_name="Genre")
-    description = models.TextField(verbose_name="Description")
-    habitat = models.TextField(blank=True, verbose_name="Habitat")
-    distribution = models.CharField(max_length=500, blank=True, verbose_name="Distribution")
-    statut_conservation = models.CharField(max_length=100, blank=True, verbose_name="Statut de conservation")
-    usages = models.TextField(blank=True, verbose_name="Usages traditionnels")
-    image = models.ImageField(upload_to='plantes/', blank=True, null=True, verbose_name="Image principale")
-    images_galerie = models.JSONField(default=list, blank=True, verbose_name="Galerie d'images")
+    """Modèle principal pour les plantes de l'herbier"""
+
+    # ---------- Statut de conservation (UICN) ----------
+    STATUT_CHOICES = [
+        ('CR', 'En danger critique'),
+        ('EN', 'En danger'),
+        ('VU', 'Vulnérable'),
+        ('NT', 'Quasi menacé'),
+        ('LC', 'Préoccupation mineure'),
+        ('NE', 'Non évaluée'),
+    ]
+
+    # ---------- Identification ----------
+    nom_scientifique = models.CharField(
+        max_length=200,
+        verbose_name="Nom scientifique",
+        help_text="Ex : Khaya senegalensis"
+    )
+    famille = models.ForeignKey(
+        FamilleBotanique,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='plantes',
+        verbose_name="Famille"
+    )
+    genre = models.ForeignKey(
+        GenreBotanique,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='plantes',
+        verbose_name="Genre"
+    )
+    nom_vernaculaire = models.CharField(
+        max_length=200,
+        blank=True, default='',
+        verbose_name="Nom vernaculaire",
+        help_text="Nom commun en langue locale"
+    )
+
+    # ---------- Classification ----------
+    type_morphologique = models.CharField(
+        max_length=200,
+        blank=True, default='',
+        verbose_name="Type morphologique",
+        help_text="Ex : Arbre, arbuste, herbe, liane…"
+    )
+    type_biologique = models.CharField(
+        max_length=200,
+        blank=True, default='',
+        verbose_name="Type biologique",
+        help_text="Ex : Phanérophyte, thérophyte, hémicryptophyte…"
+    )
+    affinite_chorologique = models.CharField(
+        max_length=200,
+        blank=True, default='',
+        verbose_name="Affinité chorologique",
+        help_text="Ex : Soudano-zambézienne, guinéenne…"
+    )
+    affinite_ecologique = models.CharField(
+        max_length=200,
+        blank=True, default='',
+        verbose_name="Affinité écologique",
+        help_text="Ex : Mésophile, xérophile, hygrophile…"
+    )
+
+    # ---------- Conservation ----------
+    statut_conservation = models.CharField(
+        max_length=2,
+        choices=STATUT_CHOICES,
+        default='NE',
+        verbose_name="Statut de conservation (UICN)"
+    )
+
+    # ---------- Localisation et description ----------
+    lieu_collecte = models.CharField(
+        max_length=300,
+        blank=True, default='',
+        verbose_name="Lieu de collecte",
+        help_text="Ex : Mont Tonkoui, Man"
+    )
+    habitat = models.TextField(
+        blank=True, default='',
+        verbose_name="Habitat"
+    )
+    description = models.TextField(
+        blank=True, default='',
+        verbose_name="Description"
+    )
+    distribution = models.CharField(
+        max_length=500,
+        blank=True, default='',
+        verbose_name="Distribution géographique"
+    )
+    usages = models.TextField(
+        blank=True, default='',
+        verbose_name="Usages traditionnels"
+    )
+
+    # ---------- Images ----------
+    image = models.ImageField(
+        upload_to='plantes/',
+        blank=True, null=True,
+        verbose_name="Image principale"
+    )
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (liste de chemins)",
+        help_text="Liste de chemins d'images supplémentaires"
+    )
+
+    # ---------- Métadonnées ----------
     featured = models.BooleanField(default=False, verbose_name="À la une")
     actif = models.BooleanField(default=True, verbose_name="Actif")
     date_creation = models.DateTimeField(default=timezone.now, verbose_name="Date d'ajout")
-    
+
     class Meta:
         verbose_name = "Plante"
         verbose_name_plural = "Plantes"
-        ordering = ['nom']
-    
-    def __str__(self):
-        return self.nom
+        ordering = ['nom_scientifique']
+        indexes = [
+            models.Index(fields=['nom_scientifique']),
+            models.Index(fields=['statut_conservation']),
+        ]
 
-# ========== MODÈLES POUR L'ÉQUIPE ET PARTENAIRES ==========
+    def __str__(self):
+        return self.nom_scientifique or self.nom_vernaculaire or f"Plante #{self.pk}"
+
+    # ---------- Propriétés calculées ----------
+    @property
+    def nom_affichage(self):
+        """Nom à afficher : scientifique + (vernaculaire)"""
+        if self.nom_vernaculaire:
+            return f"{self.nom_scientifique} ({self.nom_vernaculaire})"
+        return self.nom_scientifique
+
+    @property
+    def statut_conservation_label(self):
+        """Libellé lisible du statut UICN"""
+        return self.get_statut_conservation_display()
+
+    @property
+    def is_menace(self):
+        """True si la plante est menacée (CR, EN, VU)"""
+        return self.statut_conservation in ('CR', 'EN', 'VU')
+
+    @property
+    def image_url(self):
+        """URL de l'image principale (si présente)"""
+        if self.image:
+            return self.image.url
+        return None
+
+    @property
+    def galerie(self):
+        """Retourne la liste des images de la galerie, en s'assurant que c'est bien une liste"""
+        if not isinstance(self.images_galerie, list):
+            return []
+        return self.images_galerie
+
+    @property
+    def toutes_images(self):
+        """Retourne l'image principale + la galerie, sans doublons"""
+        imgs = []
+        if self.image:
+            imgs.append(self.image.url)
+        for img in self.galerie:
+            if img and img not in imgs:
+                imgs.append(img)
+        return imgs
+
+
+# ============================================================
+# ÉQUIPE ET PARTENAIRES
+# ============================================================
 
 class Equipe(models.Model):
     nom = models.CharField(max_length=200, verbose_name="Nom complet")
@@ -74,14 +238,15 @@ class Equipe(models.Model):
     bio = models.TextField(blank=True, verbose_name="Biographie")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Membre de l'équipe"
         verbose_name_plural = "Membres de l'équipe"
         ordering = ['ordre', 'nom']
-    
+
     def __str__(self):
         return self.nom
+
 
 class Partenaire(models.Model):
     nom = models.CharField(max_length=200, verbose_name="Nom du partenaire")
@@ -91,16 +256,19 @@ class Partenaire(models.Model):
     type = models.CharField(max_length=100, blank=True, verbose_name="Type de partenaire")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Partenaire"
         verbose_name_plural = "Partenaires"
         ordering = ['ordre', 'nom']
-    
+
     def __str__(self):
         return self.nom
 
-# ========== MODÈLES POUR LES SLIDES ==========
+
+# ============================================================
+# SLIDES
+# ============================================================
 
 class Slide(models.Model):
     titre = models.CharField(max_length=200, verbose_name="Titre")
@@ -110,16 +278,19 @@ class Slide(models.Model):
     lien = models.URLField(blank=True, verbose_name="Lien associé")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Slide"
         verbose_name_plural = "Slides"
         ordering = ['ordre']
-    
+
     def __str__(self):
         return self.titre
 
-# ========== MODÈLES POUR LES PROJETS ==========
+
+# ============================================================
+# PROJETS
+# ============================================================
 
 class Projet(models.Model):
     STATUT_CHOICES = [
@@ -127,14 +298,14 @@ class Projet(models.Model):
         ('encours', 'En cours'),
         ('planifie', 'Planifié'),
     ]
-    
+
     CATEGORIE_CHOICES = [
         ('recherche', 'Recherche'),
         ('conservation', 'Conservation'),
         ('formation', 'Formation'),
         ('developpement', 'Développement'),
     ]
-    
+
     titre = models.CharField(max_length=200, verbose_name="Titre du projet")
     description = models.TextField(verbose_name="Description courte")
     description_longue = models.TextField(blank=True, verbose_name="Description détaillée")
@@ -157,14 +328,15 @@ class Projet(models.Model):
     date_fin = models.DateField(null=True, blank=True)
     objectifs = models.TextField(blank=True, verbose_name="Objectifs")
     resultats = models.TextField(blank=True, verbose_name="Résultats")
-    
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
         ordering = ['-featured', '-annee']
-    
+
     def __str__(self):
         return self.titre
+
 
 class ProjetTimeline(models.Model):
     projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name='timeline', verbose_name="Projet")
@@ -172,16 +344,19 @@ class ProjetTimeline(models.Model):
     titre = models.CharField(max_length=200, verbose_name="Titre")
     description = models.TextField(verbose_name="Description")
     ordre = models.IntegerField(default=0, verbose_name="Ordre")
-    
+
     class Meta:
         verbose_name = "Étape du projet"
         verbose_name_plural = "Étapes des projets"
         ordering = ['projet', 'annee', 'ordre']
-    
+
     def __str__(self):
         return f"{self.projet.titre} - {self.annee}: {self.titre}"
 
-# ========== MODÈLES POUR LES ACTIVITÉS ==========
+
+# ============================================================
+# ACTIVITÉS
+# ============================================================
 
 class Activite(models.Model):
     titre = models.CharField(max_length=200, verbose_name="Titre")
@@ -194,21 +369,24 @@ class Activite(models.Model):
     points_forts = models.TextField(blank=True, verbose_name="Points forts (un par ligne)")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Activité"
         verbose_name_plural = "Activités"
         ordering = ['ordre', 'titre']
-    
+
     def __str__(self):
         return self.titre
-    
+
     def get_points_forts_list(self):
         if not self.points_forts:
             return []
         return [point.strip() for point in self.points_forts.split('\n') if point.strip()]
 
-# ========== MODÈLES POUR LES TÉMOIGNAGES ==========
+
+# ============================================================
+# TÉMOIGNAGES
+# ============================================================
 
 class Temoignage(models.Model):
     nom = models.CharField(max_length=200, verbose_name="Nom")
@@ -219,16 +397,19 @@ class Temoignage(models.Model):
     note = models.IntegerField(default=5, verbose_name="Note (/5)")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Témoignage"
         verbose_name_plural = "Témoignages"
         ordering = ['ordre', 'nom']
-    
+
     def __str__(self):
         return f"{self.nom} - {self.organisation}"
 
-# ========== MODÈLES POUR LES PUBLICATIONS ==========
+
+# ============================================================
+# PUBLICATIONS
+# ============================================================
 
 class Publication(models.Model):
     titre = models.CharField(max_length=300, verbose_name="Titre")
@@ -241,32 +422,38 @@ class Publication(models.Model):
     image = models.ImageField(upload_to='publications/', blank=True, null=True, verbose_name="Image")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Publication"
         verbose_name_plural = "Publications"
         ordering = ['-annee', 'ordre']
-    
+
     def __str__(self):
         return f"{self.titre} ({self.annee})"
 
-# ========== MODÈLES POUR LES FAQ ==========
+
+# ============================================================
+# FAQ
+# ============================================================
 
 class FAQ(models.Model):
     question = models.CharField(max_length=300, verbose_name="Question")
     reponse = models.TextField(verbose_name="Réponse")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "FAQ"
         verbose_name_plural = "FAQs"
         ordering = ['ordre', 'question']
-    
+
     def __str__(self):
         return self.question
 
-# ========== MODÈLES POUR LES CONTACTS ==========
+
+# ============================================================
+# CONTACT
+# ============================================================
 
 class ContactMessage(models.Model):
     SUJET_CHOICES = [
@@ -276,7 +463,7 @@ class ContactMessage(models.Model):
         ('stage', 'Demande de stage'),
         ('autre', 'Autre'),
     ]
-    
+
     nom = models.CharField(max_length=200, verbose_name="Nom complet")
     email = models.EmailField(verbose_name="Email")
     telephone = models.CharField(max_length=50, blank=True, verbose_name="Téléphone")
@@ -284,16 +471,19 @@ class ContactMessage(models.Model):
     message = models.TextField(verbose_name="Message")
     date_envoi = models.DateTimeField(default=timezone.now, verbose_name="Date d'envoi")
     lu = models.BooleanField(default=False, verbose_name="Lu")
-    
+
     class Meta:
         verbose_name = "Message de contact"
         verbose_name_plural = "Messages de contact"
         ordering = ['-date_envoi']
-    
+
     def __str__(self):
         return f"{self.nom} - {self.get_sujet_display()}"
 
-# ========== MODÈLES POUR LES STATISTIQUES ==========
+
+# ============================================================
+# STATISTIQUES
+# ============================================================
 
 class Statistique(models.Model):
     titre = models.CharField(max_length=100, verbose_name="Titre")
@@ -302,16 +492,19 @@ class Statistique(models.Model):
     icon = models.CharField(max_length=100, verbose_name="Icône", default="fas fa-chart-line")
     ordre = models.IntegerField(default=0, verbose_name="Ordre")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Statistique"
         verbose_name_plural = "Statistiques"
         ordering = ['ordre', 'titre']
-    
+
     def __str__(self):
         return f"{self.titre}: {self.valeur}{self.unite or ''}"
 
-# ========== MODÈLES POUR LA MÉTHODOLOGIE ==========
+
+# ============================================================
+# MÉTHODOLOGIE
+# ============================================================
 
 class Methodologie(models.Model):
     titre = models.CharField(max_length=200, verbose_name="Titre")
@@ -319,14 +512,19 @@ class Methodologie(models.Model):
     icon = models.CharField(max_length=100, verbose_name="Icône", default="fas fa-clipboard-list")
     ordre = models.IntegerField(default=0, verbose_name="Ordre")
     actif = models.BooleanField(default=True, verbose_name="Actif")
-    
+
     class Meta:
         verbose_name = "Étape de méthodologie"
         verbose_name_plural = "Étapes de méthodologie"
         ordering = ['ordre', 'titre']
-    
+
     def __str__(self):
         return self.titre
+
+
+# ============================================================
+# STATS HERBIER (agrégat)
+# ============================================================
 
 class HerbierStats(models.Model):
     """Statistiques globales de l'herbier"""
@@ -336,28 +534,27 @@ class HerbierStats(models.Model):
     total_images = models.IntegerField(default=0)
     dernier_ajout = models.DateTimeField(null=True, blank=True)
     date_mise_a_jour = models.DateTimeField(default=timezone.now)
-    
+
     class Meta:
         verbose_name = "Statistique Herbier"
         verbose_name_plural = "Statistiques Herbier"
-    
+
     def __str__(self):
         return f"Stats Herbier - {self.date_mise_a_jour.date()}"
-    
+
     @classmethod
     def update_stats(cls):
-        from django.db.models import Count
-        stats, created = cls.objects.get_or_create(id=1)
-        
+        stats, _ = cls.objects.get_or_create(id=1)
+
         stats.total_plantes = Plante.objects.filter(actif=True).count()
         stats.total_familles = FamilleBotanique.objects.count()
         stats.total_genres = GenreBotanique.objects.count()
         stats.total_images = Plante.objects.filter(actif=True, image__isnull=False).count()
-        
+
         dernier = Plante.objects.filter(actif=True).order_by('-date_creation').first()
         if dernier:
             stats.dernier_ajout = dernier.date_creation
-        
+
         stats.date_mise_a_jour = timezone.now()
         stats.save()
         return stats

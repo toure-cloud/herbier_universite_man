@@ -6,20 +6,39 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8x9y2z3a4b5c6d7e8f9g0h1i2j3k4l5m6n7o8p9q0r')
-ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'https://herbier-admin-backend.onrender.com/api')
-API_URL = os.environ.get('API_URL', 'https://herbier-backend.onrender.com/api')
+# ✅ URL de l'admin-backend, adaptée à l'environnement
 
-# Ou pour le backend public
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ============================================================
+# ENVIRONNEMENT
+# ============================================================
+
+# ✅ DEBUG déterminé en premier (utilisé partout ensuite)
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'   # True par défaut en local
+
+# ✅ URL de l'admin-backend, adaptée à l'environnement
+if DEBUG:
+    _default_admin_url = 'http://localhost:8001/api'
+else:
+    _default_admin_url = 'https://herbier-admin-backend.onrender.com/api'
+
+ADMIN_API_URL = os.environ.get('ADMIN_API_URL', _default_admin_url)
+
+# URL du backend public lui-même
+API_URL = os.environ.get('API_URL', 'https://herbier-backend.onrender.com/api')
 BASE_URL = os.environ.get('BASE_URL', 'https://herbier-backend.onrender.com')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# ============================================================
+# SÉCURITÉ
+# ============================================================
 
-# Correction: ALLOWED_HOSTS doit contenir des domaines, pas des URLs complètes
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
+
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',

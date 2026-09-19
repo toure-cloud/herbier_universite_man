@@ -22,6 +22,7 @@ urlpatterns = [
     path('', views.api_root, name='api-root'),
     path('health/', views.health_check, name='health-check'),
     path('stats/', views.dashboard_stats, name='dashboard-stats'),
+    path('activites-data/', views.get_activites_data, name='activites-data'),
 
     # ==================== AUTHENTIFICATION SÉPARÉE ====================
     # SuperIT
@@ -61,6 +62,7 @@ urlpatterns = [
     # ==================== MÉDIAS ====================
     path('test-media/', views.test_media, name='test-media'),
     path('media/<path:path>', views.serve_media, name='serve_media'),
+    
 ]
 
 # ✅ Routes du router

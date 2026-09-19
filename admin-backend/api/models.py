@@ -146,25 +146,104 @@ class AuditLog(models.Model):
         return f"{self.created_at:%Y-%m-%d %H:%M} · {self.user} · {self.action} · {self.model_name}"
 
 # ========== MODÈLES POUR LES DONNÉES ==========
-
 class Plante(models.Model):
-    nom = models.CharField(max_length=200)
-    famille = models.CharField(max_length=200, blank=True, null=True)
-    nom_scientifique = models.CharField(max_length=200, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    habitat = models.CharField(max_length=300, blank=True, null=True)
-    statut_conservation = models.CharField(max_length=100, blank=True, null=True)
-    image = models.ImageField(upload_to='plantes/', blank=True, null=True)
-    actif = models.BooleanField(default=True)
-    date_creation = models.DateTimeField(default=timezone.now)
-    
+    # ---------- Identification ----------
+    nom_scientifique = models.CharField(
+        max_length=200,
+        verbose_name="Nom scientifique"
+    )
+    famille = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Famille"
+    )
+    nom_vernaculaire = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Nom vernaculaire"
+    )
+
+    # ---------- Classification ----------
+    type_morphologique = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Type morphologique"
+    )
+    type_biologique = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Type biologique"
+    )
+    affinite_chorologique = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Affinité chorologique"
+    )
+    affinite_ecologique = models.CharField(
+        max_length=200,
+        blank=True, null=True,
+        verbose_name="Affinité écologique"
+    )
+
+    # ---------- Conservation ----------
+    STATUT_CHOICES = [
+        ('CR', 'En danger critique'),
+        ('EN', 'En danger'),
+        ('VU', 'Vulnérable'),
+        ('NT', 'Quasi menacé'),
+        ('LC', 'Préoccupation mineure'),
+        ('NE', 'Non évaluée'),
+    ]
+    statut_conservation = models.CharField(
+        max_length=2,
+        choices=STATUT_CHOICES,
+        default='NE',
+        verbose_name="Statut de conservation (UICN)"
+    )
+
+    # ---------- Localisation et description ----------
+    lieu_collecte = models.CharField(
+        max_length=300,
+        blank=True, null=True,
+        verbose_name="Lieu de collecte"
+    )
+    habitat = models.TextField(
+        blank=True, null=True,
+        verbose_name="Habitat"
+    )
+    description = models.TextField(
+        blank=True, null=True,
+        verbose_name="Description"
+    )
+
+    # ---------- Images multiples ----------
+    # L'image principale (pour la vignette / carte)
+    image = models.ImageField(
+        upload_to='plantes/',
+        blank=True, null=True,
+        verbose_name="Image principale"
+    )
+    # Galerie d'images supplémentaires (JSON list de chemins)
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images"
+    )
+
+    # ---------- Métadonnées ----------
+    actif = models.BooleanField(default=True, verbose_name="Actif")
+    date_creation = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Date d'ajout"
+    )
+
     class Meta:
         verbose_name = "Plante"
         verbose_name_plural = "Plantes"
-        ordering = ['nom']
-    
+        ordering = ['nom_scientifique']
+
     def __str__(self):
-        return self.nom
+        return self.nom_scientifique or self.nom_vernaculaire or f"Plante #{self.pk}"
 
 class Equipe(models.Model):
     nom = models.CharField(max_length=200)
@@ -227,7 +306,6 @@ class Projet(models.Model):
     
     def __str__(self):
         return self.titre
-
 class Activite(models.Model):
     titre = models.CharField(max_length=200)
     titre_court = models.CharField(max_length=100)
@@ -235,16 +313,27 @@ class Activite(models.Model):
     description_longue = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=100, default='fas fa-leaf')
     image = models.ImageField(upload_to='activites/', blank=True, null=True)
+    caption = models.CharField(max_length=200, blank=True, default='')
+    points_forts = models.TextField(
+        blank=True,
+        default='',
+        help_text="Un point fort par ligne"
+    )
     ordre = models.IntegerField(default=0)
     actif = models.BooleanField(default=True)
-    
+
     class Meta:
         verbose_name = "Activité"
         verbose_name_plural = "Activités"
         ordering = ['ordre', 'titre']
-    
+
     def __str__(self):
         return self.titre
+
+    def get_points_forts_list(self):
+        if not self.points_forts:
+            return []
+        return [p.strip() for p in self.points_forts.split('\n') if p.strip()]
 
 class Partenaire(models.Model):
     nom = models.CharField(max_length=200)
@@ -287,6 +376,7 @@ class Publication(models.Model):
     journal = models.CharField(max_length=200)
     annee = models.IntegerField()
     lien = models.URLField(blank=True, null=True)
+    ordre = models.IntegerField(default=0)   # ✅ AJOUT
     actif = models.BooleanField(default=True)
     
     class Meta:
