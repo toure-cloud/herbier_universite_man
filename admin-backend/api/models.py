@@ -313,6 +313,11 @@ class Activite(models.Model):
     description_longue = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=100, default='fas fa-leaf')
     image = models.ImageField(upload_to='activites/', blank=True, null=True)
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     caption = models.CharField(max_length=200, blank=True, default='')
     points_forts = models.TextField(
         blank=True,

@@ -365,6 +365,11 @@ class Activite(models.Model):
     description_longue = models.TextField(verbose_name="Description détaillée")
     icon = models.CharField(max_length=100, verbose_name="Icône Font Awesome", default="fas fa-leaf")
     image = models.ImageField(upload_to='activites/', blank=True, null=True, verbose_name="Image")
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     caption = models.CharField(max_length=200, blank=True, verbose_name="Légende")
     points_forts = models.TextField(blank=True, verbose_name="Points forts (un par ligne)")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
@@ -394,6 +399,11 @@ class Temoignage(models.Model):
     organisation = models.CharField(max_length=200, verbose_name="Organisation")
     texte = models.TextField(verbose_name="Témoignage")
     photo = models.ImageField(upload_to='temoignages/', blank=True, null=True, verbose_name="Photo")
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     note = models.IntegerField(default=5, verbose_name="Note (/5)")
     ordre = models.IntegerField(default=0, verbose_name="Ordre d'affichage")
     actif = models.BooleanField(default=True, verbose_name="Actif")
@@ -417,6 +427,11 @@ class Publication(models.Model):
     journal = models.CharField(max_length=200, verbose_name="Journal/Revue")
     annee = models.IntegerField(verbose_name="Année")
     lien = models.URLField(blank=True, null=True, verbose_name="Lien")
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     doi = models.CharField(max_length=100, blank=True, null=True, verbose_name="DOI")
     resume = models.TextField(blank=True, null=True, verbose_name="Résumé")
     image = models.ImageField(upload_to='publications/', blank=True, null=True, verbose_name="Image")
@@ -532,6 +547,11 @@ class HerbierStats(models.Model):
     total_familles = models.IntegerField(default=0)
     total_genres = models.IntegerField(default=0)
     total_images = models.IntegerField(default=0)
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     dernier_ajout = models.DateTimeField(null=True, blank=True)
     date_mise_a_jour = models.DateTimeField(default=timezone.now)
 

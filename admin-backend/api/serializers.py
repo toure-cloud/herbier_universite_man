@@ -223,7 +223,8 @@ class ActiviteSerializer(FileUploadMixin, serializers.ModelSerializer):
         fields = [
             'id', 'titre', 'titre_court',
             'description_courte', 'description_longue',
-            'icon', 'image', 'caption', 'points_forts',
+            'icon', 'image', 'images_galerie',
+            'caption', 'points_forts',
             'ordre', 'actif',
         ]
         read_only_fields = ['id']
@@ -232,6 +233,71 @@ class ActiviteSerializer(FileUploadMixin, serializers.ModelSerializer):
         if not value or value.strip() == '':
             raise serializers.ValidationError("Le titre est obligatoire")
         return value.strip()
+
+    def create(self, validated_data):
+        # Traiter les images multiples envoyées en FormData (images_0, images_1, ...)
+        request = self.context.get('request')
+        galerie_chemins = []
+
+        if request and request.FILES:
+            for key, fichier in request.FILES.items():
+                # Accepte "images" ou "images_0", "images_1", etc.
+                if key == 'images' or key.startswith('images_'):
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        galerie_chemins.append(chemin)
+
+        if galerie_chemins:
+            validated_data['images_galerie'] = galerie_chemins
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+
+        # Images existantes conservées (envoyées en JSON dans 'existing_images')
+        existing_raw = request.data.get('existing_images') if request else None
+        existing_list = []
+        if existing_raw:
+            try:
+                import json
+                existing_list = json.loads(existing_raw)
+                if not isinstance(existing_list, list):
+                    existing_list = []
+            except (ValueError, TypeError):
+                existing_list = []
+
+        # Nouvelles images
+        new_paths = []
+        if request and request.FILES:
+            for key, fichier in request.FILES.items():
+                if key == 'images' or key.startswith('images_'):
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        new_paths.append(chemin)
+
+        # Si l'admin a touché à la galerie (nouvelles images OU suppression)
+        if existing_list or new_paths or 'existing_images' in request.data:
+            validated_data['images_galerie'] = existing_list + new_paths
+
+        return super().update(instance, validated_data)
+
+    def _save_gallery_file(self, fichier):
+        """Sauvegarde un fichier dans media/activites/galerie/"""
+        import os
+        import uuid
+        import logging
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
+
+        try:
+            ext = os.path.splitext(fichier.name)[1] or '.jpg'
+            nom = f"activites/galerie/{uuid.uuid4().hex}{ext}"
+            chemin = default_storage.save(nom, ContentFile(fichier.read()))
+            return f"/media/{chemin}"
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Erreur sauvegarde image galerie activité: {e}")
+            return None
 
 class TemoignageSerializer(FileUploadMixin, serializers.ModelSerializer):
     class Meta:
