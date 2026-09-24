@@ -172,40 +172,6 @@
     </section>
 
     <!-- ============================================================
-         IMPACT
-         ============================================================ -->
-    <section id="impact" class="impact-section">
-      <div class="container">
-        <div class="impact-content">
-          <div class="impact-text" data-aos="fade-right">
-            <span class="section-badge light">Notre Impact</span>
-            <h2>
-              Des résultats
-              <span class="title-accent">concrets</span>
-              et mesurables
-            </h2>
-            <p>
-              Depuis notre création, nous mesurons l'impact de nos actions à
-              travers des indicateurs précis et des réalisations tangibles.
-            </p>
-          </div>
-
-          <div class="impact-stats" data-aos="fade-left">
-            <div v-for="(stat, index) in impactStats" :key="index" class="impact-card">
-              <div class="impact-number">
-                <span class="counter" :data-target="stat.value">
-                  {{ stat.displayValue || stat.value }}
-                </span>
-                <span class="impact-unit">{{ stat.unit }}</span>
-              </div>
-              <div class="impact-label">{{ stat.label }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
          PUBLICATIONS
          ============================================================ -->
     <section id="publications" class="publications-section">
@@ -485,7 +451,6 @@ export default {
       ],
       services: [],
       methodologie: [],
-      impactStats: [],
       publications: [],
       testimonials: [],
       selectedService: null,
@@ -499,7 +464,6 @@ export default {
         { id: 'hero', label: 'Accueil', icon: 'fas fa-home' },
         { id: 'services', label: 'Services', icon: 'fas fa-th-large' },
         { id: 'methodologie', label: 'Méthode', icon: 'fas fa-tasks' },
-        { id: 'impact', label: 'Impact', icon: 'fas fa-chart-line' },
         { id: 'publications', label: 'Recherche', icon: 'fas fa-book' },
         { id: 'temoignages', label: 'Avis', icon: 'fas fa-quote-left' },
       ],
@@ -557,14 +521,6 @@ export default {
         }))
         if (this.methodologie.length === 0) this.methodologie = this.getDefaultMethodologie()
 
-        this.impactStats = (data.statistiques || []).map(s => ({
-          value: s.valeur || '0',
-          displayValue: s.valeur || '0',
-          unit: s.unite || '',
-          label: s.titre || ''
-        }))
-        if (this.impactStats.length === 0) this.impactStats = this.getDefaultImpactStats()
-
         this.publications = (data.publications || []).map(p => ({
           title: p.titre || '',
           authors: p.auteurs || '',
@@ -586,14 +542,12 @@ export default {
         console.error('Erreur chargement activités:', error)
         this.services = this.getDefaultServices()
         this.methodologie = this.getDefaultMethodologie()
-        this.impactStats = this.getDefaultImpactStats()
         this.publications = this.getDefaultPublications()
         this.testimonials = this.getDefaultTestimonials()
       } finally {
         this.loading = false
         this.$nextTick(() => {
           this.initAnimations()
-          this.initCounters()
           this.startTestimonialTimer()
         })
       }
@@ -789,15 +743,6 @@ export default {
       ]
     },
 
-    getDefaultImpactStats() {
-      return [
-        { value: '150', displayValue: '150', unit: '+', label: 'Projets réalisés' },
-        { value: '25', displayValue: '25', unit: '', label: 'Chercheurs permanents' },
-        { value: '50', displayValue: '50', unit: '+', label: 'Publications' },
-        { value: '1000', displayValue: '1000', unit: '+', label: 'Étudiants formés' }
-      ]
-    },
-
     getDefaultPublications() {
       return [
         { title: 'Diversité floristique des Montagnes de Man', authors: 'Kouassi J., Konan M., Yao P.', journal: 'Journal of Tropical Botany', year: 2023, link: '#' }
@@ -827,26 +772,6 @@ export default {
         el.style.transform = 'translateY(24px)'
         el.style.transition = 'all 0.55s cubic-bezier(0.22, 1, 0.36, 1)'
         observer.observe(el)
-      })
-    },
-
-    initCounters() {
-      const counters = document.querySelectorAll('.counter')
-      counters.forEach(counter => {
-        const target = parseInt(counter.dataset.target)
-        if (!target || isNaN(target)) return
-        let current = 0
-        const increment = target / 60
-        const updateCounter = () => {
-          if (current < target) {
-            current += increment
-            counter.textContent = Math.ceil(current)
-            requestAnimationFrame(updateCounter)
-          } else {
-            counter.textContent = target
-          }
-        }
-        updateCounter()
       })
     }
   }
@@ -976,7 +901,7 @@ export default {
 /* ==================== HERO ==================== */
 .hero-activites {
   position: relative;
-  min-height: 380px;
+  min-height: 540px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1008,18 +933,18 @@ export default {
   filter: blur(60px);
 }
 .hero-glow-1 {
-  width: 360px;
-  height: 360px;
+  width: 480px;
+  height: 480px;
   background: radial-gradient(circle, rgba(66, 153, 225, 0.25), transparent 70%);
-  top: -100px;
-  right: -60px;
+  top: -120px;
+  right: -80px;
 }
 .hero-glow-2 {
-  width: 280px;
-  height: 280px;
+  width: 380px;
+  height: 380px;
   background: radial-gradient(circle, rgba(56, 161, 105, 0.2), transparent 70%);
-  bottom: -80px;
-  left: -40px;
+  bottom: -100px;
+  left: -60px;
 }
 
 .hero-content {
@@ -1027,30 +952,30 @@ export default {
   z-index: 2;
   max-width: 900px;
   margin: 0 auto;
-  padding: 56px 24px 48px;
+  padding: 110px 24px 100px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
-  padding: 6px 14px;
+  padding: 8px 18px;
   border-radius: var(--radius-full);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 .hero-badge i { color: #63b3ed; }
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 0.75rem;
+  margin: 0 0 1.15rem;
   letter-spacing: -0.02em;
 }
 
@@ -1062,17 +987,17 @@ export default {
 }
 
 .hero-subtitle {
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 1.1rem;
+  line-height: 1.65;
   opacity: 0.9;
-  margin: 0 auto 1.5rem;
-  max-width: 560px;
+  margin: 0 auto 2.5rem;
+  max-width: 640px;
 }
 
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 0.85rem;
+  gap: 1.15rem;
   flex-wrap: wrap;
 }
 
@@ -1080,10 +1005,10 @@ export default {
   text-align: center;
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(10px);
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 16px 22px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  min-width: 110px;
+  min-width: 140px;
   transition: all var(--transition);
 }
 .hero-stat:hover {
@@ -1093,22 +1018,22 @@ export default {
 
 .stat-number {
   font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
+  font-size: 1.7rem;
   font-weight: 700;
   color: #90cdf4;
   line-height: 1.1;
 }
 .stat-label {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   opacity: 0.8;
   font-weight: 500;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .hero-scroll-hint {
-  margin-top: 1.5rem;
-  width: 36px;
-  height: 36px;
+  margin-top: 2.5rem;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.08);
@@ -1119,12 +1044,11 @@ export default {
   justify-content: center;
   animation: bounce 2s infinite;
   transition: all var(--transition);
-  font-size: 0.85rem;
 }
 .hero-scroll-hint:hover { background: rgba(255, 255, 255, 0.18); }
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
+  50% { transform: translateY(8px); }
 }
 
 .hero-wave {
@@ -1134,7 +1058,7 @@ export default {
   right: 0;
   line-height: 0;
 }
-.hero-wave svg { display: block; width: 100%; height: 48px; }
+.hero-wave svg { display: block; width: 100%; height: 70px; }
 
 /* ==================== SERVICES ==================== */
 .expertise-section { padding: 72px 0; background: white; }
@@ -1362,70 +1286,6 @@ export default {
   margin: 0 0 6px;
 }
 .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
-
-/* ==================== IMPACT ==================== */
-.impact-section {
-  padding: 80px 0;
-  background: linear-gradient(145deg, #0a1e36 0%, #1a365d 100%);
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-.impact-section::before {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99, 179, 237, 0.15), transparent 70%);
-  top: -200px;
-  right: -200px;
-  border-radius: 50%;
-}
-
-.impact-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-}
-
-.impact-text h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.7rem, 3vw, 2.15rem);
-  font-weight: 700;
-  margin: 12px 0 14px;
-  line-height: 1.25;
-}
-.impact-text p { font-size: 1rem; opacity: 0.9; line-height: 1.65; margin: 0; }
-
-.impact-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-}
-
-.impact-card {
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 1.6rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all var(--transition);
-}
-.impact-card:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.12); }
-
-.impact-number {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.3rem;
-  font-weight: 700;
-  margin-bottom: 6px;
-  line-height: 1.1;
-}
-.impact-unit { font-size: 1.4rem; color: #90cdf4; }
-.impact-label { font-size: 0.875rem; opacity: 0.85; }
 
 /* ==================== PUBLICATIONS ==================== */
 .publications-section { padding: 72px 0; background: white; }
@@ -2090,17 +1950,11 @@ export default {
 }
 
 /* ==================== RESPONSIVE ==================== */
-@media (max-width: 992px) {
-  .impact-content { grid-template-columns: 1fr; text-align: center; }
-  .impact-stats { max-width: 540px; margin: 0 auto; }
-}
-
 @media (max-width: 768px) {
   .hero-content { padding: 48px 20px 40px; }
   .services-grid { grid-template-columns: 1fr; }
   .step-card { flex-direction: column; text-align: center; }
   .step-icon { align-self: center; }
-  .impact-stats { grid-template-columns: 1fr 1fr; }
   .publications-grid { grid-template-columns: 1fr; }
   .cta-buttons { flex-direction: column; align-items: center; }
   .testimonials-carousel { flex-direction: column; }
