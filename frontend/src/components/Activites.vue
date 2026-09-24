@@ -1,11 +1,31 @@
 <template>
   <div class="activites">
-    <!-- ==================== HERO ==================== -->
-    <section class="hero-activites">
+    <!-- ============================================================
+         BARRE DE NAVIGATION STICKY (scroll-spy)
+         ============================================================ -->
+    <nav class="sticky-nav" :class="{ visible: showStickyNav }">
+      <div class="sticky-nav-inner">
+        <button
+          v-for="section in sections"
+          :key="section.id"
+          :class="['sticky-nav-btn', { active: activeSection === section.id }]"
+          @click="scrollToSection(section.id)"
+        >
+          <i :class="section.icon"></i>
+          <span>{{ section.label }}</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+    <section id="hero" class="hero-activites">
       <div class="hero-background">
         <div class="hero-gradient"></div>
         <div class="hero-pattern"></div>
-        <div class="hero-glow"></div>
+        <div class="hero-glow hero-glow-1"></div>
+        <div class="hero-glow hero-glow-2"></div>
       </div>
 
       <div class="hero-content" data-aos="fade-up">
@@ -30,6 +50,10 @@
             <div class="stat-label">{{ stat.label }}</div>
           </div>
         </div>
+
+        <button class="hero-scroll-hint" @click="scrollToSection('services')">
+          <i class="fas fa-chevron-down"></i>
+        </button>
       </div>
 
       <div class="hero-wave">
@@ -41,8 +65,10 @@
       </div>
     </section>
 
-    <!-- ==================== SERVICES / EXPERTISE ==================== -->
-    <section class="expertise-section">
+    <!-- ============================================================
+         SERVICES
+         ============================================================ -->
+    <section id="services" class="expertise-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
           <span class="section-badge">Nos Services</span>
@@ -64,7 +90,7 @@
             class="service-card"
             :class="{ 'has-image': getServiceMainImage(service) }"
             data-aos="fade-up"
-            :data-aos-delay="index * 80"
+            :data-aos-delay="Math.min(index * 60, 300)"
             @click="openService(service)"
             role="button"
             tabindex="0"
@@ -75,10 +101,14 @@
                 :src="getImageUrl(getServiceMainImage(service))"
                 :alt="service.title"
                 @error="handleImageError"
+                loading="lazy"
               />
               <span v-if="getServiceAllImages(service).length > 1" class="gallery-count">
                 <i class="fas fa-images"></i> {{ getServiceAllImages(service).length }}
               </span>
+              <div class="image-overlay-hint">
+                <i class="fas fa-expand"></i>
+              </div>
             </div>
 
             <div class="service-icon">
@@ -95,17 +125,19 @@
               </li>
             </ul>
 
-            <button class="service-details-btn" type="button">
+            <div class="service-details-btn">
               Voir les détails
               <i class="fas fa-arrow-right"></i>
-            </button>
+            </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ==================== MÉTHODOLOGIE ==================== -->
-    <section class="methodologie-section">
+    <!-- ============================================================
+         MÉTHODOLOGIE
+         ============================================================ -->
+    <section id="methodologie" class="methodologie-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
           <span class="section-badge">Notre Processus</span>
@@ -119,7 +151,7 @@
             :key="index"
             class="timeline-step"
             data-aos="fade-up"
-            :data-aos-delay="index * 90"
+            :data-aos-delay="Math.min(index * 80, 320)"
           >
             <div class="step-marker">
               <div class="step-number">{{ index + 1 }}</div>
@@ -139,8 +171,10 @@
       </div>
     </section>
 
-    <!-- ==================== IMPACT ==================== -->
-    <section class="impact-section">
+    <!-- ============================================================
+         IMPACT
+         ============================================================ -->
+    <section id="impact" class="impact-section">
       <div class="container">
         <div class="impact-content">
           <div class="impact-text" data-aos="fade-right">
@@ -171,8 +205,10 @@
       </div>
     </section>
 
-    <!-- ==================== PUBLICATIONS ==================== -->
-    <section class="publications-section">
+    <!-- ============================================================
+         PUBLICATIONS
+         ============================================================ -->
+    <section id="publications" class="publications-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
           <span class="section-badge">Recherche</span>
@@ -186,7 +222,7 @@
             :key="index"
             class="publication-card"
             data-aos="fade-up"
-            :data-aos-delay="index * 80"
+            :data-aos-delay="Math.min(index * 60, 240)"
           >
             <div class="publication-icon">
               <i class="fas fa-file-alt"></i>
@@ -204,8 +240,10 @@
       </div>
     </section>
 
-    <!-- ==================== TÉMOIGNAGES ==================== -->
-    <section class="testimonials-section">
+    <!-- ============================================================
+         TÉMOIGNAGES — Carrousel
+         ============================================================ -->
+    <section id="temoignages" class="testimonials-section">
       <div class="container">
         <div class="section-header" data-aos="fade-up">
           <span class="section-badge">Témoignages</span>
@@ -213,34 +251,55 @@
           <p class="section-subtitle">Ce que nos partenaires disent de notre travail</p>
         </div>
 
-        <div class="testimonials-grid">
-          <article
-            v-for="(testimonial, index) in testimonials"
-            :key="index"
-            class="testimonial-card"
-            data-aos="fade-up"
-            :data-aos-delay="index * 80"
-          >
-            <div class="testimonial-quote">
-              <i class="fas fa-quote-left"></i>
-              <p>{{ testimonial.text }}</p>
-            </div>
-            <div class="testimonial-author">
-              <div class="author-avatar">
-                <img :src="getAvatarUrl(testimonial.avatar)" :alt="testimonial.name" @error="handleAvatarError" />
+        <div class="testimonials-carousel" data-aos="fade-up">
+          <button class="carousel-nav prev" @click="prevTestimonial" aria-label="Précédent">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+
+          <transition name="testimonial-fade" mode="out-in">
+            <article class="testimonial-card" :key="currentTestimonialIndex">
+              <div class="testimonial-quote">
+                <i class="fas fa-quote-left"></i>
+                <p>{{ currentTestimonial?.text }}</p>
               </div>
-              <div class="author-info">
-                <h4>{{ testimonial.name }}</h4>
-                <p>{{ testimonial.position }}</p>
-                <span>{{ testimonial.organization }}</span>
+              <div class="testimonial-author">
+                <div class="author-avatar">
+                  <img
+                    :src="getAvatarUrl(currentTestimonial?.avatar)"
+                    :alt="currentTestimonial?.name"
+                    @error="handleAvatarError"
+                  />
+                </div>
+                <div class="author-info">
+                  <h4>{{ currentTestimonial?.name }}</h4>
+                  <p>{{ currentTestimonial?.position }}</p>
+                  <span>{{ currentTestimonial?.organization }}</span>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          </transition>
+
+          <button class="carousel-nav next" @click="nextTestimonial" aria-label="Suivant">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Indicateurs -->
+        <div class="carousel-dots" v-if="testimonials.length > 1">
+          <button
+            v-for="(_, i) in testimonials"
+            :key="i"
+            :class="['dot', { active: i === currentTestimonialIndex }]"
+            @click="currentTestimonialIndex = i"
+            :aria-label="`Témoignage ${i + 1}`"
+          ></button>
         </div>
       </div>
     </section>
 
-    <!-- ==================== CTA ==================== -->
+    <!-- ============================================================
+         CTA
+         ============================================================ -->
     <section class="cta-section">
       <div class="container">
         <div class="cta-content" data-aos="zoom-in">
@@ -261,15 +320,25 @@
       </div>
     </section>
 
-    <!-- ==================== MODALE DÉTAIL SERVICE ==================== -->
-    <transition name="service-modal-fade">
-      <div v-if="selectedService" class="service-modal" @click.self="closeService">
+    <!-- ============================================================
+         MODAL DÉTAIL SERVICE — PREMIUM
+         ============================================================ -->
+    <transition name="modal-fade">
+      <div
+        v-if="selectedService"
+        class="service-modal"
+        @click.self="closeService"
+        role="dialog"
+        aria-modal="true"
+      >
         <div class="service-modal-container">
+          <!-- Bouton fermer -->
           <button class="service-modal-close" @click="closeService" aria-label="Fermer">
             <i class="fas fa-times"></i>
           </button>
 
-          <div class="service-modal-header">
+          <!-- En-tête -->
+          <header class="service-modal-header">
             <div class="service-modal-icon">
               <i :class="selectedService.icon"></i>
             </div>
@@ -279,9 +348,20 @@
               </span>
               <h2>{{ selectedService.title }}</h2>
             </div>
-          </div>
 
+            <div class="service-modal-nav" v-if="services.length > 1">
+              <button @click="navService(-1)" aria-label="Service précédent" title="Précédent">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button @click="navService(1)" aria-label="Service suivant" title="Suivant">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </header>
+
+          <!-- Corps -->
           <div class="service-modal-body">
+            <!-- Galerie -->
             <div v-if="allServiceImages.length" class="service-modal-gallery">
               <div class="service-modal-gallery-main">
                 <img
@@ -289,31 +369,74 @@
                   :alt="selectedService.title"
                   @error="handleImageError"
                 />
+                <div class="gallery-main-overlay"></div>
+
+                <!-- Compteur -->
+                <div class="gallery-counter" v-if="allServiceImages.length > 1">
+                  <i class="fas fa-image"></i>
+                  {{ currentServiceImageIndex + 1 }} / {{ allServiceImages.length }}
+                </div>
+
+                <!-- Navigation -->
+                <button
+                  v-if="allServiceImages.length > 1"
+                  class="gallery-nav prev"
+                  @click.stop="prevServiceImage"
+                  aria-label="Image précédente"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button
+                  v-if="allServiceImages.length > 1"
+                  class="gallery-nav next"
+                  @click.stop="nextServiceImage"
+                  aria-label="Image suivante"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
               </div>
+
+              <!-- Miniatures -->
               <div v-if="allServiceImages.length > 1" class="service-modal-gallery-thumbs">
-                <img
+                <button
                   v-for="(img, i) in allServiceImages"
                   :key="i"
-                  :src="getImageUrl(img)"
-                  :class="{ active: i === currentServiceImageIndex }"
+                  :class="['thumb', { active: i === currentServiceImageIndex }]"
                   @click="currentServiceImageIndex = i"
-                  @error="handleImageError"
-                  :alt="`Image ${i + 1}`"
-                />
+                  :aria-label="`Image ${i + 1}`"
+                >
+                  <img :src="getImageUrl(img)" @error="handleImageError" :alt="`Image ${i + 1}`" />
+                </button>
               </div>
             </div>
 
+            <!-- Caption -->
             <p v-if="selectedService.caption" class="service-modal-caption">
+              <i class="fas fa-camera"></i>
               {{ selectedService.caption }}
             </p>
 
-            <p class="service-modal-description">
-              {{ selectedService.descriptionLongue || selectedService.description }}
-            </p>
+            <!-- Description -->
+            <div class="service-modal-section">
+              <h3 class="modal-section-title">
+                <span class="title-icon"><i class="fas fa-align-left"></i></span>
+                Description
+              </h3>
+              <p class="service-modal-description">
+                {{ selectedService.descriptionLongue || selectedService.description }}
+              </p>
+            </div>
 
-            <div v-if="selectedService.features && selectedService.features.length" class="service-modal-features">
-              <h3>Points forts</h3>
-              <ul>
+            <!-- Points forts -->
+            <div
+              v-if="selectedService.features && selectedService.features.length"
+              class="service-modal-section"
+            >
+              <h3 class="modal-section-title">
+                <span class="title-icon"><i class="fas fa-star"></i></span>
+                Points forts
+              </h3>
+              <ul class="service-modal-features">
                 <li v-for="(feature, idx) in selectedService.features" :key="idx">
                   <i class="fas fa-check-circle"></i>
                   <span>{{ feature }}</span>
@@ -322,12 +445,23 @@
             </div>
           </div>
 
-          <div class="service-modal-footer">
-            <button class="btn-modal-close" @click="closeService">Fermer</button>
-            <router-link to="/contact" class="btn-modal-cta">
-              Demander ce service <i class="fas fa-arrow-right"></i>
-            </router-link>
-          </div>
+          <!-- Pied -->
+          <footer class="service-modal-footer">
+            <div class="modal-footer-actions">
+              <button class="btn-modal-share" @click="shareService" title="Partager">
+                <i class="fas fa-share-alt"></i>
+              </button>
+              <button class="btn-modal-close" @click="closeService">
+                Fermer
+              </button>
+              <router-link to="/contact" class="btn-modal-cta">
+                Demander ce service <i class="fas fa-arrow-right"></i>
+              </router-link>
+            </div>
+            <div class="modal-keyboard-hint">
+              <kbd>←</kbd> <kbd>→</kbd> naviguer · <kbd>Échap</kbd> fermer
+            </div>
+          </footer>
         </div>
       </div>
     </transition>
@@ -356,6 +490,19 @@ export default {
       testimonials: [],
       selectedService: null,
       currentServiceImageIndex: 0,
+      // Nouveaux
+      showStickyNav: false,
+      activeSection: 'hero',
+      currentTestimonialIndex: 0,
+      testimonialTimer: null,
+      sections: [
+        { id: 'hero', label: 'Accueil', icon: 'fas fa-home' },
+        { id: 'services', label: 'Services', icon: 'fas fa-th-large' },
+        { id: 'methodologie', label: 'Méthode', icon: 'fas fa-tasks' },
+        { id: 'impact', label: 'Impact', icon: 'fas fa-chart-line' },
+        { id: 'publications', label: 'Recherche', icon: 'fas fa-book' },
+        { id: 'temoignages', label: 'Avis', icon: 'fas fa-quote-left' },
+      ],
     }
   },
   computed: {
@@ -366,10 +513,20 @@ export default {
     currentServiceImage() {
       return this.allServiceImages[this.currentServiceImageIndex] || ''
     },
+    currentTestimonial() {
+      return this.testimonials[this.currentTestimonialIndex] || {}
+    },
   },
   mounted() {
     this.initAnimations()
     this.loadActivitesData()
+    window.addEventListener('scroll', this.handleScroll, { passive: true })
+    window.addEventListener('keydown', this.handleKeydown)
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('keydown', this.handleKeydown)
+    this.stopTestimonialTimer()
   },
   methods: {
     async loadActivitesData() {
@@ -437,6 +594,7 @@ export default {
         this.$nextTick(() => {
           this.initAnimations()
           this.initCounters()
+          this.startTestimonialTimer()
         })
       }
     },
@@ -484,18 +642,133 @@ export default {
       e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23e2e8f0' width='100' height='100'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%2394a3b8'/%3E%3Cpath d='M20,90 Q50,60 80,90' fill='%2394a3b8'/%3E%3C/svg%3E"
     },
 
+    // ============================================================
+    // MODAL SERVICE
+    // ============================================================
     openService(service) {
       this.selectedService = service
       this.currentServiceImageIndex = 0
       document.body.style.overflow = 'hidden'
+      this.stopTestimonialTimer()
     },
 
     closeService() {
       this.selectedService = null
       this.currentServiceImageIndex = 0
       document.body.style.overflow = ''
+      this.startTestimonialTimer()
     },
 
+    nextServiceImage() {
+      if (this.allServiceImages.length > 1) {
+        this.currentServiceImageIndex =
+          (this.currentServiceImageIndex + 1) % this.allServiceImages.length
+      }
+    },
+
+    prevServiceImage() {
+      if (this.allServiceImages.length > 1) {
+        this.currentServiceImageIndex =
+          (this.currentServiceImageIndex - 1 + this.allServiceImages.length) %
+          this.allServiceImages.length
+      }
+    },
+
+    navService(direction) {
+      const currentIndex = this.services.findIndex(s => s.id === this.selectedService?.id)
+      if (currentIndex === -1) return
+      const nextIndex = (currentIndex + direction + this.services.length) % this.services.length
+      this.openService(this.services[nextIndex])
+    },
+
+    shareService() {
+      if (!this.selectedService) return
+      const data = {
+        title: this.selectedService.title,
+        text: this.selectedService.description,
+        url: window.location.href,
+      }
+      if (navigator.share) {
+        navigator.share(data).catch(() => {})
+      } else {
+        navigator.clipboard?.writeText(window.location.href)
+        alert('Lien copié dans le presse-papiers')
+      }
+    },
+
+    // ============================================================
+    // NAVIGATION STICKY + SCROLL-SPY
+    // ============================================================
+    handleScroll() {
+      this.showStickyNav = window.scrollY > 400
+
+      // Scroll-spy
+      const scrollPos = window.scrollY + 200
+      for (const section of this.sections) {
+        const el = document.getElementById(section.id)
+        if (el) {
+          const top = el.offsetTop
+          const bottom = top + el.offsetHeight
+          if (scrollPos >= top && scrollPos < bottom) {
+            this.activeSection = section.id
+            break
+          }
+        }
+      }
+    },
+
+    scrollToSection(id) {
+      const el = document.getElementById(id)
+      if (el) {
+        const offset = 80
+        window.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' })
+      }
+    },
+
+    // ============================================================
+    // CARROUSEL TÉMOIGNAGES
+    // ============================================================
+    nextTestimonial() {
+      if (this.testimonials.length > 1) {
+        this.currentTestimonialIndex =
+          (this.currentTestimonialIndex + 1) % this.testimonials.length
+      }
+    },
+
+    prevTestimonial() {
+      if (this.testimonials.length > 1) {
+        this.currentTestimonialIndex =
+          (this.currentTestimonialIndex - 1 + this.testimonials.length) % this.testimonials.length
+      }
+    },
+
+    startTestimonialTimer() {
+      this.stopTestimonialTimer()
+      if (this.testimonials.length > 1) {
+        this.testimonialTimer = setInterval(() => this.nextTestimonial(), 6000)
+      }
+    },
+
+    stopTestimonialTimer() {
+      if (this.testimonialTimer) {
+        clearInterval(this.testimonialTimer)
+        this.testimonialTimer = null
+      }
+    },
+
+    // ============================================================
+    // CLAVIER
+    // ============================================================
+    handleKeydown(e) {
+      if (!this.selectedService) return
+      if (e.key === 'Escape') this.closeService()
+      if (e.key === 'ArrowRight') this.nextServiceImage()
+      if (e.key === 'ArrowLeft') this.prevServiceImage()
+    },
+
+    // ============================================================
+    // FALLBACKS
+    // ============================================================
     getDefaultServices() {
       return [
         { icon: 'fas fa-leaf', title: 'Identification des plantes', description: "Service expert d'identification botanique.", features: ['Identification morphologique', 'Base de données', 'Expertise reconnue'] },
@@ -563,12 +836,12 @@ export default {
         const target = parseInt(counter.dataset.target)
         if (!target || isNaN(target)) return
         let current = 0
-        const increment = target / 50
+        const increment = target / 60
         const updateCounter = () => {
           if (current < target) {
             current += increment
             counter.textContent = Math.ceil(current)
-            setTimeout(updateCounter, 30)
+            requestAnimationFrame(updateCounter)
           } else {
             counter.textContent = target
           }
@@ -620,7 +893,6 @@ export default {
   letter-spacing: 0.04em;
   margin-bottom: 12px;
 }
-
 .section-badge.light {
   background: rgba(99, 179, 237, 0.2);
   color: #90cdf4;
@@ -647,17 +919,71 @@ export default {
   margin-bottom: 2.75rem;
 }
 
+/* ==================== STICKY NAV ==================== */
+.sticky-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  transform: translateY(-100%);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sticky-nav.visible { transform: translateY(0); }
+
+.sticky-nav-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sticky-nav-inner::-webkit-scrollbar { display: none; }
+
+.sticky-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition);
+  font-family: inherit;
+}
+.sticky-nav-btn i { font-size: 0.75rem; }
+.sticky-nav-btn:hover {
+  background: #f1f5f9;
+  color: var(--text-primary);
+}
+.sticky-nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.25);
+}
+
 /* ==================== HERO ==================== */
 .hero-activites {
   position: relative;
-  min-height: 520px;
+  min-height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: white;
   overflow: hidden;
-  background: linear-gradient(145deg, #0f2744 0%, #1a365d 45%, #1e3a5f 100%);
+  background: linear-gradient(145deg, #0a1e36 0%, #1a365d 45%, #1e3a5f 100%);
 }
 
 .hero-background { position: absolute; inset: 0; }
@@ -665,7 +991,7 @@ export default {
 .hero-gradient {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(66, 153, 225, 0.18), transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(66, 153, 225, 0.22), transparent 70%);
 }
 
 .hero-pattern {
@@ -677,45 +1003,54 @@ export default {
 
 .hero-glow {
   position: absolute;
-  width: 480px;
-  height: 480px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(66, 153, 225, 0.12), transparent 70%);
+  pointer-events: none;
+  filter: blur(60px);
+}
+.hero-glow-1 {
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(66, 153, 225, 0.25), transparent 70%);
   top: -100px;
   right: -60px;
-  pointer-events: none;
+}
+.hero-glow-2 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(56, 161, 105, 0.2), transparent 70%);
+  bottom: -80px;
+  left: -40px;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 880px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 100px 24px 80px;
+  padding: 56px 24px 48px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
-  padding: 8px 18px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
-
 .hero-badge i { color: #63b3ed; }
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.75rem;
   letter-spacing: -0.02em;
 }
 
@@ -727,16 +1062,17 @@ export default {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.55;
   opacity: 0.9;
-  margin: 0 0 2.5rem;
+  margin: 0 auto 1.5rem;
+  max-width: 560px;
 }
 
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
 }
 
@@ -744,25 +1080,51 @@ export default {
   text-align: center;
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(10px);
-  padding: 14px 22px;
-  border-radius: 16px;
+  padding: 10px 16px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  min-width: 140px;
+  min-width: 110px;
+  transition: all var(--transition);
+}
+.hero-stat:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
 }
 
 .stat-number {
   font-family: 'Playfair Display', serif;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #90cdf4;
   line-height: 1.1;
 }
-
 .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   opacity: 0.8;
   font-weight: 500;
-  margin-top: 4px;
+  margin-top: 3px;
+}
+
+.hero-scroll-hint {
+  margin-top: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 2s infinite;
+  transition: all var(--transition);
+  font-size: 0.85rem;
+}
+.hero-scroll-hint:hover { background: rgba(255, 255, 255, 0.18); }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
 .hero-wave {
@@ -772,11 +1134,10 @@ export default {
   right: 0;
   line-height: 0;
 }
-
-.hero-wave svg { display: block; width: 100%; height: 70px; }
+.hero-wave svg { display: block; width: 100%; height: 48px; }
 
 /* ==================== SERVICES ==================== */
-.expertise-section { padding: 64px 0; background: white; }
+.expertise-section { padding: 72px 0; background: white; }
 
 .services-grid {
   display: grid;
@@ -790,15 +1151,21 @@ export default {
   padding: 1.75rem;
   border: 1px solid var(--border);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  outline: none;
+}
+
+.service-card:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
 }
 
 .service-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px -12px rgba(43, 108, 176, 0.15);
   border-color: transparent;
 }
 
@@ -816,16 +1183,31 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.service-card:hover .service-image img { transform: scale(1.05); }
+.service-card:hover .service-image img { transform: scale(1.07); }
+
+.image-overlay-hint {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.service-card:hover .image-overlay-hint { opacity: 1; }
 
 .gallery-count {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
   color: #fff;
   padding: 4px 10px;
   border-radius: 20px;
@@ -833,6 +1215,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  font-weight: 600;
 }
 
 .service-icon {
@@ -847,16 +1230,17 @@ export default {
   transition: all var(--transition);
 }
 
-.service-card:hover .service-icon { background: var(--primary); }
+.service-card:hover .service-icon {
+  background: var(--primary);
+  transform: rotate(-6deg) scale(1.05);
+}
 
 .service-icon i {
   font-size: 1.3rem;
   color: var(--primary);
   transition: color var(--transition);
 }
-
 .service-card:hover .service-icon i { color: white; }
-
 .service-card.has-image .service-icon { display: none; }
 
 .service-card h3 {
@@ -890,7 +1274,7 @@ export default {
 }
 
 .service-features li i {
-  color: var(--primary);
+  color: var(--accent);
   font-size: 0.85rem;
   margin-top: 2px;
   flex-shrink: 0;
@@ -898,31 +1282,22 @@ export default {
 
 .service-details-btn {
   margin-top: 14px;
-  background: none;
-  border: none;
   color: var(--primary);
   font-weight: 500;
   font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0;
-  cursor: pointer;
   transition: gap 0.25s ease;
 }
-
 .service-card:hover .service-details-btn { gap: 12px; }
 
 /* ==================== MÉTHODOLOGIE ==================== */
-.methodologie-section { padding: 64px 0; background: var(--bg-page); }
+.methodologie-section { padding: 72px 0; background: var(--bg-page); }
 
 .methodologie-timeline { max-width: 860px; margin: 0 auto; }
 
-.timeline-step {
-  display: flex;
-  gap: 1.35rem;
-  margin-bottom: 1.25rem;
-}
+.timeline-step { display: flex; gap: 1.35rem; margin-bottom: 1.25rem; }
 
 .step-marker {
   display: flex;
@@ -965,7 +1340,6 @@ export default {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all var(--transition);
 }
-
 .step-card:hover { transform: translateX(6px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
 
 .step-icon {
@@ -978,7 +1352,6 @@ export default {
   justify-content: center;
   flex-shrink: 0;
 }
-
 .step-icon i { font-size: 1.25rem; color: var(--primary); }
 
 .step-content h3 {
@@ -988,14 +1361,25 @@ export default {
   color: var(--text-primary);
   margin: 0 0 6px;
 }
-
 .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
 
 /* ==================== IMPACT ==================== */
 .impact-section {
-  padding: 72px 0;
-  background: linear-gradient(145deg, #0f2744 0%, #1a365d 100%);
+  padding: 80px 0;
+  background: linear-gradient(145deg, #0a1e36 0%, #1a365d 100%);
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+.impact-section::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99, 179, 237, 0.15), transparent 70%);
+  top: -200px;
+  right: -200px;
+  border-radius: 50%;
 }
 
 .impact-content {
@@ -1003,6 +1387,8 @@ export default {
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .impact-text h2 {
@@ -1012,7 +1398,6 @@ export default {
   margin: 12px 0 14px;
   line-height: 1.25;
 }
-
 .impact-text p { font-size: 1rem; opacity: 0.9; line-height: 1.65; margin: 0; }
 
 .impact-stats {
@@ -1030,7 +1415,6 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all var(--transition);
 }
-
 .impact-card:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.12); }
 
 .impact-number {
@@ -1040,13 +1424,11 @@ export default {
   margin-bottom: 6px;
   line-height: 1.1;
 }
-
 .impact-unit { font-size: 1.4rem; color: #90cdf4; }
-
 .impact-label { font-size: 0.875rem; opacity: 0.85; }
 
 /* ==================== PUBLICATIONS ==================== */
-.publications-section { padding: 64px 0; background: white; }
+.publications-section { padding: 72px 0; background: white; }
 
 .publications-grid {
   display: grid;
@@ -1063,8 +1445,11 @@ export default {
   border: 1px solid var(--border);
   transition: all var(--transition);
 }
-
-.publication-card:hover { transform: translateX(5px); background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+.publication-card:hover {
+  transform: translateX(5px);
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
 
 .publication-icon {
   width: 48px;
@@ -1076,7 +1461,6 @@ export default {
   justify-content: center;
   flex-shrink: 0;
 }
-
 .publication-icon i { font-size: 1.2rem; color: var(--primary); }
 
 .publication-details h3 {
@@ -1087,10 +1471,8 @@ export default {
   margin: 0 0 6px;
   line-height: 1.35;
 }
-
 .publication-authors { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 4px; }
 .publication-journal { font-size: 0.75rem; color: var(--text-muted); margin: 0 0 10px; }
-
 .publication-link {
   font-size: 0.8rem;
   color: var(--primary);
@@ -1101,58 +1483,66 @@ export default {
   font-weight: 500;
   transition: gap var(--transition);
 }
-
 .publication-link:hover { gap: 10px; }
 
-/* ==================== TÉMOIGNAGES ==================== */
-.testimonials-section { padding: 64px 0; background: var(--bg-page); }
+/* ==================== TÉMOIGNAGES — Carrousel ==================== */
+.testimonials-section { padding: 72px 0; background: var(--bg-page); }
 
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.5rem;
+.testimonials-carousel {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .testimonial-card {
+  flex: 1;
   background: white;
-  border-radius: 20px;
-  padding: 1.75rem;
+  border-radius: 24px;
+  padding: 2.25rem 2rem;
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.06);
+  text-align: center;
 }
 
-.testimonial-card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
-
 .testimonial-quote i {
-  font-size: 1.75rem;
+  font-size: 2rem;
   color: var(--primary);
   opacity: 0.2;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: block;
 }
 
 .testimonial-quote p {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-style: italic;
   color: var(--text-secondary);
-  line-height: 1.65;
-  margin: 0 0 1.35rem;
+  line-height: 1.7;
+  margin: 0 0 1.75rem;
 }
 
-.testimonial-author { display: flex; align-items: center; gap: 14px; }
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
 
 .author-avatar {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--primary-light);
   flex-shrink: 0;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-
 .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
+.author-info { text-align: left; }
 .author-info h4 {
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
@@ -1160,12 +1550,61 @@ export default {
   color: var(--text-primary);
   margin: 0 0 2px;
 }
-
 .author-info p { font-size: 0.8rem; color: var(--text-secondary); margin: 0; }
 .author-info span { font-size: 0.75rem; color: var(--text-muted); }
 
+.carousel-nav {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.carousel-nav:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: scale(1.08);
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: all var(--transition);
+  padding: 0;
+}
+.dot.active {
+  background: var(--primary);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.testimonial-fade-enter-active,
+.testimonial-fade-leave-active { transition: opacity 0.35s ease, transform 0.35s ease; }
+.testimonial-fade-enter-from { opacity: 0; transform: translateX(20px); }
+.testimonial-fade-leave-to { opacity: 0; transform: translateX(-20px); }
+
 /* ==================== CTA ==================== */
-.cta-section { padding: 48px 0 64px; background: white; }
+.cta-section { padding: 56px 0 72px; background: white; }
 
 .cta-content {
   text-align: center;
@@ -1176,6 +1615,18 @@ export default {
   border-radius: 28px;
   color: white;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+.cta-content::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99, 179, 237, 0.15), transparent 70%);
+  top: -150px;
+  right: -100px;
+  border-radius: 50%;
 }
 
 .cta-content h2 {
@@ -1183,11 +1634,11 @@ export default {
   font-size: 1.85rem;
   font-weight: 700;
   margin: 0 0 10px;
+  position: relative;
 }
+.cta-content p { font-size: 1rem; opacity: 0.9; margin: 0 0 1.75rem; line-height: 1.55; position: relative; }
 
-.cta-content p { font-size: 1rem; opacity: 0.9; margin: 0 0 1.75rem; line-height: 1.55; }
-
-.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
 
 .btn-primary {
   display: inline-flex;
@@ -1203,7 +1654,6 @@ export default {
   transition: all var(--transition);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 .btn-primary:hover { gap: 12px; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15); }
 
 .btn-secondary {
@@ -1220,12 +1670,10 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.25);
   transition: all var(--transition);
 }
-
 .btn-secondary:hover { background: rgba(255, 255, 255, 0.22); transform: translateY(-2px); }
 
 /* ==================== LOADING ==================== */
 .loading-block { text-align: center; padding: 60px 0; }
-
 .spinner {
   width: 44px;
   height: 44px;
@@ -1235,17 +1683,16 @@ export default {
   animation: spin 0.75s linear infinite;
   margin: 0 auto 1rem;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .loading-block p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* ==================== MODALE ==================== */
+/* ==================== MODAL SERVICE ==================== */
 .service-modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(4px);
+  background: rgba(10, 20, 35, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1256,35 +1703,37 @@ export default {
 .service-modal-container {
   background: #fff;
   border-radius: 24px;
-  max-width: 760px;
+  max-width: 800px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 92vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
 }
 
 .service-modal-close {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.95);
   color: #64748b;
   cursor: pointer;
   font-size: 0.95rem;
-  z-index: 2;
-  transition: all 0.2s;
+  z-index: 10;
+  transition: all var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-
 .service-modal-close:hover {
-  background: rgba(239, 68, 68, 0.9);
+  background: #e53e3e;
   color: #fff;
   transform: rotate(90deg);
 }
@@ -1293,8 +1742,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 24px 28px 20px;
+  padding: 26px 28px 20px;
   border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 5;
+  border-radius: 24px 24px 0 0;
 }
 
 .service-modal-icon {
@@ -1307,7 +1761,6 @@ export default {
   justify-content: center;
   flex-shrink: 0;
 }
-
 .service-modal-icon i { font-size: 1.4rem; color: #2b6cb0; }
 
 .service-modal-header-text { flex: 1; min-width: 0; }
@@ -1331,77 +1784,201 @@ export default {
   line-height: 1.25;
 }
 
+.service-modal-nav {
+  display: flex;
+  gap: 4px;
+  margin-right: 50px;
+}
+.service-modal-nav button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.service-modal-nav button:hover {
+  background: #2b6cb0;
+  color: #fff;
+  border-color: #2b6cb0;
+}
+
 .service-modal-body { padding: 24px 28px; }
 
-.service-modal-gallery { margin-bottom: 20px; }
+/* Galerie modal */
+.service-modal-gallery { margin-bottom: 24px; }
 
 .service-modal-gallery-main {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
   overflow: hidden;
   background: #f1f5f9;
+  position: relative;
 }
 
-.service-modal-gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+.service-modal-gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-main-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), transparent 30%, transparent 70%, rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+}
+
+.gallery-counter {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a202c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.gallery-nav:hover {
+  background: #2b6cb0;
+  color: #fff;
+  transform: translateY(-50%) scale(1.1);
+}
+.gallery-nav.prev { left: 12px; }
+.gallery-nav.next { right: 12px; }
 
 .service-modal-gallery-thumbs {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.service-modal-gallery-thumbs::-webkit-scrollbar { height: 6px; }
+.service-modal-gallery-thumbs::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
-.service-modal-gallery-thumbs img {
-  aspect-ratio: 1;
+.thumb {
+  flex-shrink: 0;
+  width: 76px;
+  height: 60px;
   border-radius: 10px;
-  object-fit: cover;
-  cursor: pointer;
+  overflow: hidden;
   border: 2px solid transparent;
-  transition: all 0.2s;
+  cursor: pointer;
+  padding: 0;
+  background: #f1f5f9;
+  transition: all var(--transition);
+  opacity: 0.65;
 }
-
-.service-modal-gallery-thumbs img.active { border-color: #2b6cb0; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb:hover { opacity: 0.9; transform: translateY(-2px); }
+.thumb.active {
+  border-color: #2b6cb0;
+  opacity: 1;
+  box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
+}
 
 .service-modal-caption {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #94a3b8;
   font-style: italic;
   text-align: center;
-  margin: 0 0 16px;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.service-modal-section { margin-bottom: 1.5rem; }
+.service-modal-section:last-child { margin-bottom: 0; }
+
+.modal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a202c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 12px;
+}
+
+.title-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #ebf4ff;
+  color: #2b6cb0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .service-modal-description {
   font-size: 0.95rem;
   color: #4a5568;
-  line-height: 1.7;
-  margin: 0 0 20px;
+  line-height: 1.75;
+  margin: 0;
   white-space: pre-line;
 }
 
 .service-modal-features {
-  background: #f8fafc;
-  border-radius: 14px;
-  padding: 18px 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
 }
-
-.service-modal-features h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 10px;
-}
-
-.service-modal-features ul { list-style: none; padding: 0; margin: 0; }
 
 .service-modal-features li {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: 6px 0;
+  padding: 10px 14px;
   font-size: 0.88rem;
   color: #4a5568;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
 
 .service-modal-features li i {
@@ -1412,30 +1989,57 @@ export default {
 }
 
 .service-modal-footer {
+  padding: 16px 28px 24px;
+  border-top: 1px solid #e2e8f0;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-radius: 0 0 24px 24px;
+}
+
+.modal-footer-actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  padding: 16px 28px 24px;
-  border-top: 1px solid #e2e8f0;
+  align-items: center;
+}
+
+.btn-modal-share {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.btn-modal-share:hover {
+  background: #ebf4ff;
+  color: #2b6cb0;
+  border-color: #2b6cb0;
 }
 
 .btn-modal-close {
-  padding: 10px 20px;
-  border-radius: 9999px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
   border: 1px solid #e2e8f0;
   background: #fff;
   color: #4a5568;
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition);
+  font-family: inherit;
 }
-
 .btn-modal-close:hover { background: #f8fafc; }
 
 .btn-modal-cta {
   padding: 10px 22px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background: #2b6cb0;
   color: #fff;
   text-decoration: none;
@@ -1444,52 +2048,75 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: all var(--transition);
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.25);
 }
+.btn-modal-cta:hover { background: #1a4f8a; gap: 12px; transform: translateY(-1px); }
 
-.btn-modal-cta:hover { background: #1a4f8a; gap: 12px; }
+.modal-keyboard-hint {
+  text-align: center;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 12px;
+}
+.modal-keyboard-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+  margin: 0 2px;
+}
 
 /* ==================== TRANSITIONS ==================== */
-.service-modal-fade-enter-active,
-.service-modal-fade-leave-active { transition: opacity 0.25s ease; }
+.modal-fade-enter-active,
+.modal-fade-leave-active { transition: opacity 0.28s ease; }
 
-.service-modal-fade-enter-active .service-modal-container,
-.service-modal-fade-leave-active .service-modal-container {
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+.modal-fade-enter-active .service-modal-container,
+.modal-fade-leave-active .service-modal-container {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
 }
 
-.service-modal-fade-enter-from,
-.service-modal-fade-leave-to { opacity: 0; }
+.modal-fade-enter-from,
+.modal-fade-leave-to { opacity: 0; }
 
-.service-modal-fade-enter-from .service-modal-container,
-.service-modal-fade-leave-to .service-modal-container {
-  transform: scale(0.94) translateY(10px);
+.modal-fade-enter-from .service-modal-container,
+.modal-fade-leave-to .service-modal-container {
+  transform: scale(0.94) translateY(20px);
+  opacity: 0;
 }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 992px) {
   .impact-content { grid-template-columns: 1fr; text-align: center; }
+  .impact-stats { max-width: 540px; margin: 0 auto; }
 }
 
 @media (max-width: 768px) {
-  .hero-content { padding: 80px 20px 60px; }
+  .hero-content { padding: 48px 20px 40px; }
   .services-grid { grid-template-columns: 1fr; }
   .step-card { flex-direction: column; text-align: center; }
-  .impact-stats { grid-template-columns: 1fr; }
-  .publications-grid, .testimonials-grid { grid-template-columns: 1fr; }
+  .step-icon { align-self: center; }
+  .impact-stats { grid-template-columns: 1fr 1fr; }
+  .publications-grid { grid-template-columns: 1fr; }
   .cta-buttons { flex-direction: column; align-items: center; }
+  .testimonials-carousel { flex-direction: column; }
+  .carousel-nav { display: none; }
+  .sticky-nav-btn span { display: none; }
+  .sticky-nav-btn { padding: 8px 12px; }
+  .service-modal-nav { display: none; }
 }
 
 @media (max-width: 600px) {
-  .service-modal-header { padding: 20px 20px 16px; }
+  .service-modal-header { padding: 20px 20px 16px; flex-wrap: wrap; }
   .service-modal-body { padding: 20px; }
-  .service-modal-footer {
-    flex-direction: column-reverse;
-    padding: 16px 20px 20px;
-  }
-  .btn-modal-close, .btn-modal-cta {
-    width: 100%;
-    justify-content: center;
-  }
+  .service-modal-footer { padding: 16px 20px 20px; }
+  .modal-footer-actions { flex-direction: column-reverse; }
+  .btn-modal-close, .btn-modal-cta { width: 100%; justify-content: center; }
+  .service-modal-gallery-main { aspect-ratio: 4 / 3; }
+  .service-modal-features { grid-template-columns: 1fr; }
 }
 </style>

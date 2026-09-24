@@ -209,12 +209,95 @@ class SlideSerializer(FileUploadMixin, serializers.ModelSerializer):
 class ProjetSerializer(FileUploadMixin, serializers.ModelSerializer):
     class Meta:
         model = Projet
-        fields = ['id', 'titre', 'categorie', 'statut', 'annee', 'lieu', 'description', 'image']
+        fields = [
+            'id', 'titre', 'categorie', 'statut',
+            'annee', 'lieu', 'description', 'description_longue',
+            'progression', 'partenaires_count', 'budget',
+            'image', 'images_galerie',
+        ]
         read_only_fields = ['id']
-    
+
     def validate_titre(self, value):
         if not value or value.strip() == '':
             raise serializers.ValidationError("Le titre est obligatoire")
+        return value.strip()
+
+    def create(self, validated_data):
+        # ✅ Toujours définir images_galerie (jamais None)
+        if not validated_data.get('images_galerie'):
+            validated_data['images_galerie'] = []
+
+        # Traiter les images de la galerie envoyées en FormData
+        request = self.context.get('request')
+        galerie_chemins = list(validated_data.get('images_galerie', []))
+
+        if request and request.FILES:
+            # Image principale
+            if 'image' in request.FILES:
+                validated_data['image'] = request.FILES['image']
+
+            # Galerie : accepte gallery_0, gallery_1, ... ou images_0, ...
+            for key, fichier in request.FILES.items():
+                if key == 'images' or key.startswith('gallery_') or key.startswith('images_'):
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        galerie_chemins.append(chemin)
+
+        validated_data['images_galerie'] = galerie_chemins
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+
+        # Image principale
+        if request and 'image' in request.FILES:
+            validated_data['image'] = request.FILES['image']
+
+        # Images existantes conservées (envoyées en JSON dans 'existing_images')
+        existing_raw = request.data.get('existing_images') if request else None
+        existing_list = []
+        if existing_raw:
+            try:
+                import json
+                existing_list = json.loads(existing_raw)
+                if not isinstance(existing_list, list):
+                    existing_list = []
+            except (ValueError, TypeError):
+                existing_list = []
+
+        # Nouvelles images
+        new_paths = []
+        if request and request.FILES:
+            for key, fichier in request.FILES.items():
+                if key == 'images' or key.startswith('gallery_') or key.startswith('images_'):
+                    chemin = self._save_gallery_file(fichier)
+                    if chemin:
+                        new_paths.append(chemin)
+
+        # ✅ Toujours une liste (jamais None)
+        if existing_list or new_paths or (request and 'existing_images' in request.data):
+            validated_data['images_galerie'] = existing_list + new_paths
+        elif 'images_galerie' in validated_data and validated_data['images_galerie'] is None:
+            validated_data['images_galerie'] = []
+
+        return super().update(instance, validated_data)
+
+    def _save_gallery_file(self, fichier):
+        """Sauvegarde dans media/projets/galerie/"""
+        import os
+        import uuid
+        import logging
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
+
+        try:
+            ext = os.path.splitext(fichier.name)[1] or '.jpg'
+            nom = f"projets/galerie/{uuid.uuid4().hex}{ext}"
+            chemin = default_storage.save(nom, ContentFile(fichier.read()))
+            return f"/media/{chemin}"
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Erreur sauvegarde galerie projet: {e}")
+            return None
         return value.strip()
 
 class ActiviteSerializer(FileUploadMixin, serializers.ModelSerializer):

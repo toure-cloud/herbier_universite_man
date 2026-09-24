@@ -751,7 +751,7 @@ export default {
 /* ==================== HERO ==================== */
 .hero-projets {
   position: relative;
-  min-height: 500px;
+  min-height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -759,7 +759,7 @@ export default {
   color: white;
   overflow: hidden;
   background: linear-gradient(145deg, #0f2744 0%, #1a365d 45%, #1e3a5f 100%);
-  padding: 100px 0 80px;
+  padding: 56px 0 48px;
 }
 
 .hero-background {
@@ -786,12 +786,12 @@ export default {
 
 .hero-glow {
   position: absolute;
-  width: 480px;
-  height: 480px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(66, 153, 225, 0.12), transparent 70%);
-  top: -100px;
-  right: -60px;
+  top: -80px;
+  right: -40px;
   pointer-events: none;
 }
 
@@ -806,16 +806,16 @@ export default {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 8px 18px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .hero-badge i {
@@ -824,10 +824,10 @@ export default {
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.1rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.75rem;
   letter-spacing: -0.02em;
 }
 
@@ -839,16 +839,16 @@ export default {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.55;
   opacity: 0.9;
-  margin: 0 0 2.5rem;
+  margin: 0 0 1.5rem;
 }
 
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
 }
 
@@ -857,10 +857,10 @@ export default {
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 14px 22px;
+  padding: 10px 16px;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  min-width: 130px;
+  min-width: 110px;
   transition: all var(--transition);
 }
 
@@ -871,17 +871,17 @@ export default {
 
 .stat-number {
   font-family: 'Playfair Display', serif;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #90cdf4;
   line-height: 1.1;
 }
 
 .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   opacity: 0.8;
   font-weight: 500;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .hero-wave {
@@ -895,7 +895,7 @@ export default {
 .hero-wave svg {
   display: block;
   width: 100%;
-  height: 70px;
+  height: 48px;
 }
 
 /* ==================== FILTRES ==================== */
@@ -1937,17 +1937,17 @@ export default {
 
 @media (max-width: 768px) {
   .hero-projets {
-    padding: 80px 0 60px;
-    min-height: 420px;
+    padding: 48px 0 40px;
+    min-height: 320px;
   }
 
   .hero-stats {
-    gap: 10px;
+    gap: 8px;
   }
 
   .stat-item {
-    min-width: 120px;
-    padding: 12px 16px;
+    min-width: 100px;
+    padding: 8px 12px;
   }
 
   .filters-wrapper {

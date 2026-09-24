@@ -297,7 +297,21 @@ class Projet(models.Model):
     annee = models.CharField(max_length=50, blank=True, null=True)
     lieu = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    description_longue = models.TextField(blank=True, null=True)
+    progression = models.IntegerField(default=0)
+    partenaires_count = models.IntegerField(default=0)
+    budget = models.CharField(max_length=100, blank=True, null=True)
+    
+    # ---------- Images ----------
     image = models.ImageField(upload_to='projets/', blank=True, null=True)
+    
+    # ✅ null=True + default=list → jamais d'erreur NOT NULL
+    images_galerie = models.JSONField(
+        default=list,
+        blank=True,
+        null=True,
+        verbose_name="Galerie d'images (chemins)"
+    )
     
     class Meta:
         verbose_name = "Projet"
@@ -306,6 +320,7 @@ class Projet(models.Model):
     
     def __str__(self):
         return self.titre
+    
 class Activite(models.Model):
     titre = models.CharField(max_length=200)
     titre_court = models.CharField(max_length=100)

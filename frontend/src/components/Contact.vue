@@ -435,13 +435,13 @@ export default {
 /* Hero Section */
 .hero-contact {
     position: relative;
-    min-height: 450px;
+    min-height: 320px;
     background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #1a2a3a 100%);
     display: flex;
     align-items: center;
     text-align: center;
     color: white;
-    padding: 80px 0 120px;
+    padding: 56px 0 64px;
 }
 
 .hero-bg {
@@ -476,33 +476,34 @@ export default {
 .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
-    padding: 0.5rem 1.5rem;
+    padding: 6px 14px;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
     border: 1px solid rgba(255,255,255,0.2);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .hero-badge i {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #3498db;
 }
 
 .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     line-height: 1.2;
-    margin: 1rem 0;
+    margin: 0.5rem 0 0.75rem;
 }
 
 .hero-subtitle {
     font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     opacity: 0.9;
+    line-height: 1.55;
 }
 
 .hero-wave {
@@ -511,6 +512,12 @@ export default {
     left: 0;
     right: 0;
     line-height: 0;
+}
+
+.hero-wave svg {
+    display: block;
+    width: 100%;
+    height: 48px;
 }
 
 /* Container */
@@ -1007,12 +1014,17 @@ export default {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .hero-contact {
+        min-height: 280px;
+        padding: 48px 0 40px;
+    }
+
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
     
     .hero-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.875rem;
     }
     
     .contact-grid {

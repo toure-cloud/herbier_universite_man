@@ -654,7 +654,7 @@ export default {
 /* ==================== HERO ==================== */
 .hero-herbier {
   position: relative;
-  min-height: 480px;
+  min-height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -683,37 +683,37 @@ export default {
   position: relative;
   z-index: 2;
   max-width: 880px;
-  padding: 100px 24px;
+  padding: 56px 24px 48px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
-  padding: 8px 18px;
+  padding: 6px 14px;
   border-radius: 9999px;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .hero-badge i { color: #63b3ed; }
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.75rem;
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.55;
   opacity: 0.9;
-  margin: 0 0 2.5rem;
+  margin: 0 0 1.5rem;
 }
 
 .highlight {
@@ -724,7 +724,7 @@ export default {
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
 }
 
@@ -732,10 +732,10 @@ export default {
   text-align: center;
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(10px);
-  padding: 14px 22px;
-  border-radius: 16px;
+  padding: 10px 16px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  min-width: 140px;
+  min-width: 110px;
   transition: all 0.25s ease;
 }
 
@@ -746,15 +746,15 @@ export default {
 
 .stat-number {
   font-family: 'Playfair Display', serif;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #90cdf4;
 }
 
 .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   opacity: 0.85;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .hero-wave {
@@ -765,7 +765,7 @@ export default {
   line-height: 0;
 }
 
-.hero-wave svg { display: block; width: 100%; height: 70px; }
+.hero-wave svg { display: block; width: 100%; height: 48px; }
 
 /* ==================== RECHERCHE ==================== */
 .search-section {
