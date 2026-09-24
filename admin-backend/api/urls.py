@@ -35,6 +35,10 @@ urlpatterns = [
     path('resend-code/', views.resend_code, name='resend-code'),
     path('logout/', views.logout_view, name='logout'),
     path('me/', views.me_view, name='me'),
+        # ==================== CONTACT (SuperIT) ====================
+    path('contact-messages/', views.contact_messages, name='contact-messages'),
+    path('contact-messages/stats/', views.contact_messages_stats, name='contact-messages-stats'),
+    path('contact-messages/<int:message_id>/', views.contact_message_detail, name='contact-message-detail'),
 
     # Mot de passe oublié
     path('forgot-password/', views.forgot_password, name='forgot-password'),

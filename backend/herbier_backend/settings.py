@@ -14,6 +14,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8x9y2z3a4b5c6d7e8f9g0
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Secret partagé avec l'admin-backend (pour le proxy contact)
+SYNC_SECRET = os.environ.get('SYNC_SECRET', 'dev-secret-change-me')
 # ============================================================
 # ENVIRONNEMENT
 # ============================================================

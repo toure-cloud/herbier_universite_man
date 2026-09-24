@@ -92,6 +92,7 @@ const menuItems = computed(() => {
     { to: '/maintenance', label: 'Maintenance', icon: 'fas fa-tools' },
     { to: '/herbier-data', label: 'Données Herbier', icon: 'fas fa-database' },
     { to: '/stats', label: 'Statistiques', icon: 'fas fa-chart-bar' },
+    { to: '/messages', label: 'Messages', icon: 'fas fa-envelope', badge: 'Live' },
   ]
 
   const commonFooter = [

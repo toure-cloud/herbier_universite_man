@@ -266,13 +266,45 @@
             </div>
         </section>
 
-        <!-- Toast Notification -->
-        <div class="toast" :class="{ show: showToast }">
-            <div class="toast-content">
-                <i class="fas fa-check-circle"></i>
-                <span>{{ toastMessage }}</span>
+        <!-- ==================== MODALE DE CONFIRMATION ==================== -->
+        <transition name="modal-fade">
+            <div v-if="showSuccessModal" class="confirm-modal-overlay" @click.self="closeSuccessModal">
+                <div class="confirm-modal">
+                    <div class="confirm-modal-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+
+                    <h2 class="confirm-modal-title">Message envoyé !</h2>
+
+                    <p class="confirm-modal-text">
+                        Merci <strong>{{ lastSentName }}</strong>, nous avons bien reçu votre message.
+                        Notre équipe vous répondra dans les plus brefs délais
+                        <span class="confirm-modal-highlight">(sous 48h ouvrées)</span>.
+                    </p>
+
+                    <div class="confirm-modal-recap" v-if="lastSentSubject">
+                        <div class="recap-row">
+                            <i class="fas fa-tag"></i>
+                            <span><strong>Sujet :</strong> {{ lastSentSubject }}</span>
+                        </div>
+                        <div class="recap-row">
+                            <i class="fas fa-envelope"></i>
+                            <span><strong>Réponse à :</strong> {{ lastSentEmail }}</span>
+                        </div>
+                    </div>
+
+                    <div class="confirm-modal-actions">
+                        <button type="button" class="btn-modal-secondary" @click="closeSuccessModal">
+                            Fermer
+                        </button>
+                        <router-link to="/" class="btn-modal-primary" @click="closeSuccessModal">
+                            Retour à l'accueil
+                            <i class="fas fa-arrow-right"></i>
+                        </router-link>
+                    </div>
+                </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -300,6 +332,11 @@ export default {
             isSubmitting: false,
             showToast: false,
             toastMessage: '',
+            // Modale de confirmation
+            showSuccessModal: false,
+            lastSentName: '',
+            lastSentEmail: '',
+            lastSentSubject: '',
             faqs: [
                 {
                     question: "Comment puis-je proposer une collaboration ?",
@@ -350,6 +387,7 @@ export default {
                 observer.observe(el)
             })
         },
+
         validateForm() {
             let isValid = true
             
@@ -377,6 +415,7 @@ export default {
             
             return isValid
         },
+
         async submitForm() {
             if (!this.validateForm()) {
                 this.showNotification('Veuillez corriger les erreurs dans le formulaire', 'error')
@@ -386,12 +425,24 @@ export default {
             this.isSubmitting = true
             
             try {
-                // Appel API réel - Décommentez pour utiliser l'API
-                // const response = await axios.post('http://localhost:8001/api/submit-contact/', this.form)
-                
-                // Simulation d'envoi
-                await new Promise(resolve => setTimeout(resolve, 1500))
-                
+                // ✅ Appel API réel
+                const response = await axios.post(
+                    config.API_ENDPOINTS.contact,
+                    {
+                        nom: this.form.nom,
+                        email: this.form.email,
+                        telephone: this.form.telephone || '',
+                        sujet: this.form.sujet || 'information',
+                        message: this.form.message
+                    }
+                )
+
+                // Mémoriser les infos pour la modale
+                this.lastSentName = this.form.nom
+                this.lastSentEmail = this.form.email
+                this.lastSentSubject = this.getSubjectLabel(this.form.sujet)
+
+                // Réinitialiser le formulaire
                 this.form = {
                     nom: '',
                     email: '',
@@ -400,14 +451,38 @@ export default {
                     message: '',
                     consentement: false
                 }
-                
-                this.showNotification('Votre message a été envoyé avec succès ! Nous vous répondrons rapidement.', 'success')
+
+                // ✅ Afficher la modale de confirmation
+                this.showSuccessModal = true
+                document.body.style.overflow = 'hidden'
+
             } catch (error) {
-                this.showNotification('Une erreur est survenue. Veuillez réessayer plus tard.', 'error')
+                console.error('Erreur envoi contact:', error)
+                this.showNotification(
+                    error.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer plus tard.',
+                    'error'
+                )
             } finally {
                 this.isSubmitting = false
             }
         },
+
+        closeSuccessModal() {
+            this.showSuccessModal = false
+            document.body.style.overflow = ''
+        },
+
+        getSubjectLabel(value) {
+            const map = {
+                information: "Demande d'information",
+                collaboration: 'Proposition de collaboration',
+                projet: 'Soumission de projet',
+                stage: 'Demande de stage',
+                autre: 'Autre',
+            }
+            return map[value] || value || '—'
+        },
+
         showNotification(message, type) {
             this.toastMessage = message
             this.showToast = true
@@ -415,9 +490,11 @@ export default {
                 this.showToast = false
             }, 5000)
         },
+
         toggleFaq(index) {
             this.faqs[index].open = !this.faqs[index].open
         },
+
         downloadBrochure() {
             alert('Téléchargement de la brochure...')
         }
@@ -986,6 +1063,179 @@ export default {
     gap: 0.8rem;
 }
 
+/* ==================== MODALE DE CONFIRMATION ==================== */
+.confirm-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+}
+
+.confirm-modal {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2.5rem 2rem 2rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.confirm-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.confirm-modal-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 2.5rem;
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 12px;
+}
+
+.confirm-modal-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: #4a5568;
+    line-height: 1.65;
+    margin: 0 0 20px;
+}
+
+.confirm-modal-text strong {
+    color: #1a202c;
+    font-weight: 600;
+}
+
+.confirm-modal-highlight {
+    color: #059669;
+    font-weight: 600;
+}
+
+.confirm-modal-recap {
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.recap-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    padding: 5px 0;
+}
+
+.recap-row i {
+    color: #3498db;
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.recap-row strong {
+    color: #1e293b;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-modal-secondary {
+    padding: 11px 22px;
+    border-radius: 9999px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.btn-modal-primary {
+    padding: 11px 22px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px -4px rgba(16, 185, 129, 0.45);
+}
+
+.btn-modal-primary:hover {
+    transform: translateY(-2px);
+    gap: 12px;
+    box-shadow: 0 6px 20px -4px rgba(16, 185, 129, 0.55);
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+    transition: opacity 0.25s ease;
+}
+
+.modal-fade-enter-active .confirm-modal,
+.modal-fade-leave-active .confirm-modal {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+    opacity: 0;
+}
+
+.modal-fade-enter-from .confirm-modal,
+.modal-fade-leave-to .confirm-modal {
+    transform: scale(0.92) translateY(10px);
+}
+
 /* Toast Notification */
 .toast {
     position: fixed;
@@ -1053,6 +1303,30 @@ export default {
     
     .section-title {
         font-size: 1.5rem;
+    }
+
+    .confirm-modal {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .confirm-modal-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 2rem;
+    }
+
+    .confirm-modal-title {
+        font-size: 1.3rem;
+    }
+
+    .confirm-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-modal-secondary,
+    .btn-modal-primary {
+        width: 100%;
+        justify-content: center;
     }
 }
 

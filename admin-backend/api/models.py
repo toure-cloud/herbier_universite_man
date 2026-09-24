@@ -514,3 +514,32 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"[{self.type}] {self.title}"
+    
+    
+class ContactMessage(models.Model):
+    SUJET_CHOICES = [
+        ('information', 'Demande d\'information'),
+        ('collaboration', 'Proposition de collaboration'),
+        ('projet', 'Soumission de projet'),
+        ('stage', 'Demande de stage'),
+        ('autre', 'Autre'),
+    ]
+
+    nom = models.CharField(max_length=200, verbose_name="Nom complet")
+    email = models.EmailField(verbose_name="Email")
+    telephone = models.CharField(max_length=50, blank=True, verbose_name="Téléphone")
+    sujet = models.CharField(
+        max_length=50, choices=SUJET_CHOICES, default='information',
+        verbose_name="Sujet"
+    )
+    message = models.TextField(verbose_name="Message")
+    date_envoi = models.DateTimeField(default=timezone.now, verbose_name="Date d'envoi")
+    lu = models.BooleanField(default=False, verbose_name="Lu")
+
+    class Meta:
+        verbose_name = "Message de contact"
+        verbose_name_plural = "Messages de contact"
+        ordering = ['-date_envoi']
+
+    def __str__(self):
+        return f"{self.nom} - {self.get_sujet_display()}"  

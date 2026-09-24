@@ -901,7 +901,7 @@ export default {
 /* ==================== HERO ==================== */
 .hero-activites {
   position: relative;
-  min-height: 540px;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -933,18 +933,18 @@ export default {
   filter: blur(60px);
 }
 .hero-glow-1 {
-  width: 480px;
-  height: 480px;
+  width: 280px;
+  height: 280px;
   background: radial-gradient(circle, rgba(66, 153, 225, 0.25), transparent 70%);
-  top: -120px;
-  right: -80px;
+  top: -80px;
+  right: -40px;
 }
 .hero-glow-2 {
-  width: 380px;
-  height: 380px;
+  width: 220px;
+  height: 220px;
   background: radial-gradient(circle, rgba(56, 161, 105, 0.2), transparent 70%);
-  bottom: -100px;
-  left: -60px;
+  bottom: -60px;
+  left: -30px;
 }
 
 .hero-content {
@@ -952,30 +952,30 @@ export default {
   z-index: 2;
   max-width: 900px;
   margin: 0 auto;
-  padding: 110px 24px 100px;
+  padding: 40px 24px 32px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
-  padding: 8px 18px;
+  padding: 5px 12px;
   border-radius: var(--radius-full);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 .hero-badge i { color: #63b3ed; }
 
 .hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
   font-weight: 700;
   line-height: 1.2;
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
 }
 
@@ -987,17 +987,17 @@ export default {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.5;
   opacity: 0.9;
-  margin: 0 auto 2.5rem;
-  max-width: 640px;
+  margin: 0 auto 1.15rem;
+  max-width: 540px;
 }
 
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 1.15rem;
+  gap: 0.7rem;
   flex-wrap: wrap;
 }
 
@@ -1005,35 +1005,35 @@ export default {
   text-align: center;
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(10px);
-  padding: 16px 22px;
-  border-radius: 16px;
+  padding: 8px 14px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  min-width: 140px;
+  min-width: 100px;
   transition: all var(--transition);
 }
 .hero-stat:hover {
   background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .stat-number {
   font-family: 'Playfair Display', serif;
-  font-size: 1.7rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #90cdf4;
   line-height: 1.1;
 }
 .stat-label {
-  font-size: 0.78rem;
+  font-size: 0.65rem;
   opacity: 0.8;
   font-weight: 500;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .hero-scroll-hint {
-  margin-top: 2.5rem;
-  width: 44px;
-  height: 44px;
+  margin-top: 1rem;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.08);
@@ -1044,11 +1044,12 @@ export default {
   justify-content: center;
   animation: bounce 2s infinite;
   transition: all var(--transition);
+  font-size: 0.75rem;
 }
 .hero-scroll-hint:hover { background: rgba(255, 255, 255, 0.18); }
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+  50% { transform: translateY(5px); }
 }
 
 .hero-wave {
@@ -1058,7 +1059,7 @@ export default {
   right: 0;
   line-height: 0;
 }
-.hero-wave svg { display: block; width: 100%; height: 70px; }
+.hero-wave svg { display: block; width: 100%; height: 36px; }
 
 /* ==================== SERVICES ==================== */
 .expertise-section { padding: 72px 0; background: white; }
@@ -1951,7 +1952,7 @@ export default {
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
-  .hero-content { padding: 48px 20px 40px; }
+  .hero-content { padding: 32px 20px 28px; }
   .services-grid { grid-template-columns: 1fr; }
   .step-card { flex-direction: column; text-align: center; }
   .step-icon { align-self: center; }

@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
 ]
-
+# Secret partagé avec l'admin-backend (pour le proxy contact)
+SYNC_SECRET = os.environ.get('SYNC_SECRET', 'dev-secret-change-me')
 # ============================================
 # MIDDLEWARES
 # ============================================

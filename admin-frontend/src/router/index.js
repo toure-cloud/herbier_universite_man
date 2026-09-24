@@ -36,6 +36,9 @@ const routes = [
 
   // ---------- 404 ----------
   { path: '/:pathMatch(.*)*', redirect: '/it-login' },
+  { path: '/messages', name: 'ContactMessages',
+  component: () => import('../views/ContactMessages.vue'),
+  meta: { requiresAuth: true, roles: ['it_admin'] } },
 ]
 
 const router = createRouter({
@@ -45,6 +48,7 @@ const router = createRouter({
     return { top: 0 }
   },
 })
+
 
 // ============================================
 // GUARDS DE SÉCURITÉ

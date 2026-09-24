@@ -7,7 +7,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from rest_framework import serializers
 from .models import (
-    Partenaire, Plante, Equipe, Slide, Projet, Activite, 
+    ContactMessage, Partenaire, Plante, Equipe, Slide, Projet, Activite, 
     Temoignage, Publication, FAQ, Statistique, Methodologie,
     SuperAdmin, AuditLog,
 )
@@ -538,3 +538,30 @@ class AuditLogSerializer(serializers.ModelSerializer):
             'details', 'ip_address', 'user_agent', 'created_at',
         ]
         read_only_fields = fields
+        
+        
+class ContactMessageSerializer(serializers.ModelSerializer):
+    sujet_label = serializers.CharField(
+        source='get_sujet_display',
+        read_only=True
+    )
+
+    class Meta:
+        model = ContactMessage
+        fields = [
+            'id', 'nom', 'email', 'telephone',
+            'sujet', 'sujet_label', 'message',
+            'date_envoi', 'lu',
+        ]
+        read_only_fields = ['id', 'date_envoi']
+
+    def validate_nom(self, value):
+        if not value or len(value.strip()) < 2:
+            raise serializers.ValidationError("Le nom doit contenir au moins 2 caractères")
+        return value.strip()
+
+    def validate_message(self, value):
+        if not value or len(value.strip()) < 10:
+            raise serializers.ValidationError("Le message doit contenir au moins 10 caractères")
+        return value.strip()
+        

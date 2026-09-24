@@ -7,29 +7,31 @@ from datetime import timedelta
 import pyotp
 import qrcode
 import base64
+from django.db.models import Q
 import secrets
 from io import BytesIO
 from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
+
+
 from .authentication import BearerTokenAuthentication, verify_token
 from .audit import log_action, record_login_attempt, check_login_rate_limit
 from .models import (
-    SuperAdmin, OTPCode, UserToken, AuditLog,
+    ContactMessage, SuperAdmin, OTPCode, UserToken, AuditLog,
     LoginAttempt, UserKnownIP, Notification,
     Plante, Equipe, Slide, Projet, Activite,
     Partenaire, Temoignage, Publication, FAQ,
     Statistique, Methodologie,
 )
 from .serializers import (
-    SuperAdminSerializer, SuperAdminCreateSerializer, AuditLogSerializer,
+    ContactMessageSerializer, SuperAdminSerializer, SuperAdminCreateSerializer, AuditLogSerializer,
     PlanteSerializer, EquipeSerializer, SlideSerializer,
     ProjetSerializer, ActiviteSerializer, TemoignageSerializer,
     PublicationSerializer, FAQSerializer, StatistiqueSerializer,
@@ -993,4 +995,175 @@ def get_activites_data(request):
             Methodologie.objects.filter(actif=True).order_by('ordre', 'titre'),
             many=True
         ).data,
+    })
+    
+    
+    # ============================================================
+# MESSAGES DE CONTACT (SuperIT uniquement)
+# ============================================================
+
+@api_view(['GET', 'POST'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def contact_messages(request):
+    """
+    GET  : liste tous les messages (SuperIT uniquement)
+    POST : reçoit un message depuis le backend public (proxy)
+    """
+    # ---------- POST (proxy depuis le public) ----------
+    if request.method == 'POST':
+        serializer = ContactMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            msg = serializer.save()
+            return Response({
+                'success': True,
+                'id': msg.id,
+                'message': 'Message enregistré.'
+            }, status=status.HTTP_201_CREATED)
+        return Response(
+            {'success': False, 'errors': serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # ---------- GET (liste pour l'admin) ----------
+    if request.user.role != 'it_admin':
+        return Response(
+            {'detail': "Accès réservé au SuperIT."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    qs = ContactMessage.objects.all()
+
+    lu = request.query_params.get('lu')
+    if lu is not None:
+        qs = qs.filter(lu=(lu.lower() == 'true'))
+
+    search = request.query_params.get('search')
+    if search:
+        qs = qs.filter(
+            Q(nom__icontains=search) |
+            Q(email__icontains=search) |
+            Q(message__icontains=search)
+        )
+
+    return Response(ContactMessageSerializer(qs, many=True).data)
+
+
+# ============================================================
+# MESSAGES DE CONTACT (SuperIT uniquement)
+# ============================================================
+@api_view(['GET', 'POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+@csrf_exempt
+def contact_messages(request):
+    """
+    GET  : liste tous les messages (SuperIT uniquement)
+    POST : reçoit un message depuis le backend public (proxy)
+    """
+    # ---------- POST (proxy depuis le public) ----------
+    if request.method == 'POST':
+        # ✅ Vérification du secret partagé (empêche les abus)
+        from django.conf import settings
+        expected_secret = getattr(settings, 'SYNC_SECRET', 'dev-secret')
+        provided_secret = request.headers.get('X-Sync-Secret', '')
+        if provided_secret != expected_secret:
+            return Response(
+                {'detail': "Non autorisé."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = ContactMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            msg = serializer.save()
+            return Response({
+                'success': True,
+                'id': msg.id,
+                'message': 'Message enregistré.'
+            }, status=status.HTTP_201_CREATED)
+        return Response(
+            {'success': False, 'errors': serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # ---------- GET (admin, SuperIT only) ----------
+    # Auth token obligatoire
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return Response(
+            {'detail': "Authentification requise."},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    from .authentication import verify_token
+    token = auth_header.split(' ', 1)[1]
+    user = verify_token(token)
+
+    if not user or user.role != 'it_admin':
+        return Response(
+            {'detail': "Accès réservé au SuperIT."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    qs = ContactMessage.objects.all()
+
+    lu = request.query_params.get('lu')
+    if lu is not None:
+        qs = qs.filter(lu=(lu.lower() == 'true'))
+
+    search = request.query_params.get('search')
+    if search:
+        from django.db.models import Q
+        qs = qs.filter(
+            Q(nom__icontains=search) |
+            Q(email__icontains=search) |
+            Q(message__icontains=search)
+        )
+
+    return Response(ContactMessageSerializer(qs, many=True).data)
+
+
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAuthenticated, IsSuperIT])
+def contact_message_detail(request, message_id):
+    """
+    GET    : détail d'un message
+    PATCH  : marque lu/non lu
+    DELETE : supprime
+    """
+    try:
+        msg = ContactMessage.objects.get(id=message_id)
+    except ContactMessage.DoesNotExist:
+        return Response({'error': 'Message non trouvé'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        return Response(ContactMessageSerializer(msg).data)
+
+    if request.method == 'PATCH':
+        if 'lu' in request.data:
+            msg.lu = bool(request.data['lu'])
+            msg.save(update_fields=['lu'])
+        return Response(ContactMessageSerializer(msg).data)
+
+    if request.method == 'DELETE':
+        log_action(request, 'DELETE', model_name='ContactMessage', obj=msg, details={
+            'email': msg.email,
+            'sujet': msg.sujet,
+        })
+        msg.delete()
+        return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAuthenticated, IsSuperIT])
+def contact_messages_stats(request):
+    """Retourne le nombre de messages lus/non lus."""
+    total = ContactMessage.objects.count()
+    non_lus = ContactMessage.objects.filter(lu=False).count()
+    return Response({
+        'total': total,
+        'non_lus': non_lus,
     })

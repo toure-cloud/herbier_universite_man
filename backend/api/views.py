@@ -1,9 +1,11 @@
 import requests
 from django.conf import settings
-from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, action
+from rest_framework import viewsets, status,authentication, permissions
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, action, authentication_classes, permission_classes
 from rest_framework.response import Response
 from django.db.models import Q, Count
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import time
 from .models import (
@@ -229,6 +231,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageSerializer
     
+    @csrf_exempt
     def create(self, request, *args, **kwargs):
         try:
             response = requests.post(
@@ -416,33 +419,6 @@ def get_contact_data(request):
     })
 
 
-@api_view(['POST'])
-def submit_contact(request):
-    """Soumet un message de contact"""
-    try:
-        response = requests.post(
-            f"{ADMIN_API_URL}/submit-contact/",
-            json=request.data,
-            timeout=10
-        )
-        if response.status_code == 201:
-            return Response(response.json(), status=201)
-    except requests.RequestException:
-        pass
-    
-    # Fallback: sauvegarder localement
-    serializer = ContactMessageSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({
-            'success': True,
-            'message': 'Votre message a été envoyé avec succès !'
-        }, status=status.HTTP_201_CREATED)
-    return Response({
-        'success': False,
-        'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['GET'])
 def herbier_stats(request):
@@ -597,3 +573,118 @@ def get_stats_herbier(request):
         'total_images': Plante.objects.filter(actif=True, image__isnull=False).count(),
         'dernier_ajout': Plante.objects.filter(actif=True).order_by('-date_creation').first().date_creation if Plante.objects.filter(actif=True).exists() else None,
     })
+    
+    
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+@csrf_exempt
+def submit_contact(request):
+    """
+    Reçoit un message, l'envoie à l'admin (source de vérité),
+    puis envoie les emails (admin + accusé de réception).
+    """
+    from django.conf import settings
+    from django.core.mail import send_mail
+    import requests as http_requests
+    import logging
+    logger = logging.getLogger(__name__)
+
+    serializer = ContactMessageSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(
+            {'success': False, 'errors': serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # ---------- 1. Envoyer à l'admin-backend ----------
+    admin_saved = False
+    try:
+        response = http_requests.post(
+            f"{ADMIN_API_URL}/contact-messages/",
+            json=request.data,
+            headers={'X-Sync-Secret': getattr(settings, 'SYNC_SECRET', 'dev-secret')},
+            timeout=10,
+        )
+        if response.status_code in (200, 201):
+            admin_saved = True
+            logger.info(f"✅ Message transmis à l'admin (id {response.json().get('id')})")
+        else:
+            logger.warning(f"⚠️ Admin a refusé le message : {response.status_code} — {response.text[:200]}")
+    except http_requests.RequestException as e:
+        logger.warning(f"⚠️ Impossible de joindre l'admin : {e}")
+
+    # ---------- 2. Sauvegarde locale (fallback) ----------
+    try:
+        contact = serializer.save()
+    except Exception as e:
+        logger.error(f"❌ Erreur sauvegarde locale : {e}")
+        return Response(
+            {'success': False, 'error': 'Impossible d\'enregistrer le message.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    # ---------- 3. Email vers l'équipe ----------
+    try:
+        subject = f"[Herbier] Nouveau message : {contact.get_sujet_display()}"
+        body_admin = f"""
+Nouveau message reçu depuis le site public.
+
+Nom       : {contact.nom}
+Email     : {contact.email}
+Téléphone : {contact.telephone or '—'}
+Sujet     : {contact.get_sujet_display()}
+
+Message :
+{contact.message}
+
+---
+Reçu le {contact.date_envoi.strftime('%d/%m/%Y à %H:%M')}
+Message #{contact.id} dans la base.
+"""
+        send_mail(
+            subject=subject,
+            message=body_admin,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.CONTACT_EMAIL],
+            fail_silently=False,
+        )
+        logger.info(f"✅ Email équipe envoyé pour #{contact.id}")
+    except Exception as e:
+        logger.error(f"❌ Erreur envoi email équipe : {e}")
+
+    # ---------- 4. Accusé de réception au visiteur ----------
+    try:
+        subject_ack = "Nous avons bien reçu votre message — Herbier de l'Université de Man"
+        body_ack = f"""
+Bonjour {contact.nom},
+
+Nous vous remercions de nous avoir contactés. Votre message a bien été reçu
+et notre équipe vous répondra dans les plus brefs délais (48h ouvrées).
+
+Récapitulatif de votre demande :
+- Sujet   : {contact.get_sujet_display()}
+- Message : {contact.message}
+
+Cordialement,
+L'équipe de l'Herbier de l'Université de Man
+contact@herbier-man.ci
+"""
+        send_mail(
+            subject=subject_ack,
+            message=body_ack,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[contact.email],
+            fail_silently=False,
+        )
+        logger.info(f"✅ Accusé de réception envoyé à {contact.email}")
+    except Exception as e:
+        logger.error(f"❌ Erreur envoi accusé : {e}")
+
+    # ---------- 5. Réponse finale ----------
+    return Response({
+        'success': True,
+        'message': 'Votre message a bien été envoyé.',
+        'id': contact.id,
+        'admin_synced': admin_saved,
+    }, status=status.HTTP_201_CREATED)
