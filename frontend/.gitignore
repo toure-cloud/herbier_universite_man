@@ -37,10 +37,3 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
-
-# Backups locaux
-.backup-confirm/
-.backup-deadfiles/
-*.vue.bak
-*.vue.backup
-*.vue.old
