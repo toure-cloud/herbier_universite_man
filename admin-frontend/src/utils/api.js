@@ -1,23 +1,32 @@
-// src/utils/api.js
 import axios from 'axios'
 
 // ============================================
 // CONFIGURATION
 // ============================================
+// ✅ Détection d'environnement (compatible tunnels de dev)
 const isProduction =
-  import.meta.env.PROD || window.location.hostname !== 'localhost'
+  import.meta.env.PROD ||
+  (
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    !window.location.hostname.includes('devtunnels.ms') &&
+    !window.location.hostname.includes('trycloudflare.com') &&
+    !window.location.hostname.includes('ngrok') &&
+    !window.location.hostname.includes('loca.lt')
+  )
 
-// ✅ urls.py racine monte api.urls sous path('api/', ...)
-const ADMIN_API_URL = isProduction
-  ? 'https://herbier-admin-backend.onrender.com/api'
-  : 'http://localhost:8001/api'
+// ✅ VITE_API_URL en priorité (défini dans .env.development)
+const ADMIN_API_URL = import.meta.env.VITE_API_URL || (
+  isProduction
+    ? 'https://herbier-admin-backend.onrender.com/api'
+    : 'http://localhost:8001/api'
+)
 
-const PUBLIC_API_URL = isProduction
-  ? 'https://herbier-backend.onrender.com/api'
-  : 'http://localhost:8000/api'
-
-console.log('🔗 ADMIN_API_URL:', ADMIN_API_URL)
-console.log('🔗 PUBLIC_API_URL:', PUBLIC_API_URL)
+const PUBLIC_API_URL = import.meta.env.VITE_PUBLIC_API_URL || (
+  isProduction
+    ? 'https://herbier-backend.onrender.com/api'
+    : 'http://localhost:8000/api'
+)
 
 // ============================================
 // UTILITAIRES

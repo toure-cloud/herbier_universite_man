@@ -420,9 +420,9 @@
               <button class="btn-modal-close" @click="closeService">
                 Fermer
               </button>
-              <router-link to="/contact" class="btn-modal-cta">
+              <!-- <router-link to="/contact" class="btn-modal-cta">
                 Demander ce service <i class="fas fa-arrow-right"></i>
-              </router-link>
+              </router-link> -->
             </div>
             <div class="modal-keyboard-hint">
               <kbd>←</kbd> <kbd>→</kbd> naviguer · <kbd>Échap</kbd> fermer

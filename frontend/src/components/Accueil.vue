@@ -277,24 +277,7 @@
                 :alt="membre.nom"
                 @error="handleImageError"
               />
-              <div class="team-overlay">
-                <div class="team-social">
-                  <a
-                    v-if="membre.email"
-                    :href="'mailto:' + membre.email"
-                    class="team-social-link"
-                    aria-label="Email"
-                  >
-                    <i class="fas fa-envelope"></i>
-                  </a>
-                  <a href="#" class="team-social-link" aria-label="LinkedIn">
-                    <i class="fab fa-linkedin-in"></i>
-                  </a>
-                  <a href="#" class="team-social-link" aria-label="Twitter">
-                    <i class="fab fa-twitter"></i>
-                  </a>
-                </div>
-              </div>
+              
             </div>
             <div class="team-info">
               <h3>{{ membre.nom }}</h3>
@@ -783,25 +766,26 @@ export default {
 }
 
 /* Overlay plus léger pour laisser voir l'image */
+
 .slide-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(15, 39, 68, 0.45) 0%,
-    rgba(26, 54, 93, 0.25) 100%
+    rgba(15, 39, 68, 0.15) 0%,
+    rgba(26, 54, 93, 0.08) 100%
   );
 }
-
 .slide-content {
   position: absolute;
   bottom: 14%;
-  left: 8%;
-  right: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
   max-width: 560px;
+  text-align: center;
   animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
 .slide-badge {
   display: inline-block;
   background: rgba(43, 108, 176, 0.9);
@@ -826,10 +810,10 @@ export default {
 
 .slide-text {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(242, 239, 239, 0.9);
   line-height: 1.5;
   max-width: 420px;
-  margin: 0;
+  margin: 0 auto;
 }
 
 @keyframes slideUp {
@@ -1867,7 +1851,16 @@ export default {
     min-width: auto;
   }
 }
-
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
 @media (max-width: 768px) {
 .hero-section {
   position: relative;
@@ -1897,13 +1890,18 @@ export default {
   }
 
   .slide-text {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
-
+.slide-content {
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+}
   .nav-btn {
     width: 36px;
     height: 36px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 
   .prev {

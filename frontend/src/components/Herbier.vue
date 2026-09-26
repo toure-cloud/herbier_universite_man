@@ -382,9 +382,9 @@
 
               <!-- Actions -->
               <div class="herbier-modal-actions">
-                <button class="btn-primary" @click="sharePlant">
+                <!-- <button class="btn-primary" @click="sharePlant">
                   <i class="fas fa-share-alt"></i> Partager
-                </button>
+                </button> -->
                 <button class="btn-outline" @click="closeModal">
                   <i class="fas fa-times"></i> Fermer
                 </button>

@@ -1,21 +1,27 @@
-// api.js
 import axios from 'axios'
 
 // === CONFIGURATION ===
 // ✅ Détection automatique de l'environnement
-const isProduction = import.meta.env.PROD || 
-                     window.location.hostname !== 'localhost'
+// ✅ Normalise l'URL : garantit le suffixe /api, sans doublon
+const normalizeApiUrl = (raw) => {
+  if (!raw) return raw
+  const clean = raw.replace(/\/+$/, '')
+  return clean.endsWith('/api') ? clean : `${clean}/api`
+}
 
-const ADMIN_API_URL = isProduction 
-  ? 'https://herbier-admin-backend.onrender.com/api'
-  : 'http://localhost:8001'
+const ADMIN_API_URL = normalizeApiUrl(
+  import.meta.env.VITE_API_URL ||
+  (isProduction
+    ? 'https://herbier-admin-backend.onrender.com/api'
+    : 'http://localhost:8001/api')
+)
 
-const PUBLIC_API_URL = isProduction 
-  ? 'https://herbier-backend.onrender.com/api'
-  : 'http://localhost:8000'
-
-console.log('🔗 ADMIN_API_URL:', ADMIN_API_URL)
-console.log('🔗 PUBLIC_API_URL:', PUBLIC_API_URL)
+const PUBLIC_API_URL = normalizeApiUrl(
+  import.meta.env.VITE_PUBLIC_API_URL ||
+  (isProduction
+    ? 'https://herbier-backend.onrender.com/api'
+    : 'http://localhost:8000/api')
+)
 
 // ============================================
 // UTILITAIRES

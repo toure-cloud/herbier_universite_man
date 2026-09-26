@@ -27,9 +27,7 @@ else:
     ADMIN_API_URL = os.environ.get('ADMIN_API_URL', 'http://localhost:8001/api')
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8001')
 
-print(f"🔗 PUBLIC_API_URL: {PUBLIC_API_URL}")
-print(f"🔗 ADMIN_API_URL: {ADMIN_API_URL}")
-print(f"🔗 BASE_URL: {BASE_URL}")
+
 
 # ============================================
 # APPLICATIONS
@@ -168,7 +166,27 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.devtunnels.ms',                     # ✅ Dev Tunnels VS Code
+    '.onrender.com',
+    'herbier-admin-backend.onrender.com',
+    # ... tes domaines de production
+]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:5173",
+    "https://localhost:5174",
+    "https://localhost:8000",
+    "https://localhost:8001",
+    # ... tes domaines de production
+]
 # ============================================
 # EMAIL - POUR LA 2FA
 # ============================================

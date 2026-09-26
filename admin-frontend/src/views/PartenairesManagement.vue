@@ -18,59 +18,75 @@
         :show-refresh="true"
         :loading="loading"
         @refresh="loadPartenaires"
-      />
+      >
+        <template #actions>
+          <button
+            v-if="auth.isSuperIT"
+            class="btn-create it"
+            @click="openCreate"
+          >
+            <i class="fas fa-plus"></i> Nouveau partenaire
+          </button>
+        </template>
+      </TopBar>
 
-      <!-- ✅ Bandeau lecture seule pour l'Admin -->
       <div v-if="!auth.isSuperIT" class="readonly-banner">
         <i class="fas fa-lock"></i>
         <div>
           <strong>Mode lecture seule</strong>
           <p>
-            La gestion des partenaires est réservée au <strong>Super Administrateur IT</strong>.
+            La gestion des partenaires est réservée au
+            <strong>Super Administrateur IT</strong>.
           </p>
         </div>
       </div>
 
-      <header class="page-header">
-        <div class="header-left">
-          <h1><i class="fas fa-handshake"></i> Partenaires</h1>
-          <span class="count-badge">{{ partenaires.length }} partenaire(s)</span>
+      <section class="filters-bar">
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input v-model.trim="search" type="text" placeholder="Rechercher un partenaire…" />
         </div>
-        <button
-          v-if="auth.isSuperIT"
-          class="btn-create it"
-          @click="openCreate"
-        >
-          <i class="fas fa-plus"></i> Ajouter un partenaire
-        </button>
-      </header>
+        <div class="result-count">
+          <i class="fas fa-handshake"></i> {{ filtered.length }} partenaire(s)
+        </div>
+      </section>
 
-      <div v-if="loading" class="loading-block">
+      <section v-if="loading" class="loading-block">
         <div class="spinner"></div>
-        <p>Chargement des partenaires…</p>
-      </div>
+        <p>Chargement…</p>
+      </section>
 
-      <div v-else-if="!partenaires.length" class="empty-block">
+      <section v-else-if="filtered.length === 0" class="empty-block">
         <i class="fas fa-handshake-slash"></i>
-        <p>Aucun partenaire pour le moment.</p>
-      </div>
+        <h3>Aucun partenaire</h3>
+        <p v-if="auth.isSuperIT">Ajoutez votre premier partenaire</p>
+        <p v-else>Les partenaires seront bientôt disponibles.</p>
+        <button v-if="auth.isSuperIT" class="btn-create it" @click="openCreate">
+          <i class="fas fa-plus"></i> Nouveau partenaire
+        </button>
+      </section>
 
       <section v-else class="partenaires-grid">
         <article
-          v-for="p in partenaires"
+          v-for="p in filtered"
           :key="p.id"
           class="partenaire-card"
           :class="{ inactive: !p.actif }"
         >
           <div class="partenaire-logo">
-            <img v-if="p.logo" :src="p.logo" :alt="p.nom" @error="onImageError" />
+            <img
+              v-if="p.logo"
+              :src="p.logo"
+              :alt="p.nom"
+              @error="onImageError"
+            />
             <i v-else class="fas fa-building"></i>
           </div>
 
           <div class="partenaire-body">
             <h3>{{ p.nom }}</h3>
             <p v-if="p.type" class="partenaire-type">{{ p.type }}</p>
-            <p v-if="p.description" class="partenaire-desc">{{ p.description }}</p>
+            <p v-if="p.description" class="partenaire-desc">{{ truncate(p.description, 110) }}</p>
 
             <a
               v-if="p.site_web"
@@ -91,7 +107,7 @@
             <button class="btn-icon edit" @click="openEdit(p)" title="Modifier">
               <i class="fas fa-pen"></i>
             </button>
-            <button class="btn-icon delete" @click="confirmDelete(p)" title="Supprimer">
+            <button class="btn-icon delete" @click="remove(p)" title="Supprimer">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -99,128 +115,134 @@
       </section>
     </main>
 
-    <!-- Modale (mêmes pattern que Equipe, adapté) -->
-    <div v-if="showModal" class="modal-backdrop" @click.self="closeModal">
-      <div class="modal">
-        <header class="modal-head">
-          <h2>
-            <i :class="editing ? 'fas fa-pen' : 'fas fa-plus'"></i>
-            {{ editing ? 'Modifier un partenaire' : 'Ajouter un partenaire' }}
-          </h2>
-          <button class="btn-close" @click="closeModal"><i class="fas fa-times"></i></button>
-        </header>
-
-        <form class="modal-body" @submit.prevent="savePartenaire">
-          <div class="form-grid">
-            <label class="field">
-              <span>Nom *</span>
-              <input v-model="form.nom" type="text" required />
-            </label>
-
-            <label class="field">
-              <span>Type</span>
-              <input v-model="form.type" type="text" placeholder="Ex : ONG, Université" />
-            </label>
-
-            <label class="field full">
-              <span>Site web</span>
-              <input v-model="form.site_web" type="url" placeholder="https://…" />
-            </label>
-
-            <label class="field full">
-              <span>Description</span>
-              <textarea v-model="form.description" rows="3"></textarea>
-            </label>
-
-            <label class="field">
-              <span>Ordre d'affichage</span>
-              <input v-model.number="form.ordre" type="number" min="0" />
-            </label>
-
-            <label class="field checkbox">
-              <input v-model="form.actif" type="checkbox" />
-              <span>Actif</span>
-            </label>
-
-            <label class="field full">
-              <span>Logo</span>
-              <input type="file" accept="image/*" @change="onFileChange" />
-              <small v-if="form.logoFile">Fichier : {{ form.logoFile.name }}</small>
-              <small v-else-if="editing && editing.logo">
-                Logo actuel : <em>conservé si aucun nouveau n'est choisi</em>
-              </small>
-            </label>
+    <transition name="fade">
+      <div v-if="showModal && auth.isSuperIT" class="modal-overlay" @click.self="closeModal">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title">
+              <i :class="editing ? 'fas fa-edit' : 'fas fa-handshake'"></i>
+              <h2>{{ editing ? 'Modifier' : 'Nouveau' }} partenaire</h2>
+            </div>
+            <button class="close-btn" @click="closeModal"><i class="fas fa-times"></i></button>
           </div>
 
-          <footer class="modal-foot">
-            <button type="button" class="btn btn-ghost" @click="closeModal">Annuler</button>
-            <button type="submit" class="btn btn-primary" :disabled="saving">
-              <i v-if="saving" class="fas fa-spinner fa-spin"></i>
-              {{ saving ? 'Enregistrement…' : (editing ? 'Mettre à jour' : 'Créer') }}
-            </button>
-          </footer>
-        </form>
-      </div>
-    </div>
+          <form @submit.prevent="save" class="modal-form">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Nom *</label>
+                <input v-model.trim="form.nom" type="text" required placeholder="Ex : Université de Man" />
+              </div>
+              <div class="form-group">
+                <label>Type</label>
+                <input v-model.trim="form.type" type="text" placeholder="Ex : ONG, Université" />
+              </div>
+            </div>
 
-    <div v-if="deleting" class="modal-backdrop" @click.self="cancelDelete">
-      <div class="modal small">
-        <header class="modal-head">
-          <h2><i class="fas fa-exclamation-triangle"></i> Confirmer la suppression</h2>
-        </header>
-        <div class="modal-body">
-          <p>Voulez-vous vraiment supprimer <strong>{{ deleting.nom }}</strong> ?</p>
-          <p class="hint">Cette action est irréversible.</p>
+            <div class="form-group">
+              <label>Site web</label>
+              <input v-model.trim="form.site_web" type="url" placeholder="https://…" />
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea v-model="form.description" rows="3"></textarea>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Ordre d'affichage</label>
+                <input v-model.number="form.ordre" type="number" min="0" />
+              </div>
+              <div class="form-group">
+                <label class="checkbox-wrap">
+                  <input type="checkbox" v-model="form.actif" />
+                  <span>Partenaire actif</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <ImageUploader
+                v-model="form.logoFile"
+                label="Logo"
+                icon="fas fa-building"
+                :multiple="false"
+                :max-size="5"
+                :existing-images="form.logoExisting ? [form.logoExisting] : []"
+                @files-changed="handleLogoChange"
+              />
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" @click="closeModal">Annuler</button>
+              <button type="submit" class="btn btn-primary it" :disabled="saving">
+                <i v-if="saving" class="fas fa-spinner fa-spin"></i>
+                <i v-else class="fas fa-save"></i>
+                {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+              </button>
+            </div>
+          </form>
         </div>
-        <footer class="modal-foot">
-          <button class="btn btn-ghost" @click="cancelDelete">Annuler</button>
-          <button class="btn btn-danger" :disabled="saving" @click="doDelete">
-            <i v-if="saving" class="fas fa-spinner fa-spin"></i> Supprimer
-          </button>
-        </footer>
       </div>
-    </div>
+    </transition>
 
     <Toast />
+    <ConfirmDialog />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Sidebar from '../components/Sidebar.vue'
 import TopBar from '../components/TopBar.vue'
 import Toast from '../components/Toast.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
+import ImageUploader from '../components/ImageUploader.vue'
+import { partenairesAPI } from '../utils/api'
 import { useAuthStore } from '../stores/auth'
 import { useToast } from '../composables/useToast'
-import { partenairesAPI } from '../utils/api'
+import { useConfirm } from '../composables/useConfirm'
 import { logger } from '../utils/logger'
 
-const auth = useAuthStore()
 const router = useRouter()
+const auth = useAuthStore()
 const toast = useToast()
+const askConfirm = useConfirm()
 
 const sidebarCollapsed = ref(false)
+const partenaires = ref([])
 const loading = ref(false)
 const saving = ref(false)
-
-const partenaires = ref([])
+const search = ref('')
 const showModal = ref(false)
 const editing = ref(null)
-const deleting = ref(null)
 
-const form = reactive({
+const form = ref({
   nom: '', type: '', site_web: '', description: '',
-  ordre: 0, actif: true, logoFile: null,
+  ordre: 0, actif: true,
+  logoFile: null, logoExisting: null,
 })
+
+const filtered = computed(() => {
+  if (!search.value) return partenaires.value
+  const q = search.value.toLowerCase()
+  return partenaires.value.filter(
+    (p) => p.nom?.toLowerCase().includes(q)
+        || p.type?.toLowerCase().includes(q)
+        || p.description?.toLowerCase().includes(q)
+  )
+})
+
+const truncate = (t, n) => (t?.length > n ? t.slice(0, n) + '…' : t || '')
+const onImageError = (e) => { e.target.style.display = 'none' }
 
 const loadPartenaires = async () => {
   loading.value = true
   try {
-    const { data } = await partenairesAPI.getAll()
+    const { data } = await partenairesAPI.list()
     partenaires.value = Array.isArray(data) ? data : (data.results || [])
   } catch {
-    logger.warn('Erreur chargement partenaires')
     toast.error('Impossible de charger les partenaires')
   } finally {
     loading.value = false
@@ -230,69 +252,94 @@ const loadPartenaires = async () => {
 const openCreate = () => {
   if (!auth.isSuperIT) return
   editing.value = null
-  Object.assign(form, { nom: '', type: '', site_web: '', description: '', ordre: 0, actif: true, logoFile: null })
+  form.value = {
+    nom: '', type: '', site_web: '', description: '',
+    ordre: 0, actif: true,
+    logoFile: null, logoExisting: null,
+  }
   showModal.value = true
+  document.body.style.overflow = 'hidden'
 }
 
 const openEdit = (p) => {
   if (!auth.isSuperIT) return
   editing.value = p
-  Object.assign(form, {
-    nom: p.nom ?? '', type: p.type ?? '', site_web: p.site_web ?? '',
-    description: p.description ?? '', ordre: p.ordre ?? 0,
-    actif: p.actif ?? true, logoFile: null,
-  })
+  form.value = {
+    nom: p.nom || '',
+    type: p.type || '',
+    site_web: p.site_web || '',
+    description: p.description || '',
+    ordre: p.ordre ?? 0,
+    actif: p.actif !== false,
+    logoFile: null,
+    logoExisting: p.logo || null,
+  }
   showModal.value = true
+  document.body.style.overflow = 'hidden'
 }
 
-const closeModal = () => { showModal.value = false; editing.value = null }
+const closeModal = () => {
+  showModal.value = false
+  editing.value = null
+  document.body.style.overflow = 'auto'
+}
 
-const onFileChange = (e) => { form.logoFile = e.target.files?.[0] || null }
-const onImageError = (e) => { e.target.style.display = 'none' }
+const handleLogoChange = ({ files, existing }) => {
+  form.value.logoFile = files[0] || null
+  form.value.logoExisting = existing[0] || null
+}
 
-const savePartenaire = async () => {
+const save = async () => {
   if (!auth.isSuperIT) return
+  if (!form.value.nom) {
+    toast.error('Le nom est obligatoire')
+    return
+  }
   saving.value = true
   try {
-    const payload = {
-      nom: form.nom, type: form.type || '', site_web: form.site_web || '',
-      description: form.description || '', ordre: form.ordre ?? 0, actif: form.actif,
-    }
-    if (form.logoFile) payload.logo = form.logoFile
+    const fd = new FormData()
+    fd.append('nom', form.value.nom)
+    if (form.value.type) fd.append('type', form.value.type)
+    if (form.value.site_web) fd.append('site_web', form.value.site_web)
+    if (form.value.description) fd.append('description', form.value.description)
+    fd.append('ordre', String(form.value.ordre ?? 0))
+    fd.append('actif', form.value.actif ? 'true' : 'false')
+
+    if (form.value.logoFile) fd.append('logo', form.value.logoFile)
+    else if (form.value.logoExisting) fd.append('logo', form.value.logoExisting)
 
     if (editing.value) {
-      await partenairesAPI.update(editing.value.id, payload)
+      await partenairesAPI.update(editing.value.id, fd)
       toast.success('Partenaire mis à jour')
     } else {
-      await partenairesAPI.create(payload)
+      await partenairesAPI.create(fd)
       toast.success('Partenaire ajouté')
     }
     closeModal()
     await loadPartenaires()
-  } catch {
-    logger.warn('Erreur sauvegarde partenaire')
-    toast.error('Erreur lors de l\'enregistrement')
+  } catch (err) {
+    logger.warn('Save partenaire error')
+    toast.error(err.response?.data?.error || 'Erreur lors de l\'enregistrement')
   } finally {
     saving.value = false
   }
 }
 
-const confirmDelete = (p) => { if (!auth.isSuperIT) return; deleting.value = p }
-const cancelDelete = () => { deleting.value = null }
-
-const doDelete = async () => {
-  if (!auth.isSuperIT || !deleting.value) return
-  saving.value = true
+const remove = async (p) => {
+  if (!auth.isSuperIT) return
+  const ok = await askConfirm({
+    title: 'Supprimer',
+    message: `Supprimer le partenaire « ${p.nom} » ?`,
+    dangerous: true,
+    confirmText: 'Supprimer',
+  })
+  if (!ok) return
   try {
-    await partenairesAPI.delete(deleting.value.id)
+    await partenairesAPI.remove(p.id)
     toast.success('Partenaire supprimé')
-    cancelDelete()
     await loadPartenaires()
   } catch {
-    logger.warn('Erreur suppression partenaire')
-    toast.error('Impossible de supprimer ce partenaire')
-  } finally {
-    saving.value = false
+    toast.error('Erreur lors de la suppression')
   }
 }
 
@@ -302,197 +349,275 @@ const handleLogout = async () => {
 }
 
 onMounted(() => {
-  if (!auth.isAuthenticated) { router.push('/it-login'); return }
+  if (!auth.isAuthenticated) {
+    router.push('/it-login')
+    return
+  }
   loadPartenaires()
 })
 </script>
 
 <style scoped>
-/* Reprendre exactement les mêmes styles que EquipeManagement.vue,
-   en remplaçant .equipe-grid → .partenaires-grid,
-   .membre-* → .partenaire-*,
-   .membre-photo → .partenaire-logo
-*/
-.partenaires-layout { min-height: 100vh; background: #f1f5f9; }
-.superit-theme { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-.main-content { margin-left: 260px; padding: 24px 28px 40px; }
+/* ============================================================
+   LAYOUT + THEME
+   ============================================================ */
+.partenaires-layout { min-height: 100vh; background: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+.partenaires-layout.superit-theme { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+.main-content { margin-left: 260px; padding: 24px 28px 40px; transition: margin-left 0.3s ease; }
 .main-content.expanded { margin-left: 76px; }
 
 .readonly-banner {
   display: flex; gap: 14px; align-items: flex-start;
   background: linear-gradient(135deg, #fff8e1, #ffecb3);
   border-left: 4px solid #f59e0b;
-  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
   color: #78350f;
 }
 .readonly-banner i { font-size: 22px; color: #d97706; flex-shrink: 0; margin-top: 2px; }
-.readonly-banner strong { font-size: 14px; }
-.readonly-banner p { margin: 4px 0 0; font-size: 13px; }
+.readonly-banner strong { font-size: 14px; display: block; margin-bottom: 2px; }
+.readonly-banner p { margin: 0; font-size: 13px; line-height: 1.5; }
 
-.page-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 20px;
-}
-.header-left { display: flex; align-items: baseline; gap: 12px; }
-.page-header h1 {
-  font-size: 22px; color: #0f172a; margin: 0; font-weight: 700;
-  display: flex; align-items: center; gap: 10px;
-}
-.superit-theme .page-header h1 { color: #e2e8f0; }
-.count-badge {
-  background: #e2e8f0; color: #475569;
-  padding: 4px 10px; border-radius: 12px;
-  font-size: 12px; font-weight: 600;
-}
 .btn-create {
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 18px; border-radius: 10px; border: none;
-  background: #10b981; color: #fff; font-weight: 600; font-size: 14px;
-  cursor: pointer; transition: all .15s;
+  padding: 10px 20px; color: #fff;
+  border: none; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; cursor: pointer;
 }
-.btn-create.it { background: #6366f1; }
-.btn-create.it:hover { background: #4f46e5; transform: translateY(-1px); }
+.btn-create.it {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  box-shadow: 0 4px 14px -4px rgba(99, 102, 241, 0.5);
+}
+.btn-create:hover { transform: translateY(-1px); }
+
+.filters-bar {
+  display: flex; gap: 12px; padding: 14px 18px;
+  background: #fff; border-radius: 12px; margin-bottom: 20px;
+  flex-wrap: wrap; align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.superit-theme .filters-bar {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+.search-wrap { flex: 1; min-width: 200px; position: relative; }
+.search-wrap i {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%); color: #94a3b8; font-size: 13px;
+}
+.search-wrap input {
+  width: 100%; padding: 10px 14px 10px 40px;
+  border: 1.5px solid #e2e8f0; border-radius: 10px;
+  font-size: 13.5px; font-family: inherit;
+  background: #f8fafc; color: #0f172a;
+}
+.superit-theme .search-wrap input {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.search-wrap input:focus { outline: none; border-color: #6366f1; background: #fff; }
+.superit-theme .search-wrap input:focus { border-color: #818cf8; background: rgba(255, 255, 255, 0.08); }
+.result-count {
+  font-size: 12.5px; color: #64748b;
+  padding: 6px 14px; background: #f1f5f9; border-radius: 20px;
+}
+.superit-theme .result-count { color: #94a3b8; background: rgba(255, 255, 255, 0.04); }
+.result-count i { color: #6366f1; margin-right: 4px; }
+.superit-theme .result-count i { color: #818cf8; }
+
+.loading-block, .empty-block {
+  background: #fff; border-radius: 12px; padding: 60px 20px; text-align: center;
+}
+.superit-theme .loading-block, .superit-theme .empty-block {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid #e2e8f0; border-top-color: #6366f1;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+.superit-theme .spinner { border-color: rgba(255, 255, 255, 0.15); border-top-color: #818cf8; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-block i { font-size: 48px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+.superit-theme .empty-block i { color: #6366f1; }
+.empty-block h3 { color: #0f172a; margin: 0 0 6px; }
+.superit-theme .empty-block h3 { color: #fff; }
+.empty-block p { color: #64748b; margin: 0 0 16px; }
+.superit-theme .empty-block p { color: #94a3b8; }
 
 .partenaires-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
 }
 .partenaire-card {
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s;
+  display: flex; gap: 16px; padding: 18px;
   position: relative;
-  background: #fff; border-radius: 14px; padding: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  display: flex; gap: 16px;
-  transition: all .15s;
 }
-.partenaire-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
 .superit-theme .partenaire-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
 }
-.partenaire-card.inactive { opacity: .55; }
+.partenaire-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.1); }
+.superit-theme .partenaire-card:hover { border-color: rgba(129, 140, 248, 0.4); }
+.partenaire-card.inactive { opacity: 0.55; }
 
 .partenaire-logo {
   width: 64px; height: 64px; flex-shrink: 0;
   border-radius: 12px; overflow: hidden;
-  background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+  background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
 }
-.superit-theme .partenaire-logo { background: rgba(255,255,255,0.08); }
+.superit-theme .partenaire-logo { background: rgba(255, 255, 255, 0.08); }
 .partenaire-logo img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
-.partenaire-logo i { font-size: 30px; color: #94a3b8; }
+.partenaire-logo i { font-size: 30px; color: #cbd5e1; }
+.superit-theme .partenaire-logo i { color: #6366f1; }
 
 .partenaire-body { flex: 1; min-width: 0; }
-.partenaire-body h3 { margin: 0 0 2px; font-size: 15.5px; color: #0f172a; }
+.partenaire-body h3 { font-size: 15px; color: #0f172a; margin: 0 0 4px; font-weight: 700; }
 .superit-theme .partenaire-body h3 { color: #fff; }
-.partenaire-type { margin: 0 0 8px; font-size: 12px; color: #6366f1; font-weight: 600; text-transform: uppercase; }
-.partenaire-desc { margin: 0 0 8px; font-size: 13px; color: #64748b; line-height: 1.4; }
-.superit-theme .partenaire-desc { color: #94a3b8; }
+.partenaire-type {
+  font-size: 11px; color: #6366f1; margin: 0 0 8px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.superit-theme .partenaire-type { color: #818cf8; }
+.partenaire-desc { font-size: 12.5px; color: #475569; line-height: 1.4; margin: 0 0 8px; }
+.superit-theme .partenaire-desc { color: #cbd5e1; }
 .partenaire-link {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #10b981; text-decoration: none; font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 12px; color: #6366f1; text-decoration: none;
+  font-weight: 600; margin-bottom: 8px;
 }
 .partenaire-link:hover { text-decoration: underline; }
 
 .status-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 8px;
-  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 600; display: inline-block;
 }
-.status-badge.active { background: rgba(16,185,129,0.15); color: #10b981; }
-.status-badge.inactive { background: rgba(239,68,68,0.15); color: #ef4444; }
+.status-badge.active { background: #dcfce7; color: #15803d; }
+.status-badge.inactive { background: #fee2e2; color: #b91c1c; }
+.superit-theme .status-badge.active { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.superit-theme .status-badge.inactive { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
 .partenaire-actions {
   position: absolute; top: 12px; right: 12px;
   display: flex; gap: 6px;
 }
 .btn-icon {
-  width: 32px; height: 32px; border-radius: 8px; border: none;
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1.5px solid #e2e8f0; background: #fff;
+  color: #475569; cursor: pointer; font-size: 12px;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all .15s;
 }
-.btn-icon.edit { background: #eef2ff; color: #6366f1; }
-.btn-icon.edit:hover { background: #e0e7ff; }
-.btn-icon.delete { background: #fee2e2; color: #ef4444; }
-.btn-icon.delete:hover { background: #fecaca; }
+.superit-theme .btn-icon {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+.btn-icon:hover { background: #f8fafc; }
+.superit-theme .btn-icon:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.btn-icon.edit:hover { color: #6366f1; border-color: #c7d2fe; }
+.btn-icon.delete { color: #ef4444; border-color: #fecaca; }
+.superit-theme .btn-icon.delete { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+.btn-icon.delete:hover { background: #fee2e2; }
 
-.loading-block, .empty-block {
-  background: #fff; border-radius: 14px; padding: 60px 20px; text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.superit-theme .loading-block, .superit-theme .empty-block {
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-}
-.spinner {
-  width: 40px; height: 40px; margin: 0 auto 16px;
-  border: 3px solid rgba(0,0,0,0.08); border-top-color: #10b981;
-  border-radius: 50%; animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.empty-block i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
-.empty-block p { color: #94a3b8; margin: 0; }
-
-.modal-backdrop {
-  position: fixed; inset: 0; background: rgba(15,23,42,0.7);
+/* MODALE */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(4px);
   display: flex; align-items: center; justify-content: center;
-  z-index: 1000; padding: 20px;
+  z-index: 2000; padding: 20px;
 }
-.modal {
+.superit-theme .modal-overlay { background: rgba(15, 23, 42, 0.8); }
+.modal-box {
   background: #fff; border-radius: 16px;
-  max-width: 620px; width: 100%; max-height: 90vh; overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto;
 }
-.modal.small { max-width: 420px; }
-.modal-head {
-  padding: 18px 24px; border-bottom: 1px solid #e2e8f0;
+.superit-theme .modal-box {
+  background: #1e1b4b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.modal-header {
   display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 24px; border-bottom: 1px solid #f1f5f9;
+  position: sticky; top: 0; background: #fff;
+  border-radius: 16px 16px 0 0; z-index: 1;
 }
-.modal-head h2 {
-  margin: 0; font-size: 16px; color: #0f172a;
-  display: flex; align-items: center; gap: 10px; font-weight: 700;
+.superit-theme .modal-header {
+  background: #1e1b4b;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
 }
-.modal-head h2 i { color: #6366f1; }
-.btn-close {
-  background: none; border: none; cursor: pointer;
-  width: 32px; height: 32px; border-radius: 8px; color: #64748b;
+.modal-title { display: flex; align-items: center; gap: 12px; }
+.modal-title i { font-size: 20px; color: #6366f1; }
+.modal-title h2 { font-size: 17px; color: #0f172a; margin: 0; }
+.superit-theme .modal-title h2 { color: #fff; }
+.close-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: none; color: #94a3b8; cursor: pointer;
 }
-.btn-close:hover { background: #f1f5f9; }
+.close-btn:hover { background: #f1f5f9; color: #0f172a; }
+.superit-theme .close-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 
-.modal-body { padding: 24px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field.full { grid-column: 1 / -1; }
-.field span { font-size: 12.5px; font-weight: 600; color: #475569; }
-.field input, .field textarea {
-  padding: 10px 12px; border-radius: 8px;
-  border: 1px solid #cbd5e1; font-size: 14px; font-family: inherit;
+.modal-form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12.5px; font-weight: 600; color: #334155; }
+.superit-theme .form-group label { color: #cbd5e1; }
+.form-group input,
+.form-group textarea {
+  padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 9px;
+  font-size: 13.5px; font-family: inherit;
+  background: #f8fafc; color: #0f172a; resize: vertical;
 }
-.field input:focus, .field textarea:focus { outline: none; border-color: #6366f1; }
-.field.checkbox { flex-direction: row; align-items: center; gap: 8px; }
-.field small { color: #94a3b8; font-size: 11.5px; }
+.superit-theme .form-group input,
+.superit-theme .form-group textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.form-group input:focus { outline: none; border-color: #6366f1; background: #fff; }
+.superit-theme .form-group input:focus { border-color: #818cf8; background: rgba(255, 255, 255, 0.08); }
 
-.modal-foot {
+.checkbox-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; cursor: pointer; }
+.superit-theme .checkbox-wrap { color: #cbd5e1; }
+.checkbox-wrap input { width: 16px; height: 16px; accent-color: #6366f1; }
+
+.modal-actions {
   display: flex; justify-content: flex-end; gap: 10px;
-  padding: 16px 24px; border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  padding-top: 8px; border-top: 1px solid #f1f5f9;
 }
+.superit-theme .modal-actions { border-top-color: rgba(255, 255, 255, 0.08); }
+
 .btn {
-  padding: 10px 18px; border-radius: 8px; border: none;
-  font-weight: 600; font-size: 14px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 600; border: none; cursor: pointer;
 }
-.btn-primary { background: #6366f1; color: #fff; }
-.btn-primary:hover { background: #4f46e5; }
-.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-.btn-ghost { background: transparent; color: #64748b; }
-.btn-ghost:hover { background: #f1f5f9; }
-.btn-danger { background: #ef4444; color: #fff; }
-.btn-danger:hover { background: #dc2626; }
+.btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-secondary { background: #f1f5f9; color: #475569; }
+.superit-theme .btn-secondary { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; }
+.btn-secondary:hover { background: #e2e8f0; }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
 @media (max-width: 768px) {
   .main-content { margin-left: 76px; padding: 16px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .partenaires-grid { grid-template-columns: 1fr; }
+  .form-row-2 { grid-template-columns: 1fr; }
 }
 </style>
