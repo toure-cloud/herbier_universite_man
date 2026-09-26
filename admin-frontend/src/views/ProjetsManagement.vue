@@ -61,7 +61,7 @@
           <div class="projet-image">
             <img
               v-if="getMainImage(p)"
-              :src="getMainImage(p)"
+              :src="getImageUrl(getMainImage(p))"
               :alt="p.titre"
               @error="onImageError"
             />
@@ -177,6 +177,14 @@
             </div>
 
             <div class="form-group">
+              <label>À la une</label>
+              <label class="checkbox-wrap">
+                <input type="checkbox" v-model="form.featured" />
+                <span>Mettre ce projet en avant sur la page d'accueil</span>
+              </label>
+            </div>
+
+            <div class="form-group">
               <ImageUploader
                 v-model="form.imagesFiles"
                 label="Images du projet"
@@ -261,6 +269,7 @@ const form = ref({
   description_longue: '',
   partenaires_count: 0,
   budget: '',
+  featured: false,
   imagesFiles: [],
   imagesExisting: [],
 })
@@ -284,14 +293,40 @@ const filtered = computed(() => {
 const getCategorieLabel = (v) => categories.find((c) => c.value === v)?.label || v
 const getStatutLabel = (v) => statuts.find((s) => s.value === v)?.label || v
 
+// ✅ Renvoie la liste des chemins d'images (relatifs ou absolus)
 const getAllImages = (p) => {
   if (Array.isArray(p.images) && p.images.length) return p.images
   if (Array.isArray(p.images_galerie) && p.images_galerie.length) return p.images_galerie
   if (p.image) return [p.image]
   return []
 }
+
 const getMainImage = (p) => getAllImages(p)[0] || null
 const hasMultipleImages = (p) => getAllImages(p).length > 1
+
+// ✅ Construit une URL absolue pour afficher l'image
+//    - Si l'URL est déjà absolue (http/https) → on la garde
+//    - Si c'est un chemin /media/... → on préfixe avec l'URL de base du backend admin
+//    - Sinon → on renvoie tel quel
+const getImageUrl = (path) => {
+  if (!path) return ''
+  if (typeof path !== 'string') return ''
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  if (path.startsWith('data:') || path.startsWith('blob:')) return path
+
+  // Base URL du backend admin (sans /api)
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001/api'
+  const baseUrl = apiUrl.replace(/\/api\/?$/, '')
+
+  if (path.startsWith('/media')) {
+    return `${baseUrl}${path}`
+  }
+  if (path.startsWith('media/')) {
+    return `${baseUrl}/${path}`
+  }
+  // Cas par défaut : on suppose un chemin relatif sous /media/
+  return `${baseUrl}/media/${path.replace(/^\/+/, '')}`
+}
 
 const onImageError = (e) => {
   e.target.style.display = 'none'
@@ -318,6 +353,7 @@ const openCreate = () => {
     annee: '', lieu: '', progression: 0,
     description: '', description_longue: '',
     partenaires_count: 0, budget: '',
+    featured: false,
     imagesFiles: [], imagesExisting: [],
   }
   showModal.value = true
@@ -337,6 +373,7 @@ const openEdit = (p) => {
     description_longue: p.description_longue || '',
     partenaires_count: p.partenaires_count ?? 0,
     budget: p.budget || '',
+    featured: p.featured === true,
     imagesFiles: [],
     imagesExisting: getAllImages(p),
   }
@@ -373,9 +410,15 @@ const save = async () => {
     if (form.value.description_longue) fd.append('description_longue', form.value.description_longue)
     fd.append('partenaires_count', String(form.value.partenaires_count || 0))
     if (form.value.budget) fd.append('budget', form.value.budget)
+    fd.append('featured', form.value.featured ? 'true' : 'false')
 
+    // Nouvelles images
     form.value.imagesFiles.forEach((f) => fd.append('images', f))
-    form.value.imagesExisting.forEach((u) => fd.append('existing_images', u))
+
+    // Images existantes conservées (JSON)
+    if (form.value.imagesExisting.length) {
+      fd.append('existing_images', JSON.stringify(form.value.imagesExisting))
+    }
 
     if (editing.value) {
       await projetsAPI.update(editing.value.id, fd)
@@ -910,6 +953,22 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
+
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+}
+.superit-theme .checkbox-wrap { color: #cbd5e1; }
+.checkbox-wrap input {
+  width: 16px;
+  height: 16px;
+  accent-color: #10b981;
+}
+.superit-theme .checkbox-wrap input { accent-color: #6366f1; }
 
 .help-text {
   font-size: 11.5px;

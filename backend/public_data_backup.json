@@ -1,0 +1,1214 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "activite"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "contactmessage"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "equipe"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "famillebotanique"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "faq"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "genrebotanique"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "herbierstats"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "methodologie"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "partenaire"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "projet"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "publication"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "slide"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "statistique"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "temoignage"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "projettimeline"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "plante"
+  }
+},
+{
+  "model": "api.plante",
+  "pk": 1,
+  "fields": {
+    "nom_scientifique": "Khaya senegalensis",
+    "famille": null,
+    "genre": null,
+    "nom_vernaculaire": "Caïlcédrat",
+    "type_morphologique": "Arbre",
+    "type_biologique": "Phanérophyte",
+    "affinite_chorologique": "Soudano-zambézienne",
+    "affinite_ecologique": "Mésophile",
+    "statut_conservation": "LC",
+    "lieu_collecte": "Mont Tonkoui, Man",
+    "habitat": "Forêt claire et savane arborée",
+    "description": "Grand arbre pouvant atteindre 30 m de hauteur.",
+    "distribution": "",
+    "usages": "",
+    "image": "",
+    "images_galerie": [],
+    "featured": false,
+    "actif": true,
+    "date_creation": "2026-09-19T12:34:34.019Z"
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 1,
+  "fields": {
+    "nom": "toure",
+    "email": "toure@gmail.com",
+    "telephone": "+225 0985214525",
+    "sujet": "stage",
+    "message": "fefeaffaefaefazfazfazfazqczfaz",
+    "date_envoi": "2026-09-24T17:39:43.803Z",
+    "lu": false
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 2,
+  "fields": {
+    "nom": "TOURE armel",
+    "email": "infr@gmail.com",
+    "telephone": "0709871479",
+    "sujet": "information",
+    "message": "azertyuiopoijhgf",
+    "date_envoi": "2026-09-24T17:40:59.517Z",
+    "lu": false
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 3,
+  "fields": {
+    "nom": "emanuel Ouattrar",
+    "email": "emam@gmail.com",
+    "telephone": "0625147845",
+    "sujet": "information",
+    "message": "qssdfgazertyujhgfdsdfgh",
+    "date_envoi": "2026-09-24T18:15:33.406Z",
+    "lu": false
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 4,
+  "fields": {
+    "nom": "emanuel Ouattrar",
+    "email": "emam@gmail.com",
+    "telephone": "0625147845",
+    "sujet": "information",
+    "message": "qssdfgazertyujhgfdsdfgh",
+    "date_envoi": "2026-09-24T18:23:58.085Z",
+    "lu": false
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 5,
+  "fields": {
+    "nom": "toure sanga louis armel",
+    "email": "information@gmail.com",
+    "telephone": "0907985248",
+    "sujet": "collaboration",
+    "message": "Bonjour a toute l'equipe, nous sommes une organisation forestiere et sohaitons faire une collaboration avec vous afin de partager nos esperiences et participer egalement a vos experiences.\nDr Toure, specialiste Botanique, université canada rue 7512 bonti.",
+    "date_envoi": "2026-09-26T07:43:26.369Z",
+    "lu": false
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "add_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "change_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "delete_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "view_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "add_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "change_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "delete_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "view_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "add_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "change_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "delete_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "view_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Famille botanique",
+    "content_type": [
+      "api",
+      "famillebotanique"
+    ],
+    "codename": "add_famillebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Famille botanique",
+    "content_type": [
+      "api",
+      "famillebotanique"
+    ],
+    "codename": "change_famillebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Famille botanique",
+    "content_type": [
+      "api",
+      "famillebotanique"
+    ],
+    "codename": "delete_famillebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Famille botanique",
+    "content_type": [
+      "api",
+      "famillebotanique"
+    ],
+    "codename": "view_famillebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "add_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "change_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "delete_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "view_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Genre botanique",
+    "content_type": [
+      "api",
+      "genrebotanique"
+    ],
+    "codename": "add_genrebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Genre botanique",
+    "content_type": [
+      "api",
+      "genrebotanique"
+    ],
+    "codename": "change_genrebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Genre botanique",
+    "content_type": [
+      "api",
+      "genrebotanique"
+    ],
+    "codename": "delete_genrebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Genre botanique",
+    "content_type": [
+      "api",
+      "genrebotanique"
+    ],
+    "codename": "view_genrebotanique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Statistique Herbier",
+    "content_type": [
+      "api",
+      "herbierstats"
+    ],
+    "codename": "add_herbierstats"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Statistique Herbier",
+    "content_type": [
+      "api",
+      "herbierstats"
+    ],
+    "codename": "change_herbierstats"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Statistique Herbier",
+    "content_type": [
+      "api",
+      "herbierstats"
+    ],
+    "codename": "delete_herbierstats"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Statistique Herbier",
+    "content_type": [
+      "api",
+      "herbierstats"
+    ],
+    "codename": "view_herbierstats"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "add_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "change_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "delete_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "view_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "add_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "change_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "delete_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "view_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "add_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "change_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "delete_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "view_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "add_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "change_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "delete_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "view_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "add_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "change_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "delete_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "view_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "add_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "change_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "delete_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "view_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "add_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "change_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "delete_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "view_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Étape du projet",
+    "content_type": [
+      "api",
+      "projettimeline"
+    ],
+    "codename": "add_projettimeline"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Étape du projet",
+    "content_type": [
+      "api",
+      "projettimeline"
+    ],
+    "codename": "change_projettimeline"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Étape du projet",
+    "content_type": [
+      "api",
+      "projettimeline"
+    ],
+    "codename": "delete_projettimeline"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Étape du projet",
+    "content_type": [
+      "api",
+      "projettimeline"
+    ],
+    "codename": "view_projettimeline"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "add_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "change_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "delete_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "view_plante"
+  }
+}
+]

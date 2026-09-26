@@ -314,7 +314,7 @@ class Projet(models.Model):
     featured = models.BooleanField(default=False, verbose_name="Projet à la une")
     annee = models.CharField(max_length=50, verbose_name="Année ou période")
     lieu = models.CharField(max_length=200, verbose_name="Lieu")
-    partenaires = models.IntegerField(default=0, verbose_name="Nombre de partenaires")
+    partenaires_count = models.IntegerField(default=0, verbose_name="Nombre de partenaires")
     beneficiaires = models.CharField(max_length=100, blank=True, verbose_name="Bénéficiaires")
     budget = models.CharField(max_length=100, blank=True, verbose_name="Budget")
     duree = models.CharField(max_length=100, blank=True, verbose_name="Durée")

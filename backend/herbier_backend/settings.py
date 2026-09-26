@@ -1,9 +1,8 @@
-"""
-Django settings for herbier_backend project.
-"""
 
 from pathlib import Path
 import os
+import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -13,6 +12,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8x9y2z3a4b5c6d7e8f9g0
 # ✅ URL de l'admin-backend, adaptée à l'environnement
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 # Secret partagé avec l'admin-backend (pour le proxy contact)
 SYNC_SECRET = os.environ.get('SYNC_SECRET', 'dev-secret-change-me')
@@ -96,12 +96,12 @@ WSGI_APPLICATION = 'herbier_backend.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='postgres://herbier_public:herbierUman@2026localhost:5432/herbier_public_db',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
-
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

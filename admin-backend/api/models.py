@@ -301,6 +301,7 @@ class Projet(models.Model):
     progression = models.IntegerField(default=0)
     partenaires_count = models.IntegerField(default=0)
     budget = models.CharField(max_length=100, blank=True, null=True)
+    featured = models.BooleanField(default=False, verbose_name="Projet à la une")
     
     # ---------- Images ----------
     image = models.ImageField(upload_to='projets/', blank=True, null=True)

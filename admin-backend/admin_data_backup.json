@@ -1,0 +1,5187 @@
+[
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "auth",
+    "model": "user"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "activite"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "equipe"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "faq"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "methodologie"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "plante"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "projet"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "publication"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "slide"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "statistique"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "superadmin"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "temoignage"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "usertoken"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "otpcode"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "partenaire"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "auditlog"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "loginattempt"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "notification"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "userknownip"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "fields": {
+    "app_label": "api",
+    "model": "contactmessage"
+  }
+},
+{
+  "model": "api.superadmin",
+  "pk": 1,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "nom": "kone armel",
+    "telephone": "+2250552149457",
+    "pays_code": "+225",
+    "password": "pbkdf2_sha256$600000$EKJm1yLwpA3fqtTDy5FBGK$xKP6FwWWnJfNRWjvT+ACrvyPgmHPzombCHMHumT5pZo=",
+    "role": "admin",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false,
+    "date_joined": "2026-09-16T19:24:03.691Z",
+    "last_login": "2026-09-26T07:46:21.597Z",
+    "requires_2fa": true,
+    "totp_secret": null,
+    "totp_enabled": false,
+    "totp_backup_codes": [],
+    "totp_last_used": null
+  }
+},
+{
+  "model": "api.superadmin",
+  "pk": 2,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "nom": "Super Administrateur IT",
+    "telephone": "+2250700000001",
+    "pays_code": "+225",
+    "password": "pbkdf2_sha256$600000$VdULzHYCQUbtqEv06Tkkce$m01wEluVxntx0y+SoejZfK0BoBprDUUJNBLSDe90cps=",
+    "role": "it_admin",
+    "is_active": true,
+    "is_staff": true,
+    "is_superuser": true,
+    "date_joined": "2026-09-16T22:35:54.843Z",
+    "last_login": "2026-09-25T18:36:01.872Z",
+    "requires_2fa": true,
+    "totp_secret": null,
+    "totp_enabled": false,
+    "totp_backup_codes": [],
+    "totp_last_used": null
+  }
+},
+{
+  "model": "api.superadmin",
+  "pk": 3,
+  "fields": {
+    "email": "kouassi@gmail.com",
+    "nom": "kouassi",
+    "telephone": "+22509871478",
+    "pays_code": "+225",
+    "password": "pbkdf2_sha256$600000$9R79WZmmKbjHo3uPFxDJAz$gfSU4AzkJ6a7xvxzyngyq9Pabio3earjRSAHTi9+RV4=",
+    "role": "admin",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false,
+    "date_joined": "2026-09-22T06:25:40.898Z",
+    "last_login": "2026-09-22T06:26:58.736Z",
+    "requires_2fa": true,
+    "totp_secret": null,
+    "totp_enabled": false,
+    "totp_backup_codes": [],
+    "totp_last_used": null
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "code": "746880",
+    "type": "email",
+    "created_at": "2026-09-16T19:24:04.683Z",
+    "expires_at": "2026-09-16T19:34:04.624Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 6,
+  "fields": {
+    "user": 2,
+    "code": "070693",
+    "type": "email",
+    "created_at": "2026-09-16T22:55:19.462Z",
+    "expires_at": "2026-09-16T23:05:19.461Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "code": "126713",
+    "type": "email",
+    "created_at": "2026-09-16T22:56:42.077Z",
+    "expires_at": "2026-09-16T23:06:42.076Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 8,
+  "fields": {
+    "user": 2,
+    "code": "981708",
+    "type": "email",
+    "created_at": "2026-09-16T23:27:17.831Z",
+    "expires_at": "2026-09-16T23:37:17.830Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 9,
+  "fields": {
+    "user": 1,
+    "code": "847835",
+    "type": "email",
+    "created_at": "2026-09-17T12:07:46.001Z",
+    "expires_at": "2026-09-17T12:17:46.001Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 10,
+  "fields": {
+    "user": 2,
+    "code": "376561",
+    "type": "email",
+    "created_at": "2026-09-17T12:53:09.857Z",
+    "expires_at": "2026-09-17T13:03:09.856Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 11,
+  "fields": {
+    "user": 2,
+    "code": "848140",
+    "type": "email",
+    "created_at": "2026-09-17T13:03:16.905Z",
+    "expires_at": "2026-09-17T13:13:16.905Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 12,
+  "fields": {
+    "user": 2,
+    "code": "801919",
+    "type": "email",
+    "created_at": "2026-09-17T13:11:02.993Z",
+    "expires_at": "2026-09-17T13:21:02.993Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 13,
+  "fields": {
+    "user": 2,
+    "code": "167448",
+    "type": "email",
+    "created_at": "2026-09-17T14:05:45.131Z",
+    "expires_at": "2026-09-17T14:15:45.130Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 14,
+  "fields": {
+    "user": 1,
+    "code": "720095",
+    "type": "email",
+    "created_at": "2026-09-17T14:06:36.454Z",
+    "expires_at": "2026-09-17T14:16:36.454Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 15,
+  "fields": {
+    "user": 1,
+    "code": "050585",
+    "type": "email",
+    "created_at": "2026-09-17T15:37:58.178Z",
+    "expires_at": "2026-09-17T15:47:58.177Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 16,
+  "fields": {
+    "user": 2,
+    "code": "325506",
+    "type": "email",
+    "created_at": "2026-09-17T15:38:36.336Z",
+    "expires_at": "2026-09-17T15:48:36.335Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 17,
+  "fields": {
+    "user": 2,
+    "code": "746922",
+    "type": "email",
+    "created_at": "2026-09-17T16:06:14.180Z",
+    "expires_at": "2026-09-17T16:16:14.179Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 18,
+  "fields": {
+    "user": 1,
+    "code": "320784",
+    "type": "email",
+    "created_at": "2026-09-17T16:06:57.022Z",
+    "expires_at": "2026-09-17T16:16:57.021Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 19,
+  "fields": {
+    "user": 1,
+    "code": "048983",
+    "type": "email",
+    "created_at": "2026-09-17T16:10:39.113Z",
+    "expires_at": "2026-09-17T16:20:39.112Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 20,
+  "fields": {
+    "user": 2,
+    "code": "815500",
+    "type": "email",
+    "created_at": "2026-09-17T16:11:11.959Z",
+    "expires_at": "2026-09-17T16:21:11.959Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 21,
+  "fields": {
+    "user": 1,
+    "code": "255092",
+    "type": "email",
+    "created_at": "2026-09-17T18:36:28.347Z",
+    "expires_at": "2026-09-17T18:46:28.346Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 22,
+  "fields": {
+    "user": 2,
+    "code": "060711",
+    "type": "email",
+    "created_at": "2026-09-17T18:37:54.016Z",
+    "expires_at": "2026-09-17T18:47:54.015Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 23,
+  "fields": {
+    "user": 2,
+    "code": "360302",
+    "type": "email",
+    "created_at": "2026-09-17T19:00:02.700Z",
+    "expires_at": "2026-09-17T19:10:02.699Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 24,
+  "fields": {
+    "user": 2,
+    "code": "291242",
+    "type": "email",
+    "created_at": "2026-09-17T19:16:09.647Z",
+    "expires_at": "2026-09-17T19:26:09.646Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 25,
+  "fields": {
+    "user": 1,
+    "code": "840054",
+    "type": "email",
+    "created_at": "2026-09-17T19:42:16.558Z",
+    "expires_at": "2026-09-17T19:52:16.557Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 26,
+  "fields": {
+    "user": 2,
+    "code": "488963",
+    "type": "email",
+    "created_at": "2026-09-17T19:43:17.327Z",
+    "expires_at": "2026-09-17T19:53:17.327Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 27,
+  "fields": {
+    "user": 1,
+    "code": "610280",
+    "type": "email",
+    "created_at": "2026-09-17T19:48:37.904Z",
+    "expires_at": "2026-09-17T19:58:37.903Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 28,
+  "fields": {
+    "user": 2,
+    "code": "075026",
+    "type": "email",
+    "created_at": "2026-09-17T19:52:05.951Z",
+    "expires_at": "2026-09-17T20:02:05.951Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 29,
+  "fields": {
+    "user": 1,
+    "code": "014330",
+    "type": "email",
+    "created_at": "2026-09-17T19:57:00.614Z",
+    "expires_at": "2026-09-17T20:07:00.613Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 30,
+  "fields": {
+    "user": 2,
+    "code": "721204",
+    "type": "email",
+    "created_at": "2026-09-17T20:01:04.019Z",
+    "expires_at": "2026-09-17T20:11:04.018Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 31,
+  "fields": {
+    "user": 1,
+    "code": "738583",
+    "type": "email",
+    "created_at": "2026-09-17T20:34:01.852Z",
+    "expires_at": "2026-09-17T20:44:01.851Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 32,
+  "fields": {
+    "user": 2,
+    "code": "488361",
+    "type": "email",
+    "created_at": "2026-09-18T06:30:07.004Z",
+    "expires_at": "2026-09-18T06:40:07.004Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 33,
+  "fields": {
+    "user": 2,
+    "code": "906475",
+    "type": "email",
+    "created_at": "2026-09-18T12:17:16.673Z",
+    "expires_at": "2026-09-18T12:27:16.672Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 34,
+  "fields": {
+    "user": 2,
+    "code": "037659",
+    "type": "email",
+    "created_at": "2026-09-22T06:13:12.478Z",
+    "expires_at": "2026-09-22T06:23:12.478Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 35,
+  "fields": {
+    "user": 1,
+    "code": "367338",
+    "type": "email",
+    "created_at": "2026-09-22T06:15:01.481Z",
+    "expires_at": "2026-09-22T06:25:01.478Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 36,
+  "fields": {
+    "user": 3,
+    "code": "267589",
+    "type": "email",
+    "created_at": "2026-09-22T06:26:43.450Z",
+    "expires_at": "2026-09-22T06:36:43.449Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 37,
+  "fields": {
+    "user": 2,
+    "code": "443586",
+    "type": "email",
+    "created_at": "2026-09-22T07:54:24.286Z",
+    "expires_at": "2026-09-22T08:04:24.284Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 38,
+  "fields": {
+    "user": 2,
+    "code": "378720",
+    "type": "email",
+    "created_at": "2026-09-22T16:55:24.519Z",
+    "expires_at": "2026-09-22T17:05:24.518Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 39,
+  "fields": {
+    "user": 2,
+    "code": "192250",
+    "type": "email",
+    "created_at": "2026-09-23T15:33:23.989Z",
+    "expires_at": "2026-09-23T15:43:23.989Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 40,
+  "fields": {
+    "user": 2,
+    "code": "507517",
+    "type": "email",
+    "created_at": "2026-09-25T18:35:36.735Z",
+    "expires_at": "2026-09-25T18:45:36.734Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.otpcode",
+  "pk": 41,
+  "fields": {
+    "user": 1,
+    "code": "385501",
+    "type": "email",
+    "created_at": "2026-09-26T07:46:06.634Z",
+    "expires_at": "2026-09-26T07:56:06.633Z",
+    "is_used": true
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "token": "e5f88114c95dd3ef920c0ab4dca7cd40",
+    "created_at": "2026-09-16T19:24:59.248Z",
+    "expires_at": "2026-09-23T19:24:59.210Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "token": "4a469def088384ca829984cbb7c804d481623c690c3ae5cec4b37ad99e06110d",
+    "created_at": "2026-09-16T22:55:42.884Z",
+    "expires_at": "2026-09-23T22:55:42.883Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "token": "7b43e2ef512647897d62f443dd0e6a5b17ac6fa597b1acbae4a6ec71990e532c",
+    "created_at": "2026-09-16T22:56:58.816Z",
+    "expires_at": "2026-09-23T22:56:58.816Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 4,
+  "fields": {
+    "user": 2,
+    "token": "1f42fdeb94d49879fa2e668831bf37f96e73eed22baff4746ca3689bc1176d2b",
+    "created_at": "2026-09-16T23:27:29.859Z",
+    "expires_at": "2026-09-23T23:27:29.859Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "token": "b49916a0d517dbabb63067963e48e12a44018d3056e591c2e5a13ad877433a54",
+    "created_at": "2026-09-17T12:08:00.326Z",
+    "expires_at": "2026-09-24T12:08:00.325Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 6,
+  "fields": {
+    "user": 2,
+    "token": "6c18c805f17844b8041692a4878f1851dd43c54616fdb89590f93a83f3c2b053",
+    "created_at": "2026-09-17T12:53:26.963Z",
+    "expires_at": "2026-09-24T12:53:26.962Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 7,
+  "fields": {
+    "user": 2,
+    "token": "d97e1e1a675d9ae2f5a38caafde4ed5559eeaf07fd46c73155a2ef165a8ffff4",
+    "created_at": "2026-09-17T13:03:36.391Z",
+    "expires_at": "2026-09-24T13:03:36.391Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 8,
+  "fields": {
+    "user": 2,
+    "token": "cd0c95629be8ee4f560222c57deb136b3cbf0533fb088e4bd8f13c7cfa4514a7",
+    "created_at": "2026-09-17T13:11:20.162Z",
+    "expires_at": "2026-09-24T13:11:20.161Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 9,
+  "fields": {
+    "user": 2,
+    "token": "a7d007675b80da422ef1aaa7876d7dee88d03ff379b65f669a4804259488f270",
+    "created_at": "2026-09-17T14:05:58.095Z",
+    "expires_at": "2026-09-24T14:05:58.093Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 10,
+  "fields": {
+    "user": 1,
+    "token": "473c3bfaa4807bb10d32242dcb766a7c1d6256e6c3136367e633fce5bfcc3e06",
+    "created_at": "2026-09-17T14:06:49.537Z",
+    "expires_at": "2026-09-24T14:06:49.537Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 11,
+  "fields": {
+    "user": 1,
+    "token": "aa01382ccf606f055144b8c2e2c106bbe25ddcb5f82239fda0a4f4773dd1cc7a",
+    "created_at": "2026-09-17T15:38:18.913Z",
+    "expires_at": "2026-09-24T15:38:18.912Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 12,
+  "fields": {
+    "user": 2,
+    "token": "99a357e069665aabb51a6b58503759920d48d7903ec23fca7f5ce84c01c7841b",
+    "created_at": "2026-09-17T15:38:51.233Z",
+    "expires_at": "2026-09-24T15:38:51.232Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 13,
+  "fields": {
+    "user": 2,
+    "token": "5851bbae7c0d9a4b351573260820aa1a7d6ffe0dc214991569848f0352553136",
+    "created_at": "2026-09-17T16:06:25.546Z",
+    "expires_at": "2026-09-24T16:06:25.545Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 14,
+  "fields": {
+    "user": 1,
+    "token": "c85518181d8e856db1b26f3efa185e9e19add12f27358970cb6de4d21425ca8f",
+    "created_at": "2026-09-17T16:07:14.855Z",
+    "expires_at": "2026-09-24T16:07:14.854Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 15,
+  "fields": {
+    "user": 1,
+    "token": "b39157a80c5e3a4eb70cfe3e72117acc3672440e1ed8f870c76af716202e9dcf",
+    "created_at": "2026-09-17T16:10:49.598Z",
+    "expires_at": "2026-09-24T16:10:49.597Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 16,
+  "fields": {
+    "user": 2,
+    "token": "c46425f74c7db506aba86afd5462baaabcda0cf0150315e9a4ffc4e0cdc0feb7",
+    "created_at": "2026-09-17T16:11:23.952Z",
+    "expires_at": "2026-09-24T16:11:23.951Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 17,
+  "fields": {
+    "user": 1,
+    "token": "ca8d506b2225845290fafbf3c748864fd218a6010d8ba661031ce70333bab85b",
+    "created_at": "2026-09-17T18:36:43.245Z",
+    "expires_at": "2026-09-24T18:36:43.244Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 18,
+  "fields": {
+    "user": 2,
+    "token": "1d9dbb03b96f34a3e60845fcf31c4649b0f32804ce25b562ccbf00e90a639760",
+    "created_at": "2026-09-17T18:38:28.900Z",
+    "expires_at": "2026-09-24T18:38:28.899Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 19,
+  "fields": {
+    "user": 2,
+    "token": "0292e3710ddbe572600fa9f4f002c0cfbdd967d2f993430db03967136d183bd9",
+    "created_at": "2026-09-17T19:00:13.479Z",
+    "expires_at": "2026-09-24T19:00:13.478Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 20,
+  "fields": {
+    "user": 2,
+    "token": "1e400888c168652d9fbc7b902fec750fe5a0f86f9c3bfc6decc8c107de6518a9",
+    "created_at": "2026-09-17T19:16:21.140Z",
+    "expires_at": "2026-09-24T19:16:21.138Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 21,
+  "fields": {
+    "user": 1,
+    "token": "dcc1ce2e2f4499c0fe268ca2cf85ab4d83cf2c9acfab0c98bb5aec3da4d0f0b4",
+    "created_at": "2026-09-17T19:42:26.798Z",
+    "expires_at": "2026-09-24T19:42:26.797Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 22,
+  "fields": {
+    "user": 2,
+    "token": "aeee53238fac8156410bbf3ccc13b4903f81fc4fd7ed7607906a9fb773eb3291",
+    "created_at": "2026-09-17T19:43:26.622Z",
+    "expires_at": "2026-09-24T19:43:26.621Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 23,
+  "fields": {
+    "user": 1,
+    "token": "bc2a662208015ec489740deb71c38174abd41f2d6d24fa73e74740c226148fcd",
+    "created_at": "2026-09-17T19:48:50.904Z",
+    "expires_at": "2026-09-24T19:48:50.903Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 24,
+  "fields": {
+    "user": 2,
+    "token": "e5721a7d3962e874fbada860a65327e386313177cbe0a45eade1be036dd3df1d",
+    "created_at": "2026-09-17T19:52:16.353Z",
+    "expires_at": "2026-09-24T19:52:16.352Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 25,
+  "fields": {
+    "user": 1,
+    "token": "3e75988f0f9561c5ddcbeb94f407b3dfb8cd829e7ac6280cef244a2909d3f6b3",
+    "created_at": "2026-09-17T19:57:08.822Z",
+    "expires_at": "2026-09-24T19:57:08.820Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 26,
+  "fields": {
+    "user": 2,
+    "token": "727215cbc14caab8341c20eb47a328286c49fb4487a4908fb4c2c1724fba318f",
+    "created_at": "2026-09-17T20:01:15.106Z",
+    "expires_at": "2026-09-24T20:01:15.102Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 27,
+  "fields": {
+    "user": 1,
+    "token": "debcd426f8a0dc8ffbd900bd0128a4ab756b56499bbd10a3f02ed582cfee0185",
+    "created_at": "2026-09-17T20:34:17.553Z",
+    "expires_at": "2026-09-24T20:34:17.552Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 28,
+  "fields": {
+    "user": 2,
+    "token": "4d37fa25f46253c09b38f5207c1775a8cf1c6be10154bf90cc336ecda821c2fc",
+    "created_at": "2026-09-18T06:30:24.861Z",
+    "expires_at": "2026-09-25T06:30:24.859Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 29,
+  "fields": {
+    "user": 2,
+    "token": "8c62275ae176bab38ee044175237905d43e46a6ee1526e807bb8c69050cf191b",
+    "created_at": "2026-09-18T12:17:29.586Z",
+    "expires_at": "2026-09-25T12:17:29.584Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 30,
+  "fields": {
+    "user": 2,
+    "token": "0e96e517b570a9c44e9c49eeba6385f34c1800b3061ffb96da9b51aee2dda5a8",
+    "created_at": "2026-09-22T06:13:31.190Z",
+    "expires_at": "2026-09-29T06:13:31.189Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 31,
+  "fields": {
+    "user": 1,
+    "token": "26901a314ed396ad50aec159aa4d2f136fe3e0f23c5ec1c21f41a0f22c52464a",
+    "created_at": "2026-09-22T06:15:14.136Z",
+    "expires_at": "2026-09-29T06:15:14.134Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 32,
+  "fields": {
+    "user": 3,
+    "token": "6eb574d9d0e174c3ba9f8f7269209aaf131bdf35c286e9662ecc365e91f81a85",
+    "created_at": "2026-09-22T06:26:58.823Z",
+    "expires_at": "2026-09-29T06:26:58.822Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 33,
+  "fields": {
+    "user": 2,
+    "token": "9a30a5afd3924e370672f0a0f8e4d9e89bb932ae486d89c8da451d24f6833046",
+    "created_at": "2026-09-22T07:54:40.947Z",
+    "expires_at": "2026-09-29T07:54:40.945Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 34,
+  "fields": {
+    "user": 2,
+    "token": "0b692f6bd3c360f9635aceadedb639afac40bc3deee825af242cb5843569bedd",
+    "created_at": "2026-09-22T16:55:39.860Z",
+    "expires_at": "2026-09-29T16:55:39.859Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 35,
+  "fields": {
+    "user": 2,
+    "token": "77b48fcff9a5b9b64b7afeafac34f0ba1e82e1cbebfa1a431312bc858f4a16bd",
+    "created_at": "2026-09-23T15:33:39.606Z",
+    "expires_at": "2026-09-30T15:33:39.605Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 36,
+  "fields": {
+    "user": 2,
+    "token": "898bf0f06e9900cfb1a6ecb3f809bc41c06eb40144b2e2bafe4ad0bde572c934",
+    "created_at": "2026-09-25T18:36:01.994Z",
+    "expires_at": "2026-10-02T18:36:01.993Z",
+    "is_active": false
+  }
+},
+{
+  "model": "api.usertoken",
+  "pk": 37,
+  "fields": {
+    "user": 1,
+    "token": "cb1f8415c9cb4c30a570de57eb1e4e694a956e54c9b11bd3686b69e46e788dbe",
+    "created_at": "2026-09-26T07:46:21.797Z",
+    "expires_at": "2026-10-03T07:46:21.797Z",
+    "is_active": true
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 1,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "email": "superit@herbier-man.ci",
+      "endpoint": "SuperIT",
+      "reason": "not_found"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:32:04.153Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 2,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "email": "superit@herbier-man.ci",
+      "endpoint": "SuperIT",
+      "reason": "not_found"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:32:37.760Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 3,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "email": "informaticien@gmail.com",
+      "endpoint": "SuperIT",
+      "reason": "wrong_role",
+      "expected": "it_admin",
+      "actual": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:34:02.646Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 4,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "email": "informaticien@gmail.com",
+      "endpoint": "SuperIT",
+      "reason": "wrong_role",
+      "expected": "it_admin",
+      "actual": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:35:05.247Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 5,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (Super IT)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:55:43.054Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 6,
+  "fields": {
+    "user": 2,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T22:56:58.972Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T23:27:12.149Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 8,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (Super IT)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T23:27:30.063Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 9,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (Super IT)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-16T23:39:48.794Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 10,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T12:08:00.395Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 11,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T12:53:03.407Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 12,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T12:53:27.056Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 13,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T13:03:05.674Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 14,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T13:03:36.488Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 15,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T13:10:56.645Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 16,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T13:11:20.276Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 17,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T14:05:58.260Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 18,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T14:06:49.623Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 19,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:35:10.237Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 20,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "endpoint": "Admin",
+      "anomaly": {
+        "new_ip": true,
+        "ip": "127.0.0.1"
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:37:57.964Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 21,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:38:19.001Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 22,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:38:29.806Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 23,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "endpoint": "SuperIT",
+      "anomaly": {
+        "new_ip": true,
+        "ip": "127.0.0.1"
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:38:36.145Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 24,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T15:38:51.303Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 25,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:06:25.635Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 26,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "reason": "bad_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:06:44.427Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 27,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:07:14.940Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 28,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:10:49.691Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 29,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:11:02.393Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 30,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T16:11:24.041Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 31,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:36:20.100Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 32,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:36:43.325Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 33,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:37:25.612Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 34,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "email": "informaticien@gmail.com",
+      "endpoint": "SuperIT",
+      "reason": "wrong_role",
+      "expected": "it_admin",
+      "actual": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:37:31.941Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 35,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:38:28.997Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 36,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "1",
+    "object_repr": "attieke",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:41:08.921Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 37,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T18:59:54.511Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 38,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:00:13.589Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 39,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:16:21.228Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 40,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:42:08.049Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 41,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:42:26.886Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 42,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:43:11.298Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 43,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:43:26.727Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 44,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:48:31.458Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 45,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:48:50.989Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 46,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:51:58.725Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 47,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:52:16.447Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 48,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:56:54.673Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 49,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T19:57:08.914Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 50,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T20:00:55.973Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 51,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T20:01:15.189Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 52,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T20:33:55.841Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 53,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T20:34:17.639Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 54,
+  "fields": {
+    "user": 1,
+    "action": "DELETE",
+    "model_name": "Plante",
+    "object_id": "1",
+    "object_repr": "attieke",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T21:16:28.353Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 55,
+  "fields": {
+    "user": 1,
+    "action": "CREATE",
+    "model_name": "Projet",
+    "object_id": "1",
+    "object_repr": "pro",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T21:17:35.070Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 56,
+  "fields": {
+    "user": 1,
+    "action": "DELETE",
+    "model_name": "Projet",
+    "object_id": "1",
+    "object_repr": "pro",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "created_at": "2026-09-17T21:17:38.726Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 57,
+  "fields": {
+    "user": 1,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T06:29:58.328Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 58,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T06:30:24.946Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 59,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "changes": {
+        "is_active": {
+          "old": "True",
+          "new": "False"
+        }
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T06:31:08.710Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 60,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T06:36:02.931Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 61,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T12:17:29.672Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 62,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Activite",
+    "object_id": "1",
+    "object_repr": "oui",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T14:28:02.010Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 63,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Projet",
+    "object_id": "2",
+    "object_repr": "CONQUETE UMAN",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T15:13:27.530Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 64,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Partenaire",
+    "object_id": "1",
+    "object_repr": "Toure",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T20:49:32.096Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 65,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Equipe",
+    "object_id": "1",
+    "object_repr": "Dr Piba Serge",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T20:50:51.628Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 66,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Equipe",
+    "object_id": "2",
+    "object_repr": "Dr Eballa",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T20:51:48.273Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 67,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "2",
+    "object_repr": "kouakou",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T21:12:16.043Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 68,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Plante",
+    "object_id": "2",
+    "object_repr": "kouakou",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-18T21:18:24.190Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 69,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Plante",
+    "object_id": "1",
+    "object_repr": "Khaya senegalensis",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T13:20:37.229Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 70,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Plante",
+    "object_id": "1",
+    "object_repr": "Khaya senegalensis",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T13:23:27.561Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 71,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "2",
+    "object_repr": "kaha senegalanis",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T13:29:35.624Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 72,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Plante",
+    "object_id": "2",
+    "object_repr": "kaha senegalanis",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T14:09:29.252Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 73,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "3",
+    "object_repr": "dsdsdsdsd",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T14:41:32.586Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 74,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Plante",
+    "object_id": "3",
+    "object_repr": "dsdsdsdsd",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T14:42:50.202Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 75,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Plante",
+    "object_id": "2",
+    "object_repr": "kaha senegalanis",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-19T14:54:30.790Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 76,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:12:42.344Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 77,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "email": "informaticien@gmail.com",
+      "endpoint": "Admin",
+      "reason": "inactive"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:13:01.793Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 78,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:13:31.283Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 79,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "changes": {
+        "is_active": {
+          "old": "False",
+          "new": "True"
+        }
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:13:42.696Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 80,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:15:14.227Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 81,
+  "fields": {
+    "user": 1,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "4",
+    "object_repr": "SANGAFLEURE",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:18:13.243Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 82,
+  "fields": {
+    "user": 2,
+    "action": "SYNC",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "scope": "all"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:21:13.809Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 83,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "role": "admin"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:25:41.999Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 84,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "changes": {
+        "is_active": {
+          "old": "False",
+          "new": "True"
+        }
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:25:56.432Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 85,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:26:18.738Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 86,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "role": "admin",
+      "endpoint": "Admin",
+      "anomaly": {
+        "new_ip": true,
+        "ip": "127.0.0.1"
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:26:43.269Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 87,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:26:58.910Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 88,
+  "fields": {
+    "user": 3,
+    "action": "UPDATE",
+    "model_name": "Projet",
+    "object_id": "2",
+    "object_repr": "CONQUETE UMAN",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:27:54.148Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 89,
+  "fields": {
+    "user": 3,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T06:28:56.327Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 90,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T07:54:41.111Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 91,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Activite",
+    "object_id": "1",
+    "object_repr": "oui",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T08:06:26.727Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 92,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Activite",
+    "object_id": "1",
+    "object_repr": "oui",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T08:11:31.309Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 93,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Activite",
+    "object_id": "2",
+    "object_repr": "toure",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T08:40:54.820Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 94,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Activite",
+    "object_id": "2",
+    "object_repr": "toure",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T08:41:20.640Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 95,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T16:55:39.960Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 96,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Activite",
+    "object_id": "1",
+    "object_repr": "oui",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T17:06:30.076Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 97,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Activite",
+    "object_id": "2",
+    "object_repr": "toure",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T17:06:33.236Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 98,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Activite",
+    "object_id": "3",
+    "object_repr": "tree",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T17:38:38.652Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 99,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Activite",
+    "object_id": "3",
+    "object_repr": "tree",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T18:00:52.185Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 100,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Activite",
+    "object_id": "3",
+    "object_repr": "tree",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T18:03:38.007Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 101,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Activite",
+    "object_id": "3",
+    "object_repr": "tree",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T18:18:34.749Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 102,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Activite",
+    "object_id": "4",
+    "object_repr": "formation des elites en herbier",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-22T18:21:35.427Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 103,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "changes": {
+        "is_active": {
+          "old": "True",
+          "new": "False"
+        }
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T06:21:50.044Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 104,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Projet",
+    "object_id": "2",
+    "object_repr": "CONQUETE UMAN",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T06:34:00.976Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 105,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Projet",
+    "object_id": "2",
+    "object_repr": "CONQUETE UMAN",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T07:37:42.008Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 106,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T15:33:39.710Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 107,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "Projet",
+    "object_id": "2",
+    "object_repr": "CONQUETE UMAN",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T15:36:29.680Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 108,
+  "fields": {
+    "user": 2,
+    "action": "SYNC",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "scope": "all"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-23T21:07:31.486Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 109,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Publication",
+    "object_id": "1",
+    "object_repr": "fvkygekefef (2026)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T06:23:02.634Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 110,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Temoignage",
+    "object_id": "1",
+    "object_repr": "kouasss - universite de bouake",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T06:30:42.093Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 111,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Temoignage",
+    "object_id": "2",
+    "object_repr": "toure - ETIC",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T06:31:59.141Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 112,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Temoignage",
+    "object_id": "3",
+    "object_repr": "DOUGONE - CROUA1",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T06:35:32.563Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 113,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Publication",
+    "object_id": "2",
+    "object_repr": "AZAZZ (2024)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T06:36:53.084Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 114,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-24T22:08:24.352Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 115,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "email": "test@test.com",
+      "endpoint": "SuperIT",
+      "reason": "not_found"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "created_at": "2026-09-25T14:46:20.923Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 116,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "email": "test@test.com",
+      "endpoint": "SuperIT",
+      "reason": "not_found"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "created_at": "2026-09-25T14:47:09.945Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 117,
+  "fields": {
+    "user": null,
+    "action": "LOGIN_FAILED",
+    "model_name": null,
+    "object_id": null,
+    "object_repr": null,
+    "details": {
+      "email": "email:superit@herbier-man.ci",
+      "endpoint": "SuperIT",
+      "reason": "not_found"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "created_at": "2026-09-25T14:49:48.825Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 118,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {
+      "role": "it_admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-25T18:36:02.097Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 119,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "SuperAdmin",
+    "object_id": "3",
+    "object_repr": "kouassi (Administrateur)",
+    "details": {
+      "changes": {
+        "is_active": {
+          "old": "False",
+          "new": "True"
+        }
+      }
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-25T18:36:25.903Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 120,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Partenaire",
+    "object_id": "1",
+    "object_repr": "Toure",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-25T18:57:09.841Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 121,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Partenaire",
+    "object_id": "2",
+    "object_repr": "UNICEF",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:18:15.866Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 122,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Partenaire",
+    "object_id": "3",
+    "object_repr": "LONACI",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:19:43.053Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 123,
+  "fields": {
+    "user": 2,
+    "action": "CREATE",
+    "model_name": "Partenaire",
+    "object_id": "4",
+    "object_repr": "CNRA",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:22:27.149Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 124,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Partenaire",
+    "object_id": "3",
+    "object_repr": "LONACI",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:22:52.964Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 125,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Partenaire",
+    "object_id": "2",
+    "object_repr": "UNICEF",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:24:37.103Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 126,
+  "fields": {
+    "user": 2,
+    "action": "UPDATE",
+    "model_name": "Partenaire",
+    "object_id": "1",
+    "object_repr": "Universite de Korhgo",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:29:01.820Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 127,
+  "fields": {
+    "user": 2,
+    "action": "DELETE",
+    "model_name": "ContactMessage",
+    "object_id": "1",
+    "object_repr": "emanuel Ouattrar - Demande d'information",
+    "details": {
+      "email": "emam@gmail.com",
+      "sujet": "information"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:45:02.052Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 128,
+  "fields": {
+    "user": 2,
+    "action": "LOGOUT",
+    "model_name": "SuperAdmin",
+    "object_id": "2",
+    "object_repr": "Super Administrateur IT (IT Administrator)",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:45:47.572Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 129,
+  "fields": {
+    "user": null,
+    "action": "LOGIN",
+    "model_name": "SuperAdmin",
+    "object_id": "1",
+    "object_repr": "kone armel (Administrateur)",
+    "details": {
+      "role": "admin",
+      "method": "email_otp"
+    },
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:46:21.897Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 130,
+  "fields": {
+    "user": 1,
+    "action": "CREATE",
+    "model_name": "Plante",
+    "object_id": "5",
+    "object_repr": "hermaphrodite",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:53:43.448Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 131,
+  "fields": {
+    "user": 1,
+    "action": "UPDATE",
+    "model_name": "Plante",
+    "object_id": "4",
+    "object_repr": "SANGAFLEURE",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T07:56:36.033Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 132,
+  "fields": {
+    "user": 1,
+    "action": "CREATE",
+    "model_name": "Projet",
+    "object_id": "1",
+    "object_repr": "formation Hacking",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T12:34:27.613Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 133,
+  "fields": {
+    "user": 1,
+    "action": "UPDATE",
+    "model_name": "Temoignage",
+    "object_id": "3",
+    "object_repr": "DOUGONE - CROUA1",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T13:42:03.464Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 134,
+  "fields": {
+    "user": 1,
+    "action": "UPDATE",
+    "model_name": "Projet",
+    "object_id": "1",
+    "object_repr": "formation Hacking",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T13:50:22.519Z"
+  }
+},
+{
+  "model": "api.auditlog",
+  "pk": 135,
+  "fields": {
+    "user": 1,
+    "action": "UPDATE",
+    "model_name": "Projet",
+    "object_id": "1",
+    "object_repr": "formation Hacking",
+    "details": {},
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "created_at": "2026-09-26T13:51:43.144Z"
+  }
+},
+{
+  "model": "api.plante",
+  "pk": 2,
+  "fields": {
+    "nom_scientifique": "kaha senegalanis",
+    "famille": "Meli",
+    "nom_vernaculaire": "caiekoi",
+    "type_morphologique": "opkko",
+    "type_biologique": "djndndn",
+    "affinite_chorologique": "ivvoiro guineen",
+    "affinite_ecologique": "mesol",
+    "statut_conservation": "NE",
+    "lieu_collecte": "MAN",
+    "habitat": "vrvrvrvrv'ttv",
+    "description": "azzaddddddddddddddddazdzfzacaafazfazfazfazfazafdzaa",
+    "image": "plantes/images.jpeg",
+    "images_galerie": [
+      "/media/plantes/galerie/bd3e6c6aedd54263b6c280f5bd7bf812.png",
+      "/media/plantes/galerie/b17cc89d3aa54abb91249555a4770360.png",
+      "/media/plantes/galerie/c75422c570844b5a94e9aad0ab175e4f.png",
+      "/media/plantes/galerie/eba264aa7b0548bcbce601a4631ce3e9.png",
+      "/media/plantes/galerie/7e149ff95ec440fdaed79645792f3c22.png"
+    ],
+    "actif": true,
+    "date_creation": "2026-09-19T13:29:35.488Z"
+  }
+},
+{
+  "model": "api.plante",
+  "pk": 3,
+  "fields": {
+    "nom_scientifique": "dsdsdsdsd",
+    "famille": "sqqqddvdvdvdvc",
+    "nom_vernaculaire": "cdvfssdc",
+    "type_morphologique": "145kjh",
+    "type_biologique": "rfedderg",
+    "affinite_chorologique": "fefffef",
+    "affinite_ecologique": "dfefefeffefeef",
+    "statut_conservation": "VU",
+    "lieu_collecte": "eefefefefefefe",
+    "habitat": "eedddcccccccccccccccccccccccccddddddddddddddddddddddddffffffffffffff",
+    "description": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "image": "plantes/image2s.jpeg",
+    "images_galerie": [
+      "/media/plantes/galerie/5785fb76b4da4c7e8a21d4b8b51df597.jpeg",
+      "/media/plantes/galerie/f37bb8bf26904dadbf0718f25581a22e.jpeg",
+      "/media/plantes/galerie/0c01ba05c81042b1a2b7b1bd1d4d49a3.jpeg"
+    ],
+    "actif": true,
+    "date_creation": "2026-09-19T14:41:32.310Z"
+  }
+},
+{
+  "model": "api.plante",
+  "pk": 4,
+  "fields": {
+    "nom_scientifique": "SANGAFLEURE",
+    "famille": "TOURE",
+    "nom_vernaculaire": "MELO",
+    "type_morphologique": "MINCE",
+    "type_biologique": "ROYALE",
+    "affinite_chorologique": "TOURE-OUATTARA",
+    "affinite_ecologique": "PROPRE",
+    "statut_conservation": "NT",
+    "lieu_collecte": "MAN",
+    "habitat": "sdefzfefezfez",
+    "description": "efefezfzefefefzefefefzegezgezgzegezggregherhre",
+    "image": "plantes/Capture_décran_du_2026-08-22_22-26-51.png",
+    "images_galerie": [
+      "/media/plantes/galerie/0534553f73e349a78abf9fb5283fb37d.png",
+      "/media/plantes/galerie/6cac5adcd8694f349bcfce86c8657e38.png",
+      "/media/plantes/galerie/e9afe60ed4b64bc884bbe06fd98a6256.png",
+      "/media/plantes/galerie/4b1b709084b34de0abab46b5ef72cb7a.png",
+      "/media/plantes/galerie/c933caeb9feb490887e39f91db9e9688.jpeg",
+      "/media/plantes/galerie/1dcc14ffbc5348c9b7f176589d67924c.jpeg",
+      "/media/plantes/galerie/bfb9d464147d48d2823cded9d2f4d2d0.jpeg",
+      "/media/plantes/galerie/c473d59e55ed41a0a066f41ba8f1000b.jpeg",
+      "/media/plantes/galerie/fe498f2542ac4f5d8b1a471978c3b36c.png"
+    ],
+    "actif": true,
+    "date_creation": "2026-09-22T06:18:13.086Z"
+  }
+},
+{
+  "model": "api.plante",
+  "pk": 5,
+  "fields": {
+    "nom_scientifique": "hermaphrodite",
+    "famille": "fleur double",
+    "nom_vernaculaire": "réceptacle floral",
+    "type_morphologique": "presque jamais",
+    "type_biologique": "L'induction florale",
+    "affinite_chorologique": "L'induction florale",
+    "affinite_ecologique": "L'induction florale",
+    "statut_conservation": "NE",
+    "lieu_collecte": "bouake",
+    "habitat": "L'induction florale est le phénomène qui permet la transformation du méristème apical caulinaire en méristème floral. Cette transition peut être induite par vernalisation (froid), photopériodisme (la longueur du jour), thermopériodisme (la température),",
+    "description": "La plupart des fleurs sont hermaphrodites, c'est-à-dire qu'elles ont à la fois des organes reproducteurs mâles et femelles : elles ont un pistil et des étamines. Les étamines sont la partie mâle (qui libère du pollen), et le pistil la partie femelle (qui contient les ovules). Certaines plantes comme le pistachier ou le kiwi ont des fleurs qui ne sont pas hermaphrodites : elles sont soit mâles, soit femelles, les scientifiques parlent de fleurs gonochoriques. D'autres plantes comme l'avocatier ont des fleurs qui sont successivement mâles et femelles, on parle alors d'hermaphrodisme successif.",
+    "image": "plantes/Bluete-Schema.svg.webp",
+    "images_galerie": [
+      "/media/plantes/galerie/092a01214d9648dc8b4d711f1da60332.webp",
+      "/media/plantes/galerie/986322ee746e43b186801b72d006efb7.webp"
+    ],
+    "actif": true,
+    "date_creation": "2026-09-26T07:53:43.347Z"
+  }
+},
+{
+  "model": "api.equipe",
+  "pk": 1,
+  "fields": {
+    "nom": "Dr Piba Serge",
+    "poste": "Maitre de Conferencce",
+    "email": "piba@gmail.com",
+    "specialite": "Geneticien",
+    "photo": "equipe/10ans.jpeg",
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.equipe",
+  "pk": 2,
+  "fields": {
+    "nom": "Dr Eballa",
+    "poste": "Directrice",
+    "email": "eballa@gmail.com",
+    "specialite": "Botanique",
+    "photo": "equipe/Gemini_Generated_Image_ofzgdwofzgdwofzg.jpeg",
+    "ordre": 1,
+    "actif": true
+  }
+},
+{
+  "model": "api.projet",
+  "pk": 1,
+  "fields": {
+    "titre": "formation Hacking",
+    "categorie": "formation",
+    "statut": "encours",
+    "annee": "2025-2026",
+    "lieu": "Man.côte d'ivoire",
+    "description": "Angiospermes et gymnospermes ont donc hérité d'un ancêtre commun. Le mécanisme aboutissant à la fleur n’a pas été inventé il y a environ 150 millions d'années : il a été hérité et utilisé par la plante[",
+    "description_longue": "Une équipe du CNRS répond en partie à la question : comment est apparue une structure aussi complexe que la fleur ? L'étude d’une plante gymnosperme, Welwitschia mirabilis, qui pousse dans des déserts de Namibie et d’Angola et peut vivre plus d’un millénaire, montre que ses cônes mâles possèdent quelques ovules stériles et du nectar, ce qui révèle une tentative échouée d’inventer la fleur bisexuelle. Les chercheurs ont trouvé dans son génome des gènes similaires à ceux responsables de la formation des fleurs et organisés selon la même hiérarchie. Angiospermes et gymnospermes ont donc hérité d'un ancêtre commun. Le mécanisme aboutissant à la fleur n’a pas été inventé il y a environ 150 millions d'années : il a été hérité et utilisé par la plante[",
+    "progression": 75,
+    "partenaires_count": 1,
+    "budget": "10000000000",
+    "featured": false,
+    "image": "",
+    "images_galerie": [
+      "/media/projets/galerie/ad291423d1e4486a8fabb057d9ec4c75.png"
+    ]
+  }
+},
+{
+  "model": "api.activite",
+  "pk": 4,
+  "fields": {
+    "titre": "formation des elites en herbier",
+    "titre_court": "formation",
+    "description_courte": "les experts en la matieres ont organisé une formation",
+    "description_longue": "suite a la demande des etudiants en these , les experts ont oraganisé les samedi 14 juillet 2026 a Cocody une seance de formation dont le theme etait",
+    "icon": "fas fa-leaf",
+    "image": "activites/Capture_décran_du_2026-09-19_14-48-29.png",
+    "images_galerie": [],
+    "caption": "",
+    "points_forts": "",
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.partenaire",
+  "pk": 1,
+  "fields": {
+    "nom": "Universite de Korhgo",
+    "description": "Université dde Korhogo dont la thematique est",
+    "logo": "partenaires/universiteKorhogo.jpeg",
+    "site_web": "https://www.youtube.com/watch?v=T4KNVT2w0mU&list=RDXI5jYXheC4M&index=5",
+    "type": "Univerite",
+    "ordre": 0,
+    "actif": false
+  }
+},
+{
+  "model": "api.partenaire",
+  "pk": 2,
+  "fields": {
+    "nom": "UNICEF",
+    "description": "azertyuiop",
+    "logo": "partenaires/unicef.png",
+    "site_web": null,
+    "type": "ONG",
+    "ordre": 1,
+    "actif": true
+  }
+},
+{
+  "model": "api.partenaire",
+  "pk": 3,
+  "fields": {
+    "nom": "LONACI",
+    "description": "organisation non gouvernementale",
+    "logo": "partenaires/lonaci.png",
+    "site_web": null,
+    "type": "Lotterie Nationale Ci",
+    "ordre": 2,
+    "actif": true
+  }
+},
+{
+  "model": "api.partenaire",
+  "pk": 4,
+  "fields": {
+    "nom": "CNRA",
+    "description": "le centre nationale de recherche agronomique accompagne tous les acteurs dans le secteur agronique",
+    "logo": "partenaires/cnra.png",
+    "site_web": null,
+    "type": "Centre de recherche",
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.temoignage",
+  "pk": 1,
+  "fields": {
+    "nom": "kouasss",
+    "poste": "directeur",
+    "organisation": "universite de bouake",
+    "texte": "azertyuiosdfghjkghj",
+    "photo": "temoignages/Capture_décran_du_2026-09-23_21-16-59.png",
+    "note": 5,
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.temoignage",
+  "pk": 2,
+  "fields": {
+    "nom": "toure",
+    "poste": "ingenieur Genie Logiciel",
+    "organisation": "ETIC",
+    "texte": "AZERTYUIOSDFGHJKSDFGHJKCVBJSDFGHQSDFGHJKPLK,NBVCXDRTYH",
+    "photo": "temoignages/Capture_décran_du_2026-08-24_23-22-36.png",
+    "note": 4,
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.temoignage",
+  "pk": 3,
+  "fields": {
+    "nom": "DOUGONE",
+    "poste": "PLIIJUG",
+    "organisation": "CROUA1",
+    "texte": "Lorem ipsum dolor sit amet. Vel molestiae tempora et sequi eaque qui cumque alias. Ea doloremque dolor aut voluptates mollitia est molestiae galisum id tenetur suscipit aut veritatis deleniti ut aperiam eius.\r\n\r\nEst consequuntur quod ut nihil dolorem ea magni aliquam est optio dicta et rerum nobis. Vel atque modi ex praesentium beatae et numquam itaque et earum sunt ad quasi culpa. Quo consequatur dolore rem praesentium earum id corrupti tempore quo aliquam beatae ea illo ipsum eum vitae quasi eum quia soluta.\r\n\r\nEst repellat nisi sit similique consectetur aut nemo saepe qui laudantium ipsum et repellat corporis ea cumque corporis qui commodi voluptatem. Aut saepe veritatis qui omnis laboriosam ut doloremque quia hic officiis omnis aut enim dolorem ut magni eaque qui corporis quos. Aut ipsum commodi aut molestiae repellat ad corrupti fugiat qui expedita nihil ut porro quia. Est minus aspernatur et atque maiores in dolor quia.",
+    "photo": "temoignages/ABC_Model.svg.webp",
+    "note": 5,
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.publication",
+  "pk": 1,
+  "fields": {
+    "titre": "fvkygekefef",
+    "auteurs": "efefefafaefa",
+    "journal": "zfzzf",
+    "annee": 2026,
+    "lien": "",
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.publication",
+  "pk": 2,
+  "fields": {
+    "titre": "AZAZZ",
+    "auteurs": "KOUASSI SERGES",
+    "journal": "NGKRJ25",
+    "annee": 2024,
+    "lien": "https://www.loremipzum.com/fr/g%C3%A9n%C3%A9rateur-de-texte",
+    "ordre": 0,
+    "actif": true
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 1,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T15:37:58.082Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 2,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T15:38:36.244Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 3,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T16:06:14.044Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 4,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T16:06:56.927Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 5,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T16:11:11.870Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 6,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T18:36:28.240Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 7,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": false,
+    "reason": "wrong_role",
+    "created_at": "2026-09-17T18:37:31.846Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 8,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T18:37:53.924Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 9,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:00:02.610Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 10,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:16:09.556Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 11,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:42:16.465Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 12,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:43:17.238Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 13,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:48:37.813Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 14,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:52:05.859Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 15,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T19:57:00.520Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 16,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T20:01:03.926Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 17,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-17T20:34:01.760Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 18,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-18T06:30:06.869Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 19,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-18T12:17:16.573Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 20,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": false,
+    "reason": "inactive",
+    "created_at": "2026-09-22T06:13:01.660Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 21,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-22T06:13:12.364Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 22,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-22T06:15:01.377Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 23,
+  "fields": {
+    "email": "kouassi@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-22T06:26:43.371Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 24,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-22T07:54:24.182Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 25,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-22T16:55:24.381Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 26,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-23T15:33:23.897Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 27,
+  "fields": {
+    "email": "test@test.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "success": false,
+    "reason": "not_found",
+    "created_at": "2026-09-25T14:46:20.439Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 28,
+  "fields": {
+    "email": "test@test.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "success": false,
+    "reason": "not_found",
+    "created_at": "2026-09-25T14:47:09.829Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 29,
+  "fields": {
+    "email": "email:superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "curl/7.81.0",
+    "success": false,
+    "reason": "not_found",
+    "created_at": "2026-09-25T14:49:48.739Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 30,
+  "fields": {
+    "email": "superit@herbier-man.ci",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-25T18:35:36.608Z"
+  }
+},
+{
+  "model": "api.loginattempt",
+  "pk": 31,
+  "fields": {
+    "email": "informaticien@gmail.com",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
+    "success": true,
+    "reason": "success",
+    "created_at": "2026-09-26T07:46:06.465Z"
+  }
+},
+{
+  "model": "api.userknownip",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "ip_address": "127.0.0.1",
+    "country_code": "",
+    "first_seen": "2026-09-17T15:37:57.759Z",
+    "last_seen": "2026-09-26T07:46:06.373Z",
+    "login_count": 9
+  }
+},
+{
+  "model": "api.userknownip",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "ip_address": "127.0.0.1",
+    "country_code": "",
+    "first_seen": "2026-09-17T15:38:35.962Z",
+    "last_seen": "2026-09-25T18:35:36.525Z",
+    "login_count": 16
+  }
+},
+{
+  "model": "api.userknownip",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "ip_address": "127.0.0.1",
+    "country_code": "",
+    "first_seen": "2026-09-22T06:26:43.044Z",
+    "last_seen": "2026-09-22T06:26:43.044Z",
+    "login_count": 1
+  }
+},
+{
+  "model": "api.notification",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "type": "SECURITY",
+    "title": "Nouvelle connexion détectée",
+    "message": "Connexion depuis une nouvelle adresse IP : 127.0.0.1",
+    "details": {
+      "ip": "127.0.0.1",
+      "hour": 15
+    },
+    "is_read": false,
+    "created_at": "2026-09-17T15:37:57.840Z"
+  }
+},
+{
+  "model": "api.notification",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "type": "SECURITY",
+    "title": "Nouvelle connexion détectée",
+    "message": "Connexion depuis une nouvelle adresse IP : 127.0.0.1",
+    "details": {
+      "ip": "127.0.0.1",
+      "hour": 15
+    },
+    "is_read": false,
+    "created_at": "2026-09-17T15:38:36.056Z"
+  }
+},
+{
+  "model": "api.notification",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "type": "SECURITY",
+    "title": "Nouvelle connexion détectée",
+    "message": "Connexion depuis une nouvelle adresse IP : 127.0.0.1",
+    "details": {
+      "ip": "127.0.0.1",
+      "hour": 6
+    },
+    "is_read": false,
+    "created_at": "2026-09-22T06:26:43.147Z"
+  }
+},
+{
+  "model": "api.contactmessage",
+  "pk": 2,
+  "fields": {
+    "nom": "toure sanga louis armel",
+    "email": "information@gmail.com",
+    "telephone": "0907985248",
+    "sujet": "collaboration",
+    "message": "Bonjour a toute l'equipe, nous sommes une organisation forestiere et sohaitons faire une collaboration avec vous afin de partager nos esperiences et participer egalement a vos experiences.\nDr Toure, specialiste Botanique, université canada rue 7512 bonti.",
+    "date_envoi": "2026-09-26T07:43:26.257Z",
+    "lu": true
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": [
+      "admin",
+      "logentry"
+    ],
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view permission",
+    "content_type": [
+      "auth",
+      "permission"
+    ],
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view group",
+    "content_type": [
+      "auth",
+      "group"
+    ],
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "add_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "change_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "delete_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user",
+    "content_type": [
+      "auth",
+      "user"
+    ],
+    "codename": "view_user"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view content type",
+    "content_type": [
+      "contenttypes",
+      "contenttype"
+    ],
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view session",
+    "content_type": [
+      "sessions",
+      "session"
+    ],
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "add_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "change_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "delete_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Activité",
+    "content_type": [
+      "api",
+      "activite"
+    ],
+    "codename": "view_activite"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "add_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "change_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "delete_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Membre de l'équipe",
+    "content_type": [
+      "api",
+      "equipe"
+    ],
+    "codename": "view_equipe"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "add_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "change_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "delete_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view FAQ",
+    "content_type": [
+      "api",
+      "faq"
+    ],
+    "codename": "view_faq"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "add_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "change_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "delete_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Étape de méthodologie",
+    "content_type": [
+      "api",
+      "methodologie"
+    ],
+    "codename": "view_methodologie"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "add_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "change_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "delete_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Plante",
+    "content_type": [
+      "api",
+      "plante"
+    ],
+    "codename": "view_plante"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "add_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "change_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "delete_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Projet",
+    "content_type": [
+      "api",
+      "projet"
+    ],
+    "codename": "view_projet"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "add_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "change_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "delete_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Publication",
+    "content_type": [
+      "api",
+      "publication"
+    ],
+    "codename": "view_publication"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "add_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "change_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "delete_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Slide",
+    "content_type": [
+      "api",
+      "slide"
+    ],
+    "codename": "view_slide"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "add_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "change_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "delete_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Statistique",
+    "content_type": [
+      "api",
+      "statistique"
+    ],
+    "codename": "view_statistique"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add super admin",
+    "content_type": [
+      "api",
+      "superadmin"
+    ],
+    "codename": "add_superadmin"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change super admin",
+    "content_type": [
+      "api",
+      "superadmin"
+    ],
+    "codename": "change_superadmin"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete super admin",
+    "content_type": [
+      "api",
+      "superadmin"
+    ],
+    "codename": "delete_superadmin"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view super admin",
+    "content_type": [
+      "api",
+      "superadmin"
+    ],
+    "codename": "view_superadmin"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "add_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "change_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "delete_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Témoignage",
+    "content_type": [
+      "api",
+      "temoignage"
+    ],
+    "codename": "view_temoignage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user token",
+    "content_type": [
+      "api",
+      "usertoken"
+    ],
+    "codename": "add_usertoken"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user token",
+    "content_type": [
+      "api",
+      "usertoken"
+    ],
+    "codename": "change_usertoken"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user token",
+    "content_type": [
+      "api",
+      "usertoken"
+    ],
+    "codename": "delete_usertoken"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user token",
+    "content_type": [
+      "api",
+      "usertoken"
+    ],
+    "codename": "view_usertoken"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add otp code",
+    "content_type": [
+      "api",
+      "otpcode"
+    ],
+    "codename": "add_otpcode"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change otp code",
+    "content_type": [
+      "api",
+      "otpcode"
+    ],
+    "codename": "change_otpcode"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete otp code",
+    "content_type": [
+      "api",
+      "otpcode"
+    ],
+    "codename": "delete_otpcode"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view otp code",
+    "content_type": [
+      "api",
+      "otpcode"
+    ],
+    "codename": "view_otpcode"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "add_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "change_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "delete_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Partenaire",
+    "content_type": [
+      "api",
+      "partenaire"
+    ],
+    "codename": "view_partenaire"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Log d'audit",
+    "content_type": [
+      "api",
+      "auditlog"
+    ],
+    "codename": "add_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Log d'audit",
+    "content_type": [
+      "api",
+      "auditlog"
+    ],
+    "codename": "change_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Log d'audit",
+    "content_type": [
+      "api",
+      "auditlog"
+    ],
+    "codename": "delete_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Log d'audit",
+    "content_type": [
+      "api",
+      "auditlog"
+    ],
+    "codename": "view_auditlog"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add login attempt",
+    "content_type": [
+      "api",
+      "loginattempt"
+    ],
+    "codename": "add_loginattempt"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change login attempt",
+    "content_type": [
+      "api",
+      "loginattempt"
+    ],
+    "codename": "change_loginattempt"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete login attempt",
+    "content_type": [
+      "api",
+      "loginattempt"
+    ],
+    "codename": "delete_loginattempt"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view login attempt",
+    "content_type": [
+      "api",
+      "loginattempt"
+    ],
+    "codename": "view_loginattempt"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add notification",
+    "content_type": [
+      "api",
+      "notification"
+    ],
+    "codename": "add_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change notification",
+    "content_type": [
+      "api",
+      "notification"
+    ],
+    "codename": "change_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete notification",
+    "content_type": [
+      "api",
+      "notification"
+    ],
+    "codename": "delete_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view notification",
+    "content_type": [
+      "api",
+      "notification"
+    ],
+    "codename": "view_notification"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add user known ip",
+    "content_type": [
+      "api",
+      "userknownip"
+    ],
+    "codename": "add_userknownip"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change user known ip",
+    "content_type": [
+      "api",
+      "userknownip"
+    ],
+    "codename": "change_userknownip"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete user known ip",
+    "content_type": [
+      "api",
+      "userknownip"
+    ],
+    "codename": "delete_userknownip"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view user known ip",
+    "content_type": [
+      "api",
+      "userknownip"
+    ],
+    "codename": "view_userknownip"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can add Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "add_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can change Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "change_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can delete Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "delete_contactmessage"
+  }
+},
+{
+  "model": "auth.permission",
+  "fields": {
+    "name": "Can view Message de contact",
+    "content_type": [
+      "api",
+      "contactmessage"
+    ],
+    "codename": "view_contactmessage"
+  }
+}
+]
