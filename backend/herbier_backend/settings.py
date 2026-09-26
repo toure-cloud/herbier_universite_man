@@ -190,16 +190,7 @@ if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Configuration CORS pour l'admin-backend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:8000",
-    "http://localhost:8001",
-    "https://herbier-frontend.onrender.com",
-    "https://herbier-admin-frontend.onrender.com",
-    "https://herbier-backend.onrender.com",
-    "https://herbier-admin-backend.onrender.com",
-]
+
 
 # Permettre les requêtes cross-origin avec credentials
 CORS_ALLOW_CREDENTIALS = True

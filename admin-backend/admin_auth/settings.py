@@ -144,9 +144,20 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOWED_ORIGINS = [
-        'https://herbier-admin-frontend.onrender.com',
-        'https://herbier-frontend.onrender.com',
-        'https://herbier-admin-backend.onrender.com',
+        # Dev local
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        # Production Render
+        "https://herbier-admin-frontend.onrender.com",
+        "https://herbier-frontend.onrender.com",
+        "https://herbier_universite_man_frontend.onrender.com",
+        "https://herbier-admin-backend.onrender.com",
+        "https://herbier-backend.onrender.com",
+        # Dev Tunnels
+        "https://7z6hftkf-5173.uks1.devtunnels.ms",
+        "https://7z6hftkf-5174.uks1.devtunnels.ms",
     ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -180,17 +191,17 @@ ALLOWED_HOSTS = [
     # ... tes domaines de production
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://localhost:5173",
-    "https://localhost:5174",
-    "https://localhost:8000",
-    "https://localhost:8001",
-    # ... tes domaines de production
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://herbier-admin-backend.onrender.com",
+    "https://herbier-backend.onrender.com",
+    "https://herbier-admin-frontend.onrender.com",
+    "https://herbier-frontend.onrender.com",
+    "https://herbier_universite_man_frontend.onrender.com",
+    "https://7z6hftkf-5173.uks1.devtunnels.ms",
+    "https://7z6hftkf-5174.uks1.devtunnels.ms",
 ]
 # ============================================
 # EMAIL - POUR LA 2FA
