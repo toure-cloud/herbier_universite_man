@@ -97,7 +97,7 @@ WSGI_APPLICATION = 'herbier_backend.wsgi.application'
 # Database
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://herbier_public:herbierUman@2026localhost:5432/herbier_public_db',
+        default='postgres://herbier_public:public_pass_2026@localhost:5432/herbier_public_db',
         conn_max_age=600,
         conn_health_checks=True,
     )

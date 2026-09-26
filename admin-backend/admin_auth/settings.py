@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'admin_auth.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://herbier_admin:adminHerbieruMan@2026@localhost:5432/herbier_admin_db',
+        default='postgres://herbier_admin:admin_pass_2026@localhost:5432/herbier_admin_db',
         conn_max_age=600,
         conn_health_checks=True,
     )
