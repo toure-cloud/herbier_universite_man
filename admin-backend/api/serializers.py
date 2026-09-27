@@ -176,7 +176,7 @@ class ProjetSerializer(FileUploadMixin, serializers.ModelSerializer):
             'id', 'titre', 'categorie', 'statut',
             'annee', 'lieu', 'description', 'description_longue',
             'progression', 'partenaires_count', 'budget',
-            'image', 'images_galerie',
+            'image', 'images_galerie','featured',
         ]
         read_only_fields = ['id']
 
