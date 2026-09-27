@@ -17,65 +17,27 @@ from .models import (
 class FileUploadMixin:
     image_fields = ('image', 'photo', 'logo')
 
-    def _normalize_media_url(self, value):
-        """Normalise l'URL du média"""
-        if not value:
-            return ''
-        
-        if isinstance(value, str) and value.startswith(('http://', 'https://', 'data:')):
-            return value
-        
-        if isinstance(value, str) and value.startswith(('media/', '/media/')):
-            if self.context.get('request'):
-                return self.context['request'].build_absolute_uri('/' + value.lstrip('/'))
-            base_url = getattr(settings, 'MEDIA_BASE_URL', None) or getattr(settings, 'BASE_URL', None) or 'http://localhost:8001'
-            return f"{base_url.rstrip('/')}/{value.lstrip('/')}"
-        
-        return value
-
-    def to_internal_value(self, data):
-        """Convertit les données entrantes en données internes"""
-        if not data:
-            return {}
-        
-        # Gérer QueryDict (multipart/form-data)
-        if hasattr(data, 'dict'):
-            payload = data.dict()
-        elif hasattr(data, 'copy'):
-            payload = data.copy()
-        elif isinstance(data, dict):
-            payload = data.copy()
-        else:
-            return super().to_internal_value(data)
-
-        processed_data = {}
-        
-        for key, value in payload.items():
-            # ✅ Passer les fichiers tels quels - DRF utilisera upload_to du modèle
-            if key in self.image_fields and hasattr(value, 'read') and hasattr(value, 'size'):
-                if getattr(value, 'size', 0) > 0:
-                    processed_data[key] = value
-                else:
-                    continue
-            else:
-                processed_data[key] = value
-
-        return super().to_internal_value(processed_data)
-
     def to_representation(self, instance):
-        """Convertit les URLs des images en URLs absolues"""
+        """Convertit les URLs des images en URLs absolues."""
         data = super().to_representation(instance)
         request = self.context.get('request')
-        
+
         for field in self.image_fields:
             if field in data and data[field]:
-                if isinstance(data[field], str) and not data[field].startswith(('http://', 'https://', 'data:')):
+                value = data[field]
+                if isinstance(value, str) and not value.startswith(('http://', 'https://', 'data:')):
+                    # Chemin relatif type "plantes/xxx.jpeg"
+                    path = value.lstrip('/')
+                    if not path.startswith('media/'):
+                        path = f"media/{path}"
+                    path = f"/{path}"
+
                     if request:
-                        data[field] = request.build_absolute_uri(data[field])
+                        data[field] = request.build_absolute_uri(path)
                     else:
                         base_url = getattr(settings, 'BASE_URL', 'http://localhost:8001')
-                        data[field] = f"{base_url.rstrip('/')}{data[field]}"
-        
+                        data[field] = f"{base_url.rstrip('/')}{path}"
+
         return data
 
 
@@ -207,6 +169,7 @@ class SlideSerializer(FileUploadMixin, serializers.ModelSerializer):
 
 
 class ProjetSerializer(FileUploadMixin, serializers.ModelSerializer):
+    featured = serializers.BooleanField(required=False, default=False) 
     class Meta:
         model = Projet
         fields = [
