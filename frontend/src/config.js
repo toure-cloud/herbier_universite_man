@@ -12,9 +12,9 @@ export default {
     projets: `${API_URL}/projets/`,
     temoignages: `${API_URL}/temoignages/`,
     publications: `${API_URL}/publications/`,
-    partenaires: `${API_URL}/partenaires/`,   // ✅ ajouté
+    partenaires: `${API_URL}/partenaires/`,
     faqs: `${API_URL}/faqs/`,
-    contact: `${API_URL}/submit-contact/`,
+    contact: `${API_URL}/contact-messages/`,        // ✅ CORRIGÉ
     dashboard: `${API_URL}/dashboard/`,
     activitesData: `${API_URL}/activites-data/`,
     projetsData: `${API_URL}/projets-data/`,
