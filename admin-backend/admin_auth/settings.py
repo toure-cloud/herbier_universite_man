@@ -183,6 +183,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-sync-secret',       
 ]
 ALLOWED_HOSTS = [
     'localhost',

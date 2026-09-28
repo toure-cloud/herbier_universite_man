@@ -182,6 +182,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-sync-secret',        # ✅ AJOUTER
 ]
 
 # REST Framework settings
