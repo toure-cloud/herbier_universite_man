@@ -135,7 +135,6 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # ============================================
 # CORS - CORRIGÉ POUR LA PRODUCTION
 # ============================================
@@ -144,23 +143,23 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOWED_ORIGINS = [
-    # Dev local
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+        # Dev local
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
 
-    # Frontends en production
-    "https://herbier-admin-frontend.onrender.com",
-    "https://herbier-universite-man-frontend.onrender.com",
+        # Frontends en production
+        "https://herbier-admin-frontend.onrender.com",
+        "https://herbier-universite-man-frontend.onrender.com",
 
-    # Backends (utile pour le proxy)
-    "https://herbier-admin-backend.onrender.com",
-    "https://herbier-backend.onrender.com",
-    "https://herbier-universite-man.onrender.com",
-]
+        # Backends (utile pour le proxy)
+        "https://herbier-admin-backend.onrender.com",
+        "https://herbier-backend.onrender.com",
+        "https://herbier-universite-man.onrender.com",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -183,19 +182,20 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
-    'x-sync-secret',       
+    'x-sync-secret',       # ← important pour le formulaire de contact
 ]
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.devtunnels.ms',                     # ✅ Dev Tunnels VS Code
-    '.onrender.com',
-    'herbier-admin-backend.onrender.com',
-    # ... tes domaines de production
-]
+
 CORS_EXPOSE_HEADERS = [
     'content-type',
     'content-length',
+]
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.devtunnels.ms',
+    '.onrender.com',
+    'herbier-admin-backend.onrender.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -207,20 +207,20 @@ CSRF_TRUSTED_ORIGINS = [
     "https://herbier-admin-frontend.onrender.com",
     "https://herbier-universite-man-frontend.onrender.com",
 ]
-# ============================================
-# EMAIL - POUR LA 2FA
-# ============================================
-# settings.py
 
-import os
+
+# ============================================
+# EMAIL - POUR LA 2FA (Brevo)
+# ============================================
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')          # bb0128001@smtp-brevo.com
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # votre mot de passe SMTP Brevo
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')    # l'email que vous voulez afficher comme expéditeur
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # mot de passe SMTP Brevo
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')    # email expéditeur
+
 
 # ============================================
 # SÉCURITÉ - POUR LA PRODUCTION
@@ -233,24 +233,3 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# ============================================
-# AUTRES
-# ============================================
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ✅ Créer les dossiers nécessaires
-os.makedirs(os.path.join(BASE_DIR, 'static'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'staticfiles'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/plantes'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/equipe'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/partenaires'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/slides'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/projets'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/activites'), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, 'media/temoignages'), exist_ok=True)
-
-# ✅ WhiteNoise pour les fichiers statiques
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
