@@ -144,21 +144,23 @@ if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOWED_ORIGINS = [
-        # Dev local
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        # Production Render
-        "https://herbier-admin-frontend.onrender.com",
-        "https://herbier-frontend.onrender.com",
-        "https://herbier_universite_man_frontend.onrender.com",
-        "https://herbier-admin-backend.onrender.com",
-        "https://herbier-backend.onrender.com",
-        # Dev Tunnels
-        "https://7z6hftkf-5173.uks1.devtunnels.ms",
-        "https://7z6hftkf-5174.uks1.devtunnels.ms",
-    ]
+    # Dev local
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+
+    # Frontends en production
+    "https://herbier-admin-frontend.onrender.com",
+    "https://herbier-universite-man-frontend.onrender.com",
+
+    # Backends (utile pour le proxy)
+    "https://herbier-admin-backend.onrender.com",
+    "https://herbier-backend.onrender.com",
+    "https://herbier-universite-man.onrender.com",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -190,18 +192,19 @@ ALLOWED_HOSTS = [
     'herbier-admin-backend.onrender.com',
     # ... tes domaines de production
 ]
-
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'content-length',
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
     "https://herbier-admin-backend.onrender.com",
     "https://herbier-backend.onrender.com",
+    "https://herbier-universite-man.onrender.com",
     "https://herbier-admin-frontend.onrender.com",
-    "https://herbier-frontend.onrender.com",
-    "https://herbier_universite_man_frontend.onrender.com",
-    "https://7z6hftkf-5173.uks1.devtunnels.ms",
-    "https://7z6hftkf-5174.uks1.devtunnels.ms",
+    "https://herbier-universite-man-frontend.onrender.com",
 ]
 # ============================================
 # EMAIL - POUR LA 2FA
