@@ -210,14 +210,17 @@ CSRF_TRUSTED_ORIGINS = [
 # ============================================
 # EMAIL - POUR LA 2FA
 # ============================================
+# settings.py
 
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@herbier-man.ci')
+import os
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')          # bb0128001@smtp-brevo.com
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # votre mot de passe SMTP Brevo
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')    # l'email que vous voulez afficher comme expéditeur
 
 # ============================================
 # SÉCURITÉ - POUR LA PRODUCTION
