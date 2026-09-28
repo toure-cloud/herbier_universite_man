@@ -134,8 +134,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://7z6hftkf-5173.uks1.devtunnels.ms",   # ✅ frontend public
-    "https://7z6hftkf-5174.uks1.devtunnels.ms",
     "https://herbier-universite-man.onrender.com",
     "https://herbier-universite-man.onrender.com",
     "https://herbier-frontend-public.onrender.com",
@@ -160,6 +158,15 @@ CSRF_TRUSTED_ORIGINS = [
     "https://localhost:5174",
     "https://localhost:8000",
     "https://localhost:8001",
+        # Frontend public (site vitrine)
+    "https://herbier-universite-man-frontend.onrender.com",
+
+    # Admin frontend
+    "https://herbier-admin-frontend.onrender.com",
+
+    # Le backend lui-même (utile si appels internes)
+    "https://herbier-universite-man.onrender.com",
+    "https://herbier-backend.onrender.com",
     # ... tes domaines de production
 ]
 
