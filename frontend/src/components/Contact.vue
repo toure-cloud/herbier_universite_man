@@ -417,55 +417,61 @@ export default {
         },
 
         async submitForm() {
-            if (!this.validateForm()) {
-                this.showNotification('Veuillez corriger les erreurs dans le formulaire', 'error')
-                return
-            }
-            
-            this.isSubmitting = true
-            
-            try {
-                // ✅ Appel API réel
-                const response = await axios.post(
-                    config.API_ENDPOINTS.contact,
-                    {
-                        nom: this.form.nom,
-                        email: this.form.email,
-                        telephone: this.form.telephone || '',
-                        sujet: this.form.sujet || 'information',
-                        message: this.form.message
-                    }
-                )
+    if (!this.validateForm()) {
+        this.showNotification('Veuillez corriger les erreurs dans le formulaire', 'error')
+        return
+    }
 
-                // Mémoriser les infos pour la modale
-                this.lastSentName = this.form.nom
-                this.lastSentEmail = this.form.email
-                this.lastSentSubject = this.getSubjectLabel(this.form.sujet)
+    this.isSubmitting = true
 
-                // Réinitialiser le formulaire
-                this.form = {
-                    nom: '',
-                    email: '',
-                    telephone: '',
-                    sujet: '',
-                    message: '',
-                    consentement: false
+    try {
+        // ✅ Appel API réel
+        const response = await axios.post(
+            config.API_ENDPOINTS.contact,
+            {
+                nom: this.form.nom,
+                email: this.form.email,
+                telephone: this.form.telephone || '',
+                sujet: this.form.sujet || 'information',
+                message: this.form.message
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Sync-Secret': import.meta.env.VITE_SYNC_SECRET || ''
                 }
-
-                // ✅ Afficher la modale de confirmation
-                this.showSuccessModal = true
-                document.body.style.overflow = 'hidden'
-
-            } catch (error) {
-                console.error('Erreur envoi contact:', error)
-                this.showNotification(
-                    error.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer plus tard.',
-                    'error'
-                )
-            } finally {
-                this.isSubmitting = false
             }
-        },
+        )
+
+        // Mémoriser les infos pour la modale
+        this.lastSentName = this.form.nom
+        this.lastSentEmail = this.form.email
+        this.lastSentSubject = this.getSubjectLabel(this.form.sujet)
+
+        // Réinitialiser le formulaire
+        this.form = {
+            nom: '',
+            email: '',
+            telephone: '',
+            sujet: '',
+            message: '',
+            consentement: false
+        }
+
+        // ✅ Afficher la modale de confirmation
+        this.showSuccessModal = true
+        document.body.style.overflow = 'hidden'
+
+    } catch (error) {
+        console.error('Erreur envoi contact:', error)
+        this.showNotification(
+            error.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer plus tard.',
+            'error'
+        )
+    } finally {
+        this.isSubmitting = false
+    }
+},
 
         closeSuccessModal() {
             this.showSuccessModal = false
