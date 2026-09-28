@@ -13,13 +13,13 @@ from io import BytesIO
 from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+import logging
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-
-
 
 from .authentication import BearerTokenAuthentication, verify_token
 from .audit import log_action, record_login_attempt, check_login_rate_limit
@@ -46,10 +46,54 @@ from .audit import (
     detect_login_anomalies,
 )
 
+logger = logging.getLogger(__name__)
+
 
 # ============================================================
 # HELPERS
 # ============================================================
+
+def send_otp_email(email, code, context="connexion"):
+    """
+    Envoie le code OTP par email.
+    context = "connexion" | "resend" | "reset" | "nouveau_compte"
+    """
+    subjects = {
+        "connexion": "Votre code de vérification - Herbier Admin",
+        "resend": "Nouveau code de vérification - Herbier Admin",
+        "reset": "Réinitialisation de mot de passe - Herbier Admin",
+        "nouveau_compte": "Bienvenue - Votre code de vérification",
+    }
+
+    subject = subjects.get(context, "Votre code OTP - Herbier Admin")
+
+    message = f"""Bonjour,
+
+Votre code de vérification est : {code}
+
+Ce code est valable pendant 10 minutes.
+Ne le partagez avec personne.
+
+Cordialement,
+L'équipe Herbier Université de Man
+"""
+
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        logger.info(f"OTP envoyé par email à {email} ({context})")
+        return True
+    except Exception as e:
+        logger.error(f"Erreur envoi OTP à {email}: {str(e)}")
+        # Fallback : affiche dans les logs si l'email échoue
+        print(f"\n⚠️ ÉCHEC EMAIL - CODE OTP pour {email} : {code}\n")
+        return False
+
 
 def generate_token(user):
     UserToken.objects.filter(user=user, is_active=True).update(is_active=False)
@@ -200,7 +244,8 @@ def _do_login(request, expected_role, endpoint_label):
         expires_at=timezone.now() + timedelta(minutes=10),
     )
 
-    print(f"\n🔐 CODE OTP [{endpoint_label}] pour {email} : {code}\n")
+    # Envoi réel par email
+    send_otp_email(email, code, context="connexion")
 
     return Response({
         'success': True,
@@ -341,7 +386,8 @@ def resend_code(request):
         user=user, code=code, type='email',
         expires_at=timezone.now() + timedelta(minutes=10),
     )
-    print(f"\n🔄 NOUVEAU CODE pour {email} : {code}\n")
+
+    send_otp_email(email, code, context="resend")
 
     return Response({
         'success': True,
@@ -399,7 +445,9 @@ def forgot_password(request):
             user=user, code=code, type='email',
             expires_at=timezone.now() + timedelta(minutes=15),
         )
-        print(f"\n🔑 RÉINITIALISATION MOT DE PASSE - Code: {code}\n")
+
+        send_otp_email(email, code, context="reset")
+
         return Response({
             'success': True,
             'message': 'Code envoyé',
@@ -793,7 +841,9 @@ def create_superadmin(request):
                 user=user, code=code, type='email',
                 expires_at=timezone.now() + timedelta(minutes=10),
             )
-            print(f"\n🔐 NOUVEAU COMPTE - Code OTP: {code}\n")
+
+            send_otp_email(user.email, code, context="nouveau_compte")
+
             return Response({
                 'success': True,
                 'message': 'Compte créé',
@@ -950,8 +1000,6 @@ def totp_disable(request):
     return Response({'success': True, 'message': '2FA TOTP désactivée'})
 
 
-
-
 # ============================================================
 # AGRÉGATION — Données groupées pour le site public
 # ============================================================
@@ -996,62 +1044,12 @@ def get_activites_data(request):
             many=True
         ).data,
     })
-    
-    
-    # ============================================================
-# MESSAGES DE CONTACT (SuperIT uniquement)
-# ============================================================
-
-@api_view(['GET', 'POST'])
-@authentication_classes([BearerTokenAuthentication])
-@permission_classes([IsAuthenticated])
-def contact_messages(request):
-    """
-    GET  : liste tous les messages (SuperIT uniquement)
-    POST : reçoit un message depuis le backend public (proxy)
-    """
-    # ---------- POST (proxy depuis le public) ----------
-    if request.method == 'POST':
-        serializer = ContactMessageSerializer(data=request.data)
-        if serializer.is_valid():
-            msg = serializer.save()
-            return Response({
-                'success': True,
-                'id': msg.id,
-                'message': 'Message enregistré.'
-            }, status=status.HTTP_201_CREATED)
-        return Response(
-            {'success': False, 'errors': serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    # ---------- GET (liste pour l'admin) ----------
-    if request.user.role != 'it_admin':
-        return Response(
-            {'detail': "Accès réservé au SuperIT."},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
-    qs = ContactMessage.objects.all()
-
-    lu = request.query_params.get('lu')
-    if lu is not None:
-        qs = qs.filter(lu=(lu.lower() == 'true'))
-
-    search = request.query_params.get('search')
-    if search:
-        qs = qs.filter(
-            Q(nom__icontains=search) |
-            Q(email__icontains=search) |
-            Q(message__icontains=search)
-        )
-
-    return Response(ContactMessageSerializer(qs, many=True).data)
 
 
 # ============================================================
 # MESSAGES DE CONTACT (SuperIT uniquement)
 # ============================================================
+
 @api_view(['GET', 'POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -1064,7 +1062,6 @@ def contact_messages(request):
     # ---------- POST (proxy depuis le public) ----------
     if request.method == 'POST':
         # ✅ Vérification du secret partagé (empêche les abus)
-        from django.conf import settings
         expected_secret = getattr(settings, 'SYNC_SECRET', 'dev-secret')
         provided_secret = request.headers.get('X-Sync-Secret', '')
         if provided_secret != expected_secret:
@@ -1095,7 +1092,6 @@ def contact_messages(request):
             status=status.HTTP_401_UNAUTHORIZED
         )
 
-    from .authentication import verify_token
     token = auth_header.split(' ', 1)[1]
     user = verify_token(token)
 
@@ -1113,7 +1109,6 @@ def contact_messages(request):
 
     search = request.query_params.get('search')
     if search:
-        from django.db.models import Q
         qs = qs.filter(
             Q(nom__icontains=search) |
             Q(email__icontains=search) |
@@ -1121,7 +1116,6 @@ def contact_messages(request):
         )
 
     return Response(ContactMessageSerializer(qs, many=True).data)
-
 
 
 @api_view(['GET', 'PATCH', 'DELETE'])
