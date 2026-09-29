@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'api','anymail',s
+    'api',
+    'anymail',
 ]
 # Secret partagé avec l'admin-backend (pour le proxy contact)
 SYNC_SECRET = os.environ.get('SYNC_SECRET', 'dev-secret-change-me')
