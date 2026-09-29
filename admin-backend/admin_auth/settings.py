@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'api',
+    'api','anymail',s
 ]
 # Secret partagé avec l'admin-backend (pour le proxy contact)
 SYNC_SECRET = os.environ.get('SYNC_SECRET', 'dev-secret-change-me')
@@ -210,17 +210,14 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 # ============================================
-# EMAIL - POUR LA 2FA (Brevo)
+# EMAIL - POUR LA 2FA (Resend)
 # ============================================
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')          # bb0128001@smtp-brevo.com
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # mot de passe SMTP Brevo
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')    # email expéditeur
-
+EMAIL_BACKEND = 'anymail.backends.resend.EmailBackend'
+ANYMAIL = {
+    'RESEND_API_KEY': os.environ.get('RESEND_API_KEY', ''),
+}
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
 
 # ============================================
 # SÉCURITÉ - POUR LA PRODUCTION
