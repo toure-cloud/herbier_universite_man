@@ -13,7 +13,7 @@ services:
     name: herbier-admin-backend
     runtime: python
     plan: free
-    region: frankfurt   # ou oregon, à adapter selon ta localisation
+    region: frankfurt
     rootDir: admin-backend
     buildCommand: "./build.sh"
     startCommand: "gunicorn admin_auth.wsgi:application"
@@ -30,11 +30,13 @@ services:
         value: "3.11.9"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
+      - key: SYNC_SECRET
+        sync: false
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://herbier-admin-frontend.onrender.com,https://herbier-frontend.onrender.com"
+        value: "https://herbier-admin-frontend.onrender.com,https://herbier-universite-man-frontend.onrender.com,https://herbier-backend.onrender.com"
 
   # ============================================
-  # BACKEND PUBLIC (Django)
+  # BACKEND PUBLIC (Django - proxy)
   # ============================================
   - type: web
     name: herbier-backend
@@ -60,7 +62,7 @@ services:
       - key: ADMIN_API_URL
         value: "https://herbier-admin-backend.onrender.com/api"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://herbier-frontend.onrender.com,https://herbier-admin-frontend.onrender.com"
+        value: "https://herbier-universite-man-frontend.onrender.com,https://herbier-admin-frontend.onrender.com"
 
   # ============================================
   # FRONTEND ADMIN (Vue Static Site)
@@ -83,7 +85,7 @@ services:
   # FRONTEND PUBLIC (Vue Static Site)
   # ============================================
   - type: web
-    name: herbier-frontend
+    name: herbier-universite-man-frontend
     runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
@@ -94,6 +96,8 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: "https://herbier-backend.onrender.com/api"
+        value: "https://herbier-admin-backend.onrender.com/api"
       - key: VITE_ADMIN_MEDIA_URL
         value: "https://herbier-admin-backend.onrender.com"
+      - key: VITE_SYNC_SECRET
+        sync: false
